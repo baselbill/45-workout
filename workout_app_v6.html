@@ -797,6 +797,14 @@ function getPR(exName){
   return hist.reduce((best,e)=>e.bestWeight>best.bestWeight?e:best, hist[0]);
 }
 
+// Epley formula: 1RM = weight × (1 + reps/30)
+function calcEpley(weight, reps){
+  const w=parseFloat(weight)||0, r=parseInt(reps)||0;
+  if(w<=0||r<=0) return 0;
+  if(r===1) return Math.round(w);
+  return Math.round(w*(1+r/30));
+}
+
 // Auto-calculate 1RM from exercise history (best logged set per lift)
 function autoCalcRM(liftId){
   // Find all exercises that map to this liftId
