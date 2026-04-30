@@ -912,25 +912,49 @@ function renderStickyTimer(){
   </div>`;
 }
 
+// ─── SCREEN WAKE LOCK ──────────────────────────────────────────────────────────
+// Keeps screen on during active session. Released when session ends or
+// browser auto-releases on tab hide; re-acquired on visibilitychange.
+let _wakeLock=null;
+async function acquireWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try{
+    _wakeLock=await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release',()=>{_wakeLock=null;});
+  }catch(e){}
+}
+function releaseWakeLock(){
+  if(_wakeLock){try{_wakeLock.release();}catch(e){}_wakeLock=null;}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'&&sessionStartTime&&!_wakeLock) acquireWakeLock();
+});
+
 // ─── SESSION CLOCK ─────────────────────────────────────────────────────────────
 function startSessionClock(){
   if(!sessionStartTime) sessionStartTime=Date.now();
   if(window._sessionClockIv) clearInterval(window._sessionClockIv);
   window._sessionClockIv=setInterval(renderSessionClock,5000);
+  acquireWakeLock();
   renderSessionClock();
 }
 function renderSessionClock(){
   const el=document.getElementById('session-clock');
-  if(!el||!sessionStartTime) return;
+  if(!el) return;
+  if(!sessionStartTime){
+    el.innerHTML=`<button class="btn btn-sm" onclick="startSessionClock()" style="font-size:11px;padding:4px 10px">▶ Start session timer</button>`;
+    return;
+  }
   const elapsed=Math.floor((Date.now()-sessionStartTime)/1000);
   const m=Math.floor(elapsed/60),s=elapsed%60;
   const over45=elapsed>2700,near45=elapsed>2400;
   const col=over45?'var(--red)':near45?'var(--amber)':'var(--muted)';
-  el.innerHTML=`<span style="font-family:var(--mono);font-size:12px;color:${col}">⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} / 45:00</span>`;
+  el.innerHTML=`<span style="font-family:var(--mono);font-size:12px;color:${col}">⏱ ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} / 45:00</span> <button onclick="resetSessionClock();renderSessionClock()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0 4px">reset</button>`;
 }
 function resetSessionClock(){
   sessionStartTime=null;
   if(window._sessionClockIv) clearInterval(window._sessionClockIv);
+  releaseWakeLock();
 }
 
 // ─── SETUP ────────────────────────────────────────────────────────────────────
@@ -967,12 +991,128 @@ function toggleAwayMode(){
 
 // ─── TODAY ────────────────────────────────────────────────────────────────────
 let viewingSession=null;
+let _missedBannerDismissedCount=-1; // count at time of dismiss; -1 means not dismissed
+function dismissMissedBanner(){_missedBannerDismissedCount=getMissedSessions().length;renderToday();}
+
+// ─── REST DAY MOBILITY ────────────────────────────────────────────────────────
+// On rest days the Today tab shows a mobility routine aligned to the user's
+// last completed workout, instead of teasing the next workout's exercises.
+let restMobPhase=-1, restMobRoutine=-1;
+function getLastCompletedSession(){
+  const t=todayStr();
+  return getSchedule()
+    .filter(s=>s.date<t&&isSessionDone(s.week,s.dayIdx))
+    .sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
+}
+function routineForDayIdx(di){
+  // Day 1 (idx 0) horizontal push/pull → upper (B). Day 2 (idx 1) lower → A. Day 3 (idx 2) vertical push/pull → upper (B).
+  return di===1?0:1;
+}
+function switchRestMobRoutine(i){restMobRoutine=i;expandedMob=-1;renderToday();}
+function toggleRestMobCheck(i){setMobCheck(i,!getMobChecks(restMobPhase,restMobRoutine)[i],restMobPhase,restMobRoutine);renderToday();}
+function toggleRestMobExpand(i){expandedMob=expandedMob===i?-1:i;renderToday();}
+function clearRestMobChecks(){
+  S.mobChecks[getMobCheckKey(restMobPhase,restMobRoutine)]={};
+  if(S.mobHistory) S.mobHistory=S.mobHistory.filter(e=>!(e.date===todayStr()&&e.phase===restMobPhase&&e.routine===restMobRoutine));
+  saveState();renderToday();
+}
+
+function renderRestDayToday(missed){
+  const lastSess=getLastCompletedSession();
+  const next=getNextPendingSession();
+  const phaseRefSess=lastSess||next;
+  const phaseIdx=phaseRefSess?phaseFor(phaseRefSess.week):0;
+
+  // Initialize / re-sync rest-day routine selection
+  if(restMobRoutine===-1||restMobPhase!==phaseIdx){
+    restMobRoutine=lastSess?routineForDayIdx(lastSess.dayIdx):2;
+    restMobPhase=phaseIdx;
+  }
+
+  const phaseData=MOB_DATA[restMobPhase];
+  const routine=phaseData.routines[restMobRoutine];
+  const checks=getMobChecks(restMobPhase,restMobRoutine);
+  const totalItems=routine.items.length;
+  const checkedCount=Object.values(checks).filter(Boolean).length;
+  const pct=Math.round(checkedCount/totalItems*100);
+  const today=todayStr();
+
+  let html='';
+
+  // Missed banner (mirrors workout-day rendering)
+  if(missed.length>0&&missed.length!==_missedBannerDismissedCount&&!viewingSession)
+    html+=`<div class="missed-banner"><div class="row" style="margin-bottom:6px;align-items:center"><span style="font-size:13px;font-weight:500;color:var(--red);flex:1">⚠ ${missed.length} missed session${missed.length>1?'s':''}</span><button class="btn btn-sm" onclick="openMissedModal()" style="border-color:var(--red);color:var(--red)">Review</button><button onclick="dismissMissedBanner()" aria-label="Dismiss" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;opacity:.7">×</button></div><div style="font-size:12px;color:var(--red);opacity:.8">Tap Review to slide your program forward</div></div>`;
+
+  // Header
+  const lastInfo=lastSess
+    ? `After ${P.phases[phaseFor(lastSess.week)].days[lastSess.dayIdx].name}`
+    : 'No completed sessions yet';
+  html+=`<div class="page-header"><div class="row"><div><div class="page-title">Rest day · Mobility</div><div class="page-sub">${formatDateDisplay(today)} · ${lastInfo}</div></div><div style="display:flex;gap:6px;align-items:center"><span class="badge badge-blue">Rest</span><button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px">Jump</button></div></div></div>`;
+
+  // Next workout preview
+  if(next) html+=`<div class="alert alert-blue" style="margin-bottom:10px;font-size:12px">Next workout: ${formatDateDisplay(next.date)} · Wk ${next.week} Day ${next.dayIdx+1}</div>`;
+
+  html+=`<div class="alert alert-amber" style="margin-bottom:12px">Rest day mobility — non-negotiable for 45+. The suggested routine complements your last workout. Switch routines if you'd rather focus elsewhere.</div>`;
+
+  // Routine tabs
+  const suggestedRoutine=lastSess?routineForDayIdx(lastSess.dayIdx):2;
+  html+=`<div class="section-label">Routine</div><div style="display:flex;gap:8px;margin-bottom:14px">`;
+  phaseData.routineLabel.forEach((label,ri)=>{
+    const isSuggested=ri===suggestedRoutine, isActive=ri===restMobRoutine;
+    html+=`<button style="flex:1;padding:10px 6px;border-radius:var(--r-sm);border:1px solid ${isActive?'var(--accent)':isSuggested?'var(--amber)':'var(--border)'};background:${isActive?'var(--accent-dim)':isSuggested?'var(--amber-dim)':'transparent'};color:${isActive?'var(--accent)':isSuggested?'var(--amber)':'var(--muted)'};cursor:pointer;font-size:12px;font-weight:500;font-family:var(--sans);line-height:1.4;text-align:center" onclick="switchRestMobRoutine(${ri})">
+      <strong>${['A','B','C'][ri]}</strong><br><span style="font-size:10px">${['Lower','Upper+T-spine','Full Flow'][ri]}</span>${isSuggested&&!isActive?'<br><span style="font-size:9px;opacity:.7">suggested</span>':''}
+    </button>`;
+  });
+  html+=`</div>`;
+
+  // Routine info + progress ring
+  const r2=22,circ=2*Math.PI*r2,dash=circ*(pct/100),gap=circ-dash;
+  html+=`<div class="card" style="margin-bottom:14px"><div class="row" style="margin-bottom:6px"><div><div style="font-size:14px;font-weight:500;color:var(--text)">${phaseData.routineLabel[restMobRoutine]}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${routine.focus}</div><div style="font-size:11px;font-family:var(--mono);color:var(--accent);margin-top:3px">${routine.dur} · ${phaseData.routineSuggest[restMobRoutine]}</div></div>
+  <svg class="mob-ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r2}" fill="none" stroke="var(--surf2)" stroke-width="5"/><circle cx="28" cy="28" r="${r2}" fill="none" stroke="var(--accent)" stroke-width="5" stroke-dasharray="${dash.toFixed(1)} ${gap.toFixed(1)}" stroke-dashoffset="${(circ/4).toFixed(1)}" stroke-linecap="round"/><text x="28" y="33" text-anchor="middle" font-size="12" font-weight="600" font-family="monospace" fill="var(--text)">${pct}%</text></svg></div>
+  <div style="font-size:11px;color:var(--muted)">${checkedCount} of ${totalItems} done today</div>
+  ${pct===100?`<div class="alert alert-green" style="margin-top:10px;margin-bottom:0">✓ Routine complete — logged!</div>`:''}</div>`;
+
+  // Exercise checklist
+  routine.items.forEach((item,i)=>{
+    const checked=!!checks[i],expanded=expandedMob===i,ref=EXREF[item.n];
+    html+=`<div class="mob-check-card${checked?' checked':''}${expanded?' expanded':''}">
+      <div class="mob-check-row" onclick="toggleRestMobCheck(${i})">
+        <div class="mob-checkbox">${checked?'✓':''}</div>
+        <div style="flex:1"><div class="mob-check-name">${item.n}${item.isNew?` <span class="badge badge-amber" style="font-size:10px;padding:1px 5px">new</span>`:''}</div><div class="mob-check-meta">${item.sets}×${item.hold}</div></div>
+        <button class="help-btn" style="margin-left:0" onclick="event.stopPropagation();toggleRestMobExpand(${i})">${expanded?'▲':'▼'}</button>
+      </div>`;
+    if(item.note) html+=`<div style="font-size:12px;color:var(--muted);margin:8px 0 0;padding-top:8px;border-top:1px solid var(--border)">${item.note}</div>`;
+    if(expanded&&ref){
+      html+=`<div class="mob-detail">`;
+      if(ref.steps){html+=`<ol class="mob-steps">`;ref.steps.forEach(s=>html+=`<li><span>${s}</span></li>`);html+=`</ol>`;}
+      if(ref.cue) html+=`<div style="font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:8px;margin-top:8px">💡 ${ref.cue}</div>`;
+      if(ref.mistake) html+=`<div style="font-size:12px;color:var(--red);background:var(--red-dim);border-radius:6px;padding:8px;margin-top:6px">⚠ ${ref.mistake}</div>`;
+      if(ref.search){const q=encodeURIComponent(ref.search+' how to');html+=`<a href="https://www.youtube.com/results?search_query=${q}" class="ref-link" style="margin-top:8px" target="_blank">▶ Watch on YouTube</a>`;}
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+
+  if(checkedCount<totalItems) html+=`<button class="btn btn-ghost" onclick="clearRestMobChecks()">Reset today's checklist</button>`;
+  html+=`<div style="height:8px"></div>`;
+
+  document.getElementById('screen-today').innerHTML=html;
+  resetSessionClock(); // no session timer on rest days
+  renderStickyTimer();
+}
 
 function renderToday(){
   if(!S.startDate){initSetup();return;}
   const missed=getMissedSessions();
   const todaySess=getTodaySession();
   const next=getNextPendingSession();
+
+  // Rest day: no scheduled session today and not viewing a specific session.
+  // Show mobility routine aligned to last completed workout.
+  if(!todaySess&&!viewingSession){
+    return renderRestDayToday(missed);
+  }
+
   let sess=viewingSession;
   if(!sess){if(todaySess&&!isSessionDone(todaySess.week,todaySess.dayIdx))sess={week:todaySess.week,dayIdx:todaySess.dayIdx};else if(next)sess={week:next.week,dayIdx:next.dayIdx};else sess={week:16,dayIdx:2};}
   const w=sess.week,di=sess.dayIdx,pi=phaseFor(w),phase=P.phases[pi],day=phase.days[di],log=getLog(w,di);
@@ -992,8 +1132,8 @@ function renderToday(){
 
   let html='';
 
-  // Missed banner
-  if(missed.length>0&&!viewingSession)html+=`<div class="missed-banner"><div class="row" style="margin-bottom:6px"><span style="font-size:13px;font-weight:500;color:var(--red)">⚠ ${missed.length} missed session${missed.length>1?'s':''}</span><button class="btn btn-sm" onclick="openMissedModal()" style="border-color:var(--red);color:var(--red)">Review</button></div><div style="font-size:12px;color:var(--red);opacity:.8">Tap Review to slide your program forward</div></div>`;
+  // Missed banner — dismissible (re-shows if missed count changes or page reloads)
+  if(missed.length>0&&missed.length!==_missedBannerDismissedCount&&!viewingSession)html+=`<div class="missed-banner"><div class="row" style="margin-bottom:6px;align-items:center"><span style="font-size:13px;font-weight:500;color:var(--red);flex:1">⚠ ${missed.length} missed session${missed.length>1?'s':''}</span><button class="btn btn-sm" onclick="openMissedModal()" style="border-color:var(--red);color:var(--red)">Review</button><button onclick="dismissMissedBanner()" aria-label="Dismiss" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;opacity:.7">×</button></div><div style="font-size:12px;color:var(--red);opacity:.8">Tap Review to slide your program forward</div></div>`;
 
   // 1RM retest nudge
   if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM for accurate targets. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
@@ -1140,8 +1280,8 @@ function renderToday(){
   if(alreadyCompleted)html+=`<button class="btn" onclick="uncompleteSession(${w},${di})" style="color:var(--muted)">Undo completion</button>`;
 
   document.getElementById('screen-today').innerHTML=html;
-  if(!alreadyCompleted) startSessionClock();
-  else resetSessionClock();
+  if(alreadyCompleted) resetSessionClock();
+  else renderSessionClock();
   renderStickyTimer();
 }
 
