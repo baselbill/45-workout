@@ -1004,6 +1004,22 @@ function getLastCompletedSession(){
     .filter(s=>s.date<t&&isSessionDone(s.week,s.dayIdx))
     .sort((a,b)=>b.date.localeCompare(a.date))[0]||null;
 }
+// Consecutive days (counting back from today) with either a completed workout
+// or a completed mobility routine. A blank "today" doesn't break the streak.
+function getTrainingStreak(){
+  const sessSet=new Set();
+  Object.values(S.logs||{}).forEach(log=>{if(log._completed&&log._completedDate)sessSet.add(log._completedDate);});
+  const mobSet=new Set((S.mobHistory||[]).map(e=>e.date));
+  const td=new Date(todayStr()+'T00:00:00');
+  let streak=0;
+  for(let i=0;i<60;i++){
+    const dd=new Date(td);dd.setDate(dd.getDate()-i);
+    const ds=dateStr(dd);
+    if(sessSet.has(ds)||mobSet.has(ds))streak++;
+    else if(i>0)break;
+  }
+  return streak;
+}
 function routineForDayIdx(di){
   // Day 1 (idx 0) horizontal push/pull → upper (B). Day 2 (idx 1) lower → A. Day 3 (idx 2) vertical push/pull → upper (B).
   return di===1?0:1;
@@ -1388,7 +1404,8 @@ function renderCalendar(){
   const{year,month}=calViewMonth,sched=getSchedule(),today=todayStr();
   const firstDay=new Date(year,month,1),lastDay=new Date(year,month+1,0),daysInMonth=lastDay.getDate(),startDow=firstDay.getDay();
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
-  let html=`<div class="page-header"><div class="page-title">Calendar</div><div class="page-sub">Your 16-week training schedule</div></div>`;
+  const streak=getTrainingStreak();
+  let html=`<div class="page-header"><div class="row"><div><div class="page-title">Calendar</div><div class="page-sub">Your 16-week training schedule</div></div>${streak>0?`<span class="badge badge-green">🔥 ${streak} day streak</span>`:''}</div></div>`;
   if(S.startDate)html+=`<div class="card" style="margin-bottom:14px"><div class="row"><div><div style="font-size:12px;color:var(--muted)">Program start</div><div style="font-size:14px;font-weight:500;margin-top:2px">${formatDateDisplay(S.startDate)}</div></div><button class="btn btn-sm" onclick="changeStartDate()">Change</button></div></div>`;
   html+=`<div class="row" style="margin-bottom:12px"><button class="btn btn-sm" onclick="calPrevMonth()">← Prev</button><span style="font-size:14px;font-weight:500">${monthName}</span><button class="btn btn-sm" onclick="calNextMonth()">Next →</button></div>`;
   // Build mobility completion date set for quick lookup
@@ -1406,7 +1423,9 @@ function renderCalendar(){
       const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
       const done=!!doneLog._completed,wasAway=!!doneLog._awayMode;
       cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
-      label=`D${entry.dayIdx+1}${wasAway&&done?' ✈':''}`;
+      // Day 1/3 (idx 0/2) = upper-body push/pull. Day 2 (idx 1) = lower body.
+      const bp=entry.dayIdx===1?'L':'U';
+      label=`${bp}${entry.dayIdx+1}${wasAway&&done?' ✈':''}`;
     }else if(isToday){
       cls='today-rest';
       label=hasMobDone?'mob ✓':'rest';
@@ -1426,9 +1445,10 @@ function renderCalendar(){
     </div>`;
   }
   html+=`</div>`;
-  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 16px;font-size:11px">`;
+  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 6px;font-size:11px">`;
   [{c:'var(--accent)',l:'Today'},{c:'rgba(74,222,128,.15)',l:'Done (gym)'},{c:'rgba(251,146,60,.15)',l:'Done (away ✈)'},{c:'rgba(248,113,113,.15)',l:'Missed'},{c:'rgba(167,139,250,.08)',l:'Mobility done ◆'},{c:'var(--surf2)',l:'Upcoming'}].forEach(x=>html+=`<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:${x.c};border:1px solid rgba(255,255,255,.08);display:inline-block"></span><span style="color:var(--muted)">${x.l}</span></span>`);
   html+=`</div>`;
+  html+=`<div style="font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.5">Cell label: <strong style="color:var(--text)">U</strong>=Upper body · <strong style="color:var(--text)">L</strong>=Lower body · <strong style="color:var(--text)">1/2/3</strong>=session in cycle · <strong style="color:var(--text)">✈</strong>=away mode</div>`;
   const upcoming=sched.filter(s=>s.date>=today&&!isSessionDone(s.week,s.dayIdx)).slice(0,5);
   html+=`<div class="section-label">Next sessions</div>`;
   upcoming.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx],isT=s.date===today;html+=`<div class="card" style="cursor:pointer;${isT?'border-color:rgba(74,222,128,.3)':''}" onclick="jumpTo(${s.week},${s.dayIdx});showScreenById('today')"><div class="row"><div><div style="font-size:13px;font-weight:500">${d.name}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${formatDateDisplay(s.date)} · Week ${s.week} · ${ph.short}</div></div>${isT?'<span class="badge badge-green">Today</span>':'<span style="font-size:11px;color:var(--muted)">→</span>'}</div></div>`;});
