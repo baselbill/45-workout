@@ -1518,6 +1518,58 @@ function saveRM(id,field,val){if(!S.rm[id])S.rm[id]={};S.rm[id][field]=val;if(S.
 function clearRMOverride(id){if(S.rm[id]){delete S.rm[id].weight;delete S.rm[id].reps;delete S.rm[id].estimated;}saveState();renderStrength();}
 function snapshotRM(id){const rm=S.rm[id];if(!rm||!rm.weight||!rm.reps)return;if(!S.rmHistory[id])S.rmHistory[id]=[];S.rmHistory[id].push({date:todayStr(),weight:parseFloat(rm.weight),reps:parseInt(rm.reps),estimated:calcEpley(parseFloat(rm.weight),parseInt(rm.reps))});const next=getNextPendingSession();if(next&&PHASE_CHANGE_WEEKS.includes(next.week))S.rm[`phase_retest_${next.week}`]=true;saveState();renderStrength();}
 
+// ─── MONTHLY REPORT HELPERS ───────────────────────────────────────────────────
+let progressViewMonth=null; // 'YYYY-MM'; null = current month
+function getCurrentMonthStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function shiftMonth(monthStr,delta){const[y,m]=monthStr.split('-').map(Number);const d=new Date(y,m-1+delta,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function formatMonthDisplay(monthStr){const[y,m]=monthStr.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
+
+// PRs in month: weight PRs for weighted exercises, rep PRs for always-bodyweight exercises.
+// "PR" means: bestWeight (or bestReps for BW-only) exceeds all prior history before this month entry.
+function getPRsInMonth(monthStr){
+  const prs=[];
+  Object.entries(S.exHistory||{}).forEach(([exName,hist])=>{
+    if(!hist||!hist.length) return;
+    const sorted=[...hist].sort((a,b)=>a.date.localeCompare(b.date));
+    const isAlwaysBW=sorted.every(e=>!e.bestWeight||e.bestWeight===0);
+    let runningBest=0,monthPR=null;
+    for(const e of sorted){
+      const metric=isAlwaysBW?(e.bestReps||0):(e.bestWeight||0);
+      if(metric>runningBest&&metric>0){
+        runningBest=metric;
+        if(e.date.startsWith(monthStr)) monthPR={exName,value:metric,isBW:isAlwaysBW,date:e.date};
+      }
+    }
+    if(monthPR) prs.push(monthPR);
+  });
+  return prs.sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function getMonthlyStats(monthStr){
+  let workouts=0;
+  Object.values(S.logs||{}).forEach(log=>{
+    if(log._completed&&log._completedDate&&log._completedDate.startsWith(monthStr)) workouts++;
+  });
+  const mobility=(S.mobHistory||[]).filter(e=>e.date.startsWith(monthStr)).length;
+  const setsByEx={};let totalSets=0;
+  Object.entries(S.exHistory||{}).forEach(([exName,hist])=>{
+    let total=0;
+    hist.forEach(e=>{if(e.date.startsWith(monthStr)) total+=(e.sets||[]).length;});
+    if(total>0){setsByEx[exName]=total;totalSets+=total;}
+  });
+  const topExercises=Object.entries(setsByEx).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const prs=getPRsInMonth(monthStr);
+  return{workouts,mobility,totalSets,topExercises,prs};
+}
+
+function progressMonthChange(delta){
+  const cur=progressViewMonth||getCurrentMonthStr();
+  const next=shiftMonth(cur,delta);
+  if(next>getCurrentMonthStr()) return; // don't navigate to future
+  progressViewMonth=next;
+  renderProgress();
+}
+
 // ─── PROGRESS ─────────────────────────────────────────────────────────────────
 function renderProgress(){
   const sched=getSchedule();
@@ -1531,6 +1583,53 @@ function renderProgress(){
 
   let html=`<div class="page-header"><div class="row"><div><div class="page-title">Progress</div><div class="page-sub">Bill Zhou · 16-week program</div></div><button class="btn btn-sm" onclick="openBWModal()">+ Weight</button></div></div>`;
 
+  // ── Monthly report card ──
+  const monthStr=progressViewMonth||getCurrentMonthStr();
+  const isCurrentMonth=monthStr===getCurrentMonthStr();
+  const prevMonthStr=shiftMonth(monthStr,-1);
+  const mStats=getMonthlyStats(monthStr);
+  const pStats=getMonthlyStats(prevMonthStr);
+  const dWk=mStats.workouts-pStats.workouts,dMob=mStats.mobility-pStats.mobility,dSets=mStats.totalSets-pStats.totalSets;
+  const dBadge=(d,cur,prev)=>{
+    if(cur===0&&prev===0) return '';
+    if(d===0) return '';
+    const col=d>0?'var(--accent)':'var(--red)';
+    return `<span style="font-size:10px;color:${col};margin-left:4px">${d>0?'+':''}${d}</span>`;
+  };
+  html+=`<div class="card" style="margin-bottom:14px">
+    <div class="row" style="margin-bottom:12px;align-items:center">
+      <button class="btn btn-sm" onclick="progressMonthChange(-1)" style="padding:4px 10px">←</button>
+      <div style="text-align:center;flex:1"><div style="font-size:14px;font-weight:500">${formatMonthDisplay(monthStr)}</div><div style="font-size:10px;color:var(--muted)">${isCurrentMonth?'Current month · vs '+formatMonthDisplay(prevMonthStr):'vs '+formatMonthDisplay(prevMonthStr)}</div></div>
+      <button class="btn btn-sm" onclick="progressMonthChange(1)" style="padding:4px 10px;${isCurrentMonth?'visibility:hidden':''}">→</button>
+    </div>
+    <div class="stat-grid" style="margin-bottom:0">
+      <div class="stat-card"><div class="stat-num">${mStats.workouts}</div><div class="stat-lbl">Workouts${dBadge(dWk,mStats.workouts,pStats.workouts)}</div></div>
+      <div class="stat-card"><div class="stat-num">${mStats.mobility}</div><div class="stat-lbl">Mobility${dBadge(dMob,mStats.mobility,pStats.mobility)}</div></div>
+      <div class="stat-card"><div class="stat-num">${mStats.totalSets}</div><div class="stat-lbl">Sets${dBadge(dSets,mStats.totalSets,pStats.totalSets)}</div></div>
+      <div class="stat-card"><div class="stat-num">${mStats.prs.length}</div><div class="stat-lbl">New PRs</div></div>
+    </div>`;
+  if(mStats.topExercises.length>0){
+    html+=`<div style="margin-top:14px"><div style="font-size:10px;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">TOP EXERCISES (BY SETS)</div>`;
+    mStats.topExercises.forEach(([exName,sets])=>{
+      html+=`<div class="row" style="padding:4px 0;font-size:12px"><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${exName}</span><span style="font-family:var(--mono);color:var(--accent);flex-shrink:0;margin-left:8px">${sets} sets</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(mStats.prs.length>0){
+    html+=`<div style="margin-top:12px"><div style="font-size:10px;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">NEW PRS</div>`;
+    mStats.prs.forEach(pr=>{
+      const display=pr.isBW?`${pr.value} reps`:`${pr.value} kg`;
+      html+=`<div class="row" style="padding:4px 0;font-size:12px"><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">⭐ ${pr.exName}</span><span style="font-family:var(--mono);color:var(--amber);flex-shrink:0;margin-left:8px">${display}</span></div>`;
+    });
+    html+=`</div>`;
+  }
+  if(mStats.workouts===0&&mStats.mobility===0&&mStats.totalSets===0){
+    html+=`<div style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;padding:8px">No activity logged${isCurrentMonth?' yet this month':' in this month'}.</div>`;
+  }
+  html+=`</div>`;
+
+  // ── Lifetime stat grid ──
+  html+=`<div class="section-label">Lifetime</div>`;
   html+=`<div class="stat-grid"><div class="stat-card"><div class="stat-num">${sessComp}</div><div class="stat-lbl">Sessions done</div></div><div class="stat-card"><div class="stat-num">${pct}%</div><div class="stat-lbl">Program complete</div></div><div class="stat-card"><div class="stat-num">${totalSets}</div><div class="stat-lbl">Total sets</div></div><div class="stat-card"><div class="stat-num">${mobTotalCompletions}</div><div class="stat-lbl">Mobility sessions</div></div></div>`;
   // Mob streak + history
   html+=`<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:8px"><span style="font-size:14px;font-weight:500">Mobility</span><span class="badge badge-green">🔥 ${mobStreak} day streak</span></div>`;
