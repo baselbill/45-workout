@@ -2067,19 +2067,51 @@ html+=`<div style="display:flex;align-items:flex-start;justify-content:space-bet
     html+=`</div>`;
   }else{html+=`<div class="card" style="text-align:center;padding:20px;margin-bottom:10px"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">No bodyweight entries yet</div><button class="btn btn-sm" onclick="openBWModal()">+ Log weight</button></div>`;}
 
-  // Manual override
+  // Manual override — lift picker + single form
   html+=`<div class="section-label" style="margin-top:16px">Manual override</div>`;
-  html+=`<div class="card" style="margin-bottom:10px;padding:12px"><div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)"><span style="font-size:16px;flex-shrink:0">ⓘ</span><span>Enter a known test set to override the auto-calculation. Useful after a max effort test at a phase change.</span></div></div>`;
+  // Default to first lift that has a manual entry, or first lift overall
+  const defaultLift=overrideLiftId||(RM_LIFTS.find(l=>S.rm[l.id]&&(S.rm[l.id].weight||S.rm[l.id].reps))||RM_LIFTS[0]).id;
+  if(!overrideLiftId)overrideLiftId=defaultLift;
+  // Pill picker row
+  html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">`;
   RM_LIFTS.forEach(lift=>{
-    const rm=S.rm[lift.id]||{};
-    const est=rm.weight&&rm.reps?calcEpley(parseFloat(rm.weight),parseInt(rm.reps)):null;
-    const hist=(S.rmHistory[lift.id]||[]).slice(-4).reverse();
-    html+=`<div class="rm-card"><div class="rm-lift-name">${lift.icon} ${lift.name}</div><div class="rm-inputs"><div class="rm-input-wrap"><div class="rm-input-label">Weight (kg)</div><input class="rm-input" type="number" inputmode="decimal" step="0.5" placeholder="e.g. 80" value="${rm.weight||''}" onchange="saveRM('${lift.id}','weight',this.value)"></div><div class="rm-input-wrap"><div class="rm-input-label">Reps done</div><input class="rm-input" type="number" inputmode="numeric" placeholder="e.g. 8" value="${rm.reps||''}" onchange="saveRM('${lift.id}','reps',this.value)"></div></div>`;
-    if(est){html+=`<div class="rm-result"><div class="row"><div><div style="font-size:11px;color:var(--accent);opacity:.8">Override 1RM</div><div class="rm-1rm">${est} kg</div></div><div style="text-align:right"><div style="font-size:11px;color:var(--accent);opacity:.8">Targets</div><div style="font-size:11px;font-family:var(--mono);color:var(--accent);margin-top:4px">67%: ${Math.round(est*.67/2.5)*2.5} · 75%: ${Math.round(est*.75/2.5)*2.5} · 80%: ${Math.round(est*.80/2.5)*2.5}</div></div></div>`;if(hist.length>0){html+=`<div class="rm-history"><div style="font-size:10px;letter-spacing:.06em;margin-bottom:4px">RETEST HISTORY</div>`;hist.forEach(h=>html+=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>${formatDateDisplay(h.date)}</span><span style="color:var(--text)">${h.estimated} kg</span></div>`);html+=`</div>`;}html+=`</div><button class="btn btn-sm" onclick="snapshotRM('${lift.id}')" style="margin-top:8px">Save as retest snapshot</button>`;}
-    if(lift.id==='pullup')html+=`<div style="font-size:11px;color:var(--muted);margin-top:8px">For pull-ups: enter added weight and reps. For bodyweight only, enter 0 + reps.</div>`;
-    if(rm.weight||rm.reps)html+=`<button class="btn btn-ghost" onclick="clearRMOverride('${lift.id}')" style="font-size:11px;margin-top:4px">Clear override — use auto</button>`;
-    html+=`</div>`;
+    const hasData=S.rm[lift.id]&&(S.rm[lift.id].weight||S.rm[lift.id].reps);
+    const isActive=lift.id===overrideLiftId;
+    html+=`<button onclick="overrideLiftId='${lift.id}';renderStrength()" style="flex:1;min-width:56px;padding:8px 4px;border-radius:10px;border:1.5px solid ${isActive?'var(--accent)':'var(--border)'};background:${isActive?'var(--accent-dim)':'var(--surf2)'};cursor:pointer;font-family:var(--sans)">
+      <div style="font-size:14px">${lift.icon}</div>
+      <div style="font-size:10px;font-weight:600;color:${isActive?'var(--accent)':'var(--muted)'};margin-top:3px;letter-spacing:.01em">${lift.name.split(' ')[0]}</div>
+      ${hasData?`<div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin:4px auto 0"></div>`:'<div style="height:9px"></div>'}
+    </button>`;
   });
+  html+=`</div>`;
+  // Single form for selected lift
+  const activeLift=RM_LIFTS.find(l=>l.id===overrideLiftId);
+  if(activeLift){
+    const rm=S.rm[activeLift.id]||{};
+    const est=rm.weight&&rm.reps?calcEpley(parseFloat(rm.weight),parseInt(rm.reps)):null;
+    const hist=(S.rmHistory[activeLift.id]||[]).slice(-4).reverse();
+    html+=`<div class="card" style="margin-bottom:10px">`;
+    html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Enter a test set to override the auto-calculated 1RM for <strong style="color:var(--text)">${activeLift.name}</strong>.</div>`;
+    html+=`<div class="rm-inputs" style="margin-bottom:${est?'10':'0'}px">
+      <div class="rm-input-wrap"><div class="rm-input-label">Weight (kg)</div><input class="rm-input" type="number" inputmode="decimal" step="0.5" placeholder="e.g. 80" value="${rm.weight||''}" onchange="saveRM('${activeLift.id}','weight',this.value);renderStrength()"></div>
+      <div class="rm-input-wrap"><div class="rm-input-label">Reps done</div><input class="rm-input" type="number" inputmode="numeric" placeholder="e.g. 8" value="${rm.reps||''}" onchange="saveRM('${activeLift.id}','reps',this.value);renderStrength()"></div>
+    </div>`;
+    if(activeLift.id==='pullup')html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Enter added load + reps. For bodyweight only, enter 0 kg.</div>`;
+    if(est){
+      html+=`<div class="rm-result" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div style="font-size:11px;color:var(--accent);opacity:.8;margin-bottom:2px">Override 1RM</div><div class="rm-1rm">${est} kg</div></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--accent);opacity:.8;margin-bottom:2px">Training targets</div><div style="font-size:11px;font-family:var(--mono);color:var(--accent)">67%: ${Math.round(est*.67/2.5)*2.5} · 75%: ${Math.round(est*.75/2.5)*2.5} · 80%: ${Math.round(est*.80/2.5)*2.5}</div></div>
+      </div></div>`;
+      if(hist.length>0){
+        html+=`<div class="rm-history" style="margin-bottom:10px"><div style="font-size:10px;letter-spacing:.06em;margin-bottom:4px">RETEST HISTORY</div>`;
+        hist.forEach(h=>html+=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>${formatDateDisplay(h.date)}</span><span style="color:var(--text)">${h.estimated} kg</span></div>`);
+        html+=`</div>`;
+      }
+      html+=`<button class="btn btn-sm" onclick="snapshotRM('${activeLift.id}')" style="margin-bottom:6px">Save as retest snapshot</button>`;
+    }
+    if(rm.weight||rm.reps)html+=`<button class="btn btn-ghost" onclick="clearRMOverride('${activeLift.id}')" style="font-size:11px">Clear override — use auto</button>`;
+    html+=`</div>`;
+  }
   document.getElementById('screen-strength').innerHTML=html;
 }
 
@@ -2089,6 +2121,8 @@ function snapshotRM(id){const rm=S.rm[id];if(!rm||!rm.weight||!rm.reps)return;if
 
 // ─── MONTHLY REPORT HELPERS ───────────────────────────────────────────────────
 let progressViewMonth=null; // 'YYYY-MM'; null = current month
+let prSectionExpanded=false;
+let overrideLiftId=null; // which lift is selected in the manual override picker
 function getCurrentMonthStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function shiftMonth(monthStr,delta){const[y,m]=monthStr.split('-').map(Number);const d=new Date(y,m-1+delta,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function formatMonthDisplay(monthStr){const[y,m]=monthStr.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
@@ -2134,8 +2168,9 @@ function getMonthlyStats(monthStr){
 function progressMonthChange(delta){
   const cur=progressViewMonth||getCurrentMonthStr();
   const next=shiftMonth(cur,delta);
-  if(next>getCurrentMonthStr()) return; // don't navigate to future
+  if(next>getCurrentMonthStr()) return;
   progressViewMonth=next;
+  prSectionExpanded=false;
   renderProgress();
 }
 
@@ -2210,14 +2245,35 @@ function renderProgress(){
     html+=`</div>`;
   }
 
-  // New PRs this month
+  // New PRs this month — collapsible
   if(mStats.prs.length>0){
-    html+=`<div class="section-label">New PRs · ${formatMonthDisplay(monthStr)}</div>`;
-    mStats.prs.forEach(pr=>{
-      const muscleColor=MUSCLE_GROUPS.find(g=>EX_TO_MUSCLE[pr.exName]===g.name)?.color||'var(--amber)';
-      const display=pr.isBW?`${pr.value} reps`:`${pr.value} kg`;
-      html+=`<div class="card" style="margin-bottom:8px;padding:12px;border-left:3px solid ${muscleColor}"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pr.exName}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${formatDateDisplay(pr.date)}</div></div><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--amber);flex-shrink:0">${display}</div></div></div>`;
-    });
+    html+=`<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">`;
+    html+=`<button onclick="prSectionExpanded=!prSectionExpanded;renderProgress()" style="width:100%;background:none;border:none;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">🏆</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${mStats.prs.length} new PR${mStats.prs.length>1?'s':''}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">${formatMonthDisplay(monthStr)}</div>
+        </div>
+      </div>
+      <span style="font-size:18px;color:var(--muted);transition:transform .2s;display:inline-block;transform:rotate(${prSectionExpanded?'90':'0'}deg)">›</span>
+    </button>`;
+    if(prSectionExpanded){
+      html+=`<div style="border-top:1px solid var(--border);padding:8px 14px 12px">`;
+      mStats.prs.forEach((pr,i)=>{
+        const muscleColor=MUSCLE_GROUPS.find(g=>EX_TO_MUSCLE[pr.exName]===g.name)?.color||'var(--amber)';
+        const display=pr.isBW?`${pr.value} reps`:`${pr.value} kg`;
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;${i<mStats.prs.length-1?'border-bottom:1px solid var(--border)':''}">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <span style="width:3px;height:28px;border-radius:2px;background:${muscleColor};flex-shrink:0;display:inline-block"></span>
+            <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pr.exName}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${formatDateDisplay(pr.date)}</div></div>
+          </div>
+          <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--amber);flex-shrink:0">${display}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
   }
 
   // 16-week volume bars
