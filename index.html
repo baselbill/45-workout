@@ -61,7 +61,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ex-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.01em}.ex-detail{font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
 .ex-note{font-size:12px;color:var(--muted);background:var(--surf2);border-radius:var(--r-sm);padding:8px 12px;margin:10px 0;line-height:1.6;border-left:2px solid var(--amber)}
 .ex-rec{font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:var(--r-sm);padding:7px 10px;margin:6px 0;display:flex;align-items:center;gap:6px;font-weight:500}
-.ex-away-rec{font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:var(--r-sm);padding:7px 10px;margin:6px 0}
 .ss-badge{font-size:10px;font-family:var(--mono);background:var(--blue-dim);color:var(--blue);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
 .away-badge{font-size:10px;font-family:var(--mono);background:var(--accent-dim);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle}
 .help-btn{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surf2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);flex-shrink:0;margin-left:6px;vertical-align:middle}
@@ -152,7 +151,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .toggle-knob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .toggle-switch.on .toggle-knob{transform:translateX(18px)}
 /* Away mode banner */
-.away-banner{background:var(--accent-dim);border:1px solid rgba(255,107,53,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
 /* Calendar */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:10px 0}
 .cal-hdr{text-align:center;font-size:10px;font-family:var(--mono);color:var(--muted);padding:4px 0}
@@ -1459,18 +1457,15 @@ function renderToday(){
 
   // Away mode toggle
   const bw=getLatestBW();
+  let awayLvlStr='';
+  if(S.awayMode&&bw){const benchRM=getRM('bench');if(benchRM){const lvl=getStrengthLevel(benchRM/bw);awayLvlStr=` · ${lvl.label}`;}}
   html+=`<div class="away-toggle-wrap">
     <div>
       <div class="away-toggle-label">✈ Away from gym</div>
-      <div style="font-size:11px;color:var(--accent);opacity:.8;margin-top:2px">${S.awayMode?'Bodyweight substitutions active':'Toggle for bodyweight-only session'}</div>
+      <div style="font-size:11px;color:var(--accent);opacity:.8;margin-top:2px">${S.awayMode?`BW substitutions active${awayLvlStr}`:'Toggle for bodyweight-only session'}</div>
     </div>
     <div class="toggle-switch${S.awayMode?' on':''}" onclick="toggleAwayMode()"><div class="toggle-knob"></div></div>
   </div>`;
-  if(S.awayMode){
-    const bwMsg=bw?`Based on your ${bw} kg bodyweight and 1RM entries.`:'Add bodyweight in Progress tab for personalised targets.';
-    html+=`<div class="away-banner"><div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">✈ Bodyweight session active</div><div style="font-size:12px;color:var(--accent);opacity:.9;line-height:1.6">All exercises swapped for equipment-free alternatives. ${bwMsg}</div></div>`;
-    if(bw&&(getRM('bench')||getRM('squat')||getRM('deadlift'))){const benchRM=getRM('bench');if(benchRM){const ratio=benchRM/bw;const lvl=getStrengthLevel(ratio);html+=`<div class="card" style="margin-bottom:10px"><div class="row"><span style="font-size:12px;color:var(--muted)">Relative strength (Bench / BW)</span><span style="font-size:13px;font-weight:500;color:${lvl.color}">${lvl.label}</span></div><div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:4px">Ratio: ${ratio.toFixed(2)} · Rep targets calibrated</div></div>`;}}
-  }
   if(isDeload)html+=`<div class="alert alert-blue">Deload week — reduced intensity, same exercises.</div>`;
   if(day.note&&!S.awayMode)html+=`<div class="alert alert-amber">${day.note}</div>`;
 
@@ -1487,24 +1482,19 @@ function renderToday(){
     const isAway=!!ex.isAway;
 
     html+=`<div class="ex-card${exAllDone?' done':''}${isAway?' away-ex':''}">`;
-    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈ BW sub</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}</div></div>${ref?`<button class="help-btn" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
+    // For away exercises, fold the strength level into the detail line as a small badge
+    const awayLvlBadge=isAway&&ex.ratio!=null?`<span style="font-size:10px;font-family:var(--mono);color:${getStrengthLevel(ex.ratio).color};margin-left:6px">${getStrengthLevel(ex.ratio).label}</span>`:'';
+    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
 
-    // Weight rec (gym) or calibrated rep target (away)
-    if(isAway&&ex.ratio!==undefined&&ex.ratio!==null){
-      const lvl=getStrengthLevel(ex.ratio);
-      html+=`<div class="ex-away-rec">🎯 Target: <strong>${ex.reps} reps × ${ex.sets} sets</strong> &nbsp;·&nbsp; calibrated for <span style="color:${lvl.color}">${lvl.label}</span> level</div>`;
-      if(ex.alts&&ex.alts.length>0){
-        html+=`<div style="font-size:11px;color:var(--orange);margin:4px 0 6px;opacity:.8">Harder option: ${ex.alts[0].n} — ${ex.alts[0].note}</div>`;
-      }
-    }else if(isAway){
-      html+=`<div class="ex-away-rec">🎯 Target: <strong>${ex.reps} reps × ${ex.sets} sets</strong> &nbsp;·&nbsp; <span style="opacity:.8">Add 1RM + bodyweight for personalised targets</span></div>`;
-    }else if(rec){
+    // Weight rec — gym only; away exercises need no separate box
+    if(!isAway&&rec){
       html+=`<div class="ex-rec">🎯 Target: <strong>${rec.kg} kg</strong>&nbsp;·&nbsp;${rec.pct}% of ${rec.rm} kg 1RM</div>`;
     }else if(!isAway&&LIFT_TO_RM[ex.n]&&!getRM(LIFT_TO_RM[ex.n])){
       html+=`<div class="alert alert-blue" style="margin:6px 0;font-size:11px;padding:6px 10px">Enter your 1RM in the 1RM tab to get weight targets</div>`;
     }
 
-    html+=`<div class="ex-note">${ex.note}</div>`;
+    // Notes: gym cues don't apply to away substitutions
+    if(!isAway) html+=`<div class="ex-note">${ex.note}</div>`;
 
     if(!alreadyCompleted){
       // Last session reference
