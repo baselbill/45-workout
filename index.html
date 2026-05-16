@@ -1961,7 +1961,7 @@ function renderCalendar(){
     let cls='',label='';
     if(entry){
       const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
-      const done=!!doneLog._completed&&(doneLog._scheduledDate===date||doneLog._completedDate>=date),wasAway=!!doneLog._awayMode;
+      const done=!!doneLog._completed&&(doneLog._scheduledDate===date||(!doneLog._scheduledDate&&doneLog._completedDate===date)),wasAway=!!doneLog._awayMode;
       cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
       label=(entry.dayIdx===1?'L':'U')+(entry.dayIdx+1)+(wasAway&&done?' ✈':'');
     }else if(isToday){cls='today-rest';label=hasMobDone?'◆':'';
