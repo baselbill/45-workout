@@ -21,8 +21,14 @@
 - ✅ Bug fixed and deployed to main
 - ✅ Code changes committed and pushed
 - ✅ Documentation created
-- ✅ index.html in sync with v7
-- No outstanding issues
+- ✅ index.html restored to newer design + bug fix applied
+- ✅ Issue corrected: Avoided overwriting newer UI with older v7
+
+### Important Correction
+Initially, I mistakenly copied the older `workout_app_v7.html` to `index.html`, which reverted UI improvements from later commits (like "Redesign Calendar, 1RM, and Progress screens"). This has been fixed by:
+1. Restoring index.html to the newer version with current UI
+2. Applying the workout date validation fix to that newer version
+3. The app now has both the new UI design AND the bug fix
 
 ## Project Purpose
 A strength training program tracker for Bill Zhou's 16-week training cycle. Logs workouts, tracks progression, manages away-mode (bodyweight-only) sessions, and provides statistics on consistency and strength.
