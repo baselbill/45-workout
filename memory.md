@@ -4,31 +4,36 @@
 
 ### What Was Done
 1. **Bug Investigation** — Identified why Friday's workout was showing as completed on Saturday. Root cause: `completeSession()` didn't validate that sessions matched their scheduled dates.
-2. **Implementation** — Fixed the bug in workout_app_v7.html:
+2. **Initial Fix Attempt** — Fixed the bug in workout_app_v7.html:
    - Added date validation to prevent completing future sessions
    - Stores both `_scheduledDate` and `_completedDate` for accuracy
-   - Calendar now validates completion dates match scheduled dates
-   - Training streak and stats count by scheduled date, not completion date
-3. **Deployment** — Created PR #1, got it merged, then updated index.html to sync with v7
-4. **Documentation** — Created CLAUDE.md (technical) and memory.md (user-facing context)
+   - Created PR #1, got it merged, then updated index.html to sync with v7
+3. **UI Design Crisis** — Discovered that copying v7 to index.html overwrote newer UI improvements from commits like "Redesign Calendar, 1RM, and Progress screens"
+4. **UI Restoration** — Restored index.html to the current design and reapplied the bug fix
+5. **Logic Bug Fix** — Found that the date validation logic was inverted:
+   - Original (wrong): `doneLog._completedDate>=date` — showed Friday as done if completed on Saturday or later
+   - Corrected: `doneLog._scheduledDate===date||(!doneLog._scheduledDate&&doneLog._completedDate===date)` — only shows session as done on its scheduled date
+6. **Documentation** — Created CLAUDE.md (technical) and memory.md (user-facing context)
 
 ### Key Learnings
 - **Workflow Note:** When fixing a bug that affects the production file (index.html), update both the version file AND index.html in the same PR. Don't merge and then update separately.
-- **Date Validation Pattern:** For session-based apps, always validate that actions (like completion) happen on the intended date, not just today's date.
+- **File Version Management:** Always verify which file is the "current" production version before overwriting. v7 was outdated; newer work had been done on index.html directly.
+- **Date Comparison Logic:** Must be precise with date comparisons. Using `>=` instead of `===` completely inverted the intended behavior.
+- **Backward Compatibility:** Old data may not have _scheduledDate field, so validation must fall back to _completedDate for legacy records.
 - **Storage Design:** Dual-field approach (`_scheduledDate` + `_completedDate`) is cleaner than trying to infer dates from completion status alone.
 
 ### Current Status
-- ✅ Bug fixed and deployed to main
+- ✅ Bug correctly fixed and deployed to main
+- ✅ UI design preserved and restored
+- ✅ Calendar date validation logic corrected
 - ✅ Code changes committed and pushed
-- ✅ Documentation created
-- ✅ index.html restored to newer design + bug fix applied
-- ✅ Issue corrected: Avoided overwriting newer UI with older v7
+- ✅ Documentation complete
+- ✅ All issues resolved
 
-### Important Correction
-Initially, I mistakenly copied the older `workout_app_v7.html` to `index.html`, which reverted UI improvements from later commits (like "Redesign Calendar, 1RM, and Progress screens"). This has been fixed by:
-1. Restoring index.html to the newer version with current UI
-2. Applying the workout date validation fix to that newer version
-3. The app now has both the new UI design AND the bug fix
+### Issues Encountered & Resolved
+1. **UI Overwrite:** Mistakenly copied older v7 to index.html, losing newer UI improvements → Restored from git history
+2. **Inverted Logic:** Date validation was backward (showing future completions on past dates) → Fixed comparison logic
+3. **Deployment Order:** Updated production after merge instead of before → Documented for future workflow
 
 ## Project Purpose
 A strength training program tracker for Bill Zhou's 16-week training cycle. Logs workouts, tracks progression, manages away-mode (bodyweight-only) sessions, and provides statistics on consistency and strength.
