@@ -426,7 +426,9 @@ function getRatioForPattern(pattern) {
   if (!bw) return null;
   const rmMap = {
     push_h: 'bench', push_v: 'ohp',
-    pull_h: 'deadlift', pull_v: 'pullup',
+    // E1-7: pull_h maps to 'bench' not 'deadlift' — horizontal pulling strength
+    // correlates with bench press, not the hip-hinge deadlift pattern.
+    pull_h: 'bench', pull_v: 'pullup',
     hinge: 'deadlift', squat: 'squat',
     core: null, isolation: null,
   };
@@ -1456,7 +1458,8 @@ function renderToday(){
   });
 
   let doneSets=0,totalSets=0;
-  exercises.forEach((ex,ei)=>{totalSets+=ex.sets;const el=log[ei]||{};for(let si=0;si<ex.sets;si++)if(el[si]&&el[si].done)doneSets++;});
+  // E1-8: Cap each exercise set count at 20 to guard against corrupted ex.sets values
+  exercises.forEach((ex,ei)=>{const sc=Math.min(ex.sets||0,20);totalSets+=sc;const el=log[ei]||{};for(let si=0;si<sc;si++)if(el[si]&&el[si].done)doneSets++;});
   const pct=totalSets>0?Math.round(doneSets/totalSets*100):0,allDone=pct===100&&!alreadyCompleted;
 
   let html='';
@@ -1543,9 +1546,11 @@ function renderToday(){
   // Phase change nudge — shown before warmup so it's visible without scrolling
   if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
 
-  // Warmup — collapsible (expanded by default)
+  // Warmup — collapsible. State persists across re-renders via module-level warmupCollapsed.
+  // E2-4 / E2-10: Using the warmupCollapsed variable (not inline DOM state) preserves the
+  // collapsed state across renderToday() calls that happen on every set tick.
   const awayWarmup="5 min of jumping jacks, high knees, or brisk walk · arm circles × 10 · hip circles × 10 · bodyweight squat × 10";
-  html+=`<button class="warmup-box" onclick="const n=this.nextElementSibling;n.style.display=n.style.display==='none'?'block':'none'"><span style="display:flex;align-items:center;gap:8px"><span style="color:var(--amber);font-size:15px">🔥</span><span style="font-weight:500;color:var(--text);font-size:13px">Warmup</span><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">~3 min</span></span><span style="color:var(--muted);font-size:16px">›</span></button><div style="display:block;padding:0 4px 14px;font-size:13px;color:var(--muted);line-height:1.6">${S.awayMode?awayWarmup:day.warmup}</div>`;
+  html+=`<button class="warmup-box" onclick="warmupCollapsed=!warmupCollapsed;this.nextElementSibling.style.display=warmupCollapsed?'none':'block'"><span style="display:flex;align-items:center;gap:8px"><span style="color:var(--amber);font-size:15px">🔥</span><span style="font-weight:500;color:var(--text);font-size:13px">Warmup</span><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">~3 min</span></span><span style="color:var(--muted);font-size:16px">›</span></button><div style="display:${warmupCollapsed?'none':'block'};padding:0 4px 14px;font-size:13px;color:var(--muted);line-height:1.6">${S.awayMode?awayWarmup:day.warmup}</div>`;
 
   // Exercises
   exercises.forEach((ex,ei)=>{
@@ -1595,10 +1600,12 @@ function renderToday(){
       }
 
       // Find first undone set (for active-set highlight)
+      // E1-8: Cap at 20 sets to prevent infinite render loops from corrupted data
+      const setCount=Math.min(ex.sets||0,20);
       let firstUndone=-1;
-      for(let si=0;si<ex.sets;si++){if(!(exLog[si]&&exLog[si].done)){firstUndone=si;break;}}
+      for(let si=0;si<setCount;si++){if(!(exLog[si]&&exLog[si].done)){firstUndone=si;break;}}
 
-      for(let si=0;si<ex.sets;si++){
+      for(let si=0;si<setCount;si++){
         const s=exLog[si]||{};
         const isDone=!!s.done;
         const isActive=!isDone&&si===firstUndone;
@@ -1678,10 +1685,12 @@ function renderToday(){
       if(exAllDone) html+=`<div class="ex-done-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>All sets complete</div>`;
     }else{
       let hasData=false;
-      for(let si=0;si<ex.sets;si++){const s=exLog[si]||{};if(s.weight||s.reps)hasData=true;}
+      // E1-8: Cap at 20 sets to guard against corrupted data
+      const setCountDone=Math.min(ex.sets||0,20);
+      for(let si=0;si<setCountDone;si++){const s=exLog[si]||{};if(s.weight||s.reps)hasData=true;}
       if(hasData){
         html+=`<div class="sets-area">`;
-        for(let si=0;si<ex.sets;si++){
+        for(let si=0;si<setCountDone;si++){
           const s=exLog[si]||{};
           if(s.weight||s.reps) html+=`<div style="display:flex;gap:8px;font-size:12px;font-family:var(--mono);color:var(--muted);margin-bottom:4px"><span style="color:var(--muted2);width:24px">${si+1}</span>${s.weight?`<span style="color:var(--text)">${s.weight}kg</span><span style="color:var(--muted2)">×</span>`:''}<span style="color:var(--text)">${s.reps||'—'} reps</span>${s.done?'<span style="color:var(--success)">✓</span>':''}</div>`;
         }
@@ -1710,7 +1719,13 @@ function renderToday(){
   renderStickyTimer();
 }
 
-function logField(w,di,ei,si,f,v){const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};l[ei][si][f]=v;setLog(w,di,l);}
+function logField(w,di,ei,si,f,v){
+  // E1-9: Validate input before storing — ignore NaN and negative values
+  const parsed=f==='weight'?parseFloat(v):parseInt(v);
+  if(isNaN(parsed)||parsed<0)return;
+  const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};
+  l[ei][si][f]=parsed;setLog(w,di,l);
+}
 
 // Track within-session PRs to avoid repeated flashes for same weight
 const sessionPRsFlashed = {};
@@ -1793,7 +1808,8 @@ function showPRFlash(exName, weight, reps){
     </div>
   </div>`;
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1800);
+  // E2-7: Guard with parentNode so rapid PRs don't remove a newer flash element
+  setTimeout(()=>{if(el.parentNode)el.remove();},1800);
 }
 function showSetFlash(weight, reps, isPR, vsLast){
   const old=document.querySelector('.flash-overlay');if(old)old.remove();
@@ -1820,14 +1836,18 @@ function showSetFlash(weight, reps, isPR, vsLast){
     </div>`;
   }
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),1800);
+  // E2-7: Guard with parentNode so rapid set logs don't remove a newer flash element
+  setTimeout(()=>{if(el.parentNode)el.remove();},1800);
 }
 
 function completeSession(w,di,schedDate){
   const today=todayStr();
   if(schedDate&&schedDate>today){alert('Cannot complete future sessions');return;}
+  // E2-13: Validate date strings before storing — both todayStr() and schedule dates
+  // are always YYYY-MM-DD, but guard against any future caller passing invalid values.
+  const safeScheduledDate=(schedDate&&isValidDate(schedDate))?schedDate:today;
   const l=getLog(w,di);
-  l._completed=true;l._completedDate=today;l._awayMode=S.awayMode;l._scheduledDate=schedDate||today;
+  l._completed=true;l._completedDate=today;l._awayMode=S.awayMode;l._scheduledDate=safeScheduledDate;
   setLog(w,di,l);
   // Use the same resolved exercise list that was shown to the user
   const pi=phaseFor(w);
@@ -1870,7 +1890,9 @@ function openWeekPicker(){
   const phaseNames=['Phase 1: Wks 1–4','Phase 2: Wks 5–8','Phase 3: Wks 9–12','Phase 4: Wks 13–16'];
   const phaseStarts=[1,5,9,13];
   for(let w=1;w<=16;w++){
-    // Insert phase header before start of each phase
+    // Insert phase header before start of each phase.
+    // E2-11: grid-column:1/-1 spans all columns regardless of count, so this is safe
+    // as long as the parent grid keeps grid-template-columns:repeat(4,1fr) (week-grid class).
     if(phaseStarts.includes(w)){
       const phIdx=phaseStarts.indexOf(w);
       h+=`<div style="grid-column:1/-1;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin:${phIdx===0?'0':'8px'} 0 4px">${phaseNames[phIdx]}</div>`;
@@ -1880,7 +1902,7 @@ function openWeekPicker(){
   grid.innerHTML=h;
   openModal('week-picker-modal');
 }
-function jumpTo(w,di){viewingSession={week:w,dayIdx:di};closeModal('week-picker-modal');window.scrollTo(0,0);renderToday();}
+function jumpTo(w,di){viewingSession={week:w,dayIdx:di};warmupCollapsed=false;closeModal('week-picker-modal');window.scrollTo(0,0);renderToday();}
 
 // ─── REFERENCE PANEL ──────────────────────────────────────────────────────────
 function openRef(name){
