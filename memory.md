@@ -1,5 +1,34 @@
 # 45-Workout — Project Memory
 
+## UX Review (2026-05-16)
+
+### Critical
+1. **Setup flow has no recovery** — accidental modal dismiss leaves user with blank screen and no way back. No onboarding card in main UI.
+2. **Silent success on setup** — page just changes, no confirmation or "Welcome to Week 1" moment.
+
+### High
+3. **Modal scroll conflict** — main area scrolls underneath open modals on mobile; two nested scroll areas.
+4. **Missed sessions banner keeps reappearing** — × dismiss is temporary, no explanation why it comes back. "Slide program forward" is unexplained.
+5. **Completed set rows look broken** — disabled steppers give no visual feedback; looks like a UI bug.
+6. **Away mode toggle has no confirmation** — silently swaps all exercises mid-workout on single tap.
+
+### Medium
+7. **Week picker is 48 unlabelled cells** — no phase headers, dense, easy to tap wrong week.
+8. **Progress KPI tiles too cramped** — 4 tiles at 9px labels on 375px phone.
+9. **Empty states have no call to action** — "No activity yet" with no link or direction.
+10. **Slide program forward has no warning** — permanently shifts 16-week schedule with no confirm dialog.
+11. **Big 3 Total disappears if any lift missing** — should show partial (2 of 3 logged).
+
+### Low
+- Warmup collapsed by default; extra tap every session
+- PR flash doesn't indicate auto-dismiss
+- Upcoming sessions list silently truncates at 5
+- Phase change nudge buried mid-scroll
+- "?" buttons have no aria-label or tooltip
+- Mobility completion alert easy to miss if scrolled down
+
+---
+
 ## Engineering Review (2026-05-16)
 
 ### Critical Issues (fix soon)
