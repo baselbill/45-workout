@@ -1033,7 +1033,7 @@ function getLastCompletedSession(){
 // or a completed mobility routine. A blank "today" doesn't break the streak.
 function getTrainingStreak(){
   const sessSet=new Set();
-  Object.values(S.logs||{}).forEach(log=>{if(log._completed&&log._completedDate)sessSet.add(log._completedDate);});
+  Object.values(S.logs||{}).forEach(log=>{if(log._completed&&(log._scheduledDate||log._completedDate))sessSet.add(log._scheduledDate||log._completedDate);});
   const mobSet=new Set((S.mobHistory||[]).map(e=>e.date));
   const td=new Date(todayStr()+'T00:00:00');
   let streak=0;
@@ -1317,7 +1317,7 @@ function renderToday(){
     </div>`;
   }
 
-  if(allDone)html+=`<button class="complete-btn" onclick="completeSession(${w},${di})">Mark session complete →</button>`;
+  if(allDone)html+=`<button class="complete-btn" onclick="completeSession(${w},${di},'${schedDate}')"${isFuture?' disabled style="opacity:.5;cursor:not-allowed"':''}>Mark session complete →</button>`;
   if(alreadyCompleted)html+=`<button class="btn" onclick="uncompleteSession(${w},${di})" style="color:var(--muted)">Undo completion</button>`;
 
   document.getElementById('screen-today').innerHTML=html;
@@ -1371,9 +1371,11 @@ function showPRFlash(exName){
   setTimeout(()=>el.remove(),2200);
 }
 
-function completeSession(w,di){
+function completeSession(w,di,schedDate){
+  const today=todayStr();
+  if(schedDate&&schedDate>today){alert('Cannot complete future sessions');return;}
   const l=getLog(w,di);
-  l._completed=true;l._completedDate=todayStr();l._awayMode=S.awayMode;
+  l._completed=true;l._completedDate=today;l._awayMode=S.awayMode;l._scheduledDate=schedDate||today;
   setLog(w,di,l);
   // Use the same resolved exercise list that was shown to the user
   const pi=phaseFor(w);
@@ -1402,7 +1404,7 @@ function completeSession(w,di){
   viewingSession=null;window.scrollTo(0,0);renderToday();
 }
 
-function uncompleteSession(w,di){const l=getLog(w,di);delete l._completed;delete l._completedDate;delete l._awayMode;setLog(w,di,l);renderToday();}
+function uncompleteSession(w,di){const l=getLog(w,di);delete l._completed;delete l._completedDate;delete l._scheduledDate;delete l._awayMode;setLog(w,di,l);renderToday();}
 
 function openMissedModal(){const m=getMissedSessions();let html=`<div class="alert alert-amber" style="margin-bottom:12px">You have ${m.length} unlogged session${m.length>1?'s':''} in the past. Tap "Slide program forward" to realign your schedule to today.</div>`;m.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx];html+=`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center"><span class="badge badge-red">Wk ${s.week}</span><div><div style="font-size:13px;color:var(--text)">${d.name}</div><div style="font-size:11px;color:var(--muted)">${formatDateDisplay(s.date)}</div></div></div>`;});document.getElementById('modal-missed-body').innerHTML=html;document.getElementById('modal-missed').classList.add('open');}
 
@@ -1446,7 +1448,7 @@ function renderCalendar(){
     let cls='',label='',mobDot='';
     if(entry){
       const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
-      const done=!!doneLog._completed,wasAway=!!doneLog._awayMode;
+      const done=!!doneLog._completed&&(doneLog._scheduledDate===date||doneLog._completedDate>=date),wasAway=!!doneLog._awayMode;
       cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
       // Day 1/3 (idx 0/2) = upper-body push/pull. Day 2 (idx 1) = lower body.
       const bp=entry.dayIdx===1?'L':'U';
@@ -1573,7 +1575,7 @@ function getPRsInMonth(monthStr){
 function getMonthlyStats(monthStr){
   let workouts=0;
   Object.values(S.logs||{}).forEach(log=>{
-    if(log._completed&&log._completedDate&&log._completedDate.startsWith(monthStr)) workouts++;
+    if(log._completed&&(log._scheduledDate||log._completedDate)&&(log._scheduledDate||log._completedDate).startsWith(monthStr)) workouts++;
   });
   const mobility=(S.mobHistory||[]).filter(e=>e.date.startsWith(monthStr)).length;
   const setsByEx={};let totalSets=0;
