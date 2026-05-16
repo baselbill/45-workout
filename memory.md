@@ -29,24 +29,49 @@
 
 ---
 
-## Engineering Review (2026-05-16)
+## Engineering Review #2 (2026-05-16) — Post UX Fixes
 
-### Critical Issues (fix soon)
-1. **Calendar date logic still fragile** (line 1962) — Late completions (scheduled Wed, done Thu) won't show as done on Wed. The `_scheduledDate===date` check doesn't handle "completed late but for this scheduled day."
-2. **Training days not validated on load** — If `S.trainingDays` is corrupted/null in localStorage, `buildSchedule()` returns `[]` silently and all sessions disappear with no error.
-3. **Schedule cache never expires across days** — Invalidated only on `startDate`/`trainingDays` change, not on date change. App open past midnight shows stale sessions.
+### Critical
+E2-1. **openModal/closeModal overflow stacking bug** — `openModal()` and `openRef()` both set `#main overflow:hidden`. Closing either one resets to `''`, unlocking scroll even if the other overlay is still open. Needs a reference counter.
+E2-2. **_scheduledDate/_completedDate ambiguity in streak** — `getTrainingStreak()` uses `(log._scheduledDate||log._completedDate)`. If both are null, adds `undefined` to the Set silently. Session not counted in streak.
+E2-3. **Away mode confirm guard fragile** — `toggleAwayMode()` confirm logic returns early correctly but structure is fragile; needs explicit guard before all state mutations.
 
-### High Issues
-4. **Away mode history recorded under substitute name** — Completing in away mode logs history as "Push-Up" not "Bench Press". PRs and "last session" break when returning to gym.
-5. **Training streak edge case** — Rest days with no mobility can cause streak to count back from wrong anchor point.
+### High
+E2-4. **Warmup toggle state resets on every re-render** — Expanded/collapsed state is pure DOM (`style.display`), so it resets to expanded every time `renderToday()` is called (e.g., after logging a set). Needs a persistent JS variable.
+E2-5. **slideProgramForward cancel leaves modal open awkwardly** — If user cancels the confirm, modal stays open with no feedback. Should show a toast or close cleanly.
+E2-6. **Toast remove timeout (2900ms) mismatches CSS animation (2800ms)** — Can cause a visible cutoff. Set timeout to 2850ms.
 
-### Medium Issues
-6. **Multiple mobility routines same day collide** — Mob checks keyed by date; completing two routines overwrites the first in history.
-7. **Away rep targets use deadlift 1RM for horizontal pulls** — `pull_h` and `hinge` both map to deadlift, which is biomechanically wrong for rows.
+### Medium
+E2-7. **PR/set flash overlap on rapid logging** — If two sets are logged < 1800ms apart, first flash's `setTimeout` removes the second flash's element. Needs queue or existence check before remove.
+E2-8. **restMobPhase/-Routine globals race on first rest day render** — `getMobChecks()` may be called before globals are initialized. Add early guard.
+E2-9. **Volume counts sets with weight but zero reps** — `validSets` includes sets with weight but reps=0, contributing 0 to volume but bloating set count.
 
-### Low Issues
-8. No upper bound on `ex.sets` loop — crafted localStorage data could hang the renderer.
-9. No input validation on weight/reps fields — malformed strings silently parsed.
+### Low
+E2-10. **Warmup `display:block` inline style is brittle** — Conflicts with CSS changes. Use class toggle instead.
+E2-11. **Phase headers in week picker misalign if schedule < 48 sessions** — `grid-column:1/-1` assumes 4-column grid holds; breaks if sparse training days produce fewer than 4 sessions per phase row.
+E2-12. **Away mode confirm message doesn't mention already-logged sets are kept** — Confusing wording.
+E2-13. **Date strings not validated before storage** — `_scheduledDate` and `_completedDate` assume YYYY-MM-DD; no validation guard.
+
+---
+
+## Engineering Review #1 (2026-05-16)
+
+### Critical
+E1-1. **Calendar date logic still fragile** — Late completions (scheduled Wed, done Thu) won't show as done on Wed. `_scheduledDate===date` doesn't handle "completed late but for this day."
+E1-2. **Training days not validated on load** — If `S.trainingDays` is null/corrupt, `buildSchedule()` silently returns `[]` and all sessions vanish.
+E1-3. **Schedule cache never expires across midnight** — Cache invalidates on `startDate`/`trainingDays` change only; stale sessions shown if app stays open past midnight.
+
+### High
+E1-4. **Away mode history recorded under substitute name** — History logs "Push-Up" not "Bench Press"; PRs and "last session" break when returning to gym.
+E1-5. **Training streak edge case** — Rest days with no mobility cause streak to count from wrong anchor.
+
+### Medium
+E1-6. **Multiple mobility routines same day overwrite** — Mob checks keyed by date; second routine completion overwrites first.
+E1-7. **Away rep targets use deadlift 1RM for horizontal pulls** — `pull_h` maps to deadlift, biomechanically incorrect for rows.
+
+### Low
+E1-8. No upper bound on `ex.sets` loop — crafted localStorage data could hang renderer.
+E1-9. No input validation on weight/reps — malformed strings silently parsed.
 
 ---
 
