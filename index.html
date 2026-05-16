@@ -144,8 +144,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .seg-prog-item{flex:1;height:4px;background:var(--surf2);border-radius:2px;overflow:hidden;position:relative}
 .seg-prog-fill{height:100%;border-radius:2px;transition:width .4s ease}
 /* Away mode toggle */
-.away-toggle-wrap{background:var(--accent-dim);border:1px solid rgba(255,107,53,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.away-toggle-label{font-size:13px;font-weight:500;color:var(--accent)}
+.away-toggle-wrap{border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.away-toggle-wrap.on{border-color:rgba(255,107,53,.3);background:var(--accent-dim)}
+.away-toggle-label{font-size:12px;font-weight:500;color:var(--muted)}
 .toggle-switch{width:44px;height:26px;border-radius:13px;background:var(--surf2);border:1px solid var(--border2);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
 .toggle-switch.on{background:var(--accent);border-color:var(--accent)}
 .toggle-knob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
@@ -1474,11 +1475,8 @@ function renderToday(){
   const bw=getLatestBW();
   let awayLvlStr='';
   if(S.awayMode&&bw){const benchRM=getRM('bench');if(benchRM){const lvl=getStrengthLevel(benchRM/bw);awayLvlStr=` · ${lvl.label}`;}}
-  html+=`<div class="away-toggle-wrap">
-    <div>
-      <div class="away-toggle-label">✈ Away from gym</div>
-      <div style="font-size:11px;color:var(--accent);opacity:.8;margin-top:2px">${S.awayMode?`BW substitutions active${awayLvlStr}`:'Toggle for bodyweight-only session'}</div>
-    </div>
+  html+=`<div class="away-toggle-wrap${S.awayMode?' on':''}">
+    <span class="away-toggle-label">${S.awayMode?`✈ Away · BW substitutions active${awayLvlStr}`:'✈ Away from gym'}</span>
     <div class="toggle-switch${S.awayMode?' on':''}" onclick="toggleAwayMode()"><div class="toggle-knob"></div></div>
   </div>`;
   if(isDeload)html+=`<div class="alert alert-blue">Deload week — reduced intensity, same exercises.</div>`;
