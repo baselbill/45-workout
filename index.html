@@ -1244,6 +1244,13 @@ function saveSetup(){const v=document.getElementById('setup-date').value;if(!v){
 
 // ─── AWAY MODE TOGGLE ─────────────────────────────────────────────────────────
 function toggleAwayMode(){
+  // Check if any sets are already logged (done:true) in the current session
+  if(viewingSession||getTodaySession()){
+    const sess=viewingSession||getTodaySession();
+    const log=getLog(sess.week,sess.dayIdx);
+    const hasDoneSets=Object.values(log).some(exLog=>typeof exLog==='object'&&exLog&&Object.values(exLog).some(s=>s&&s.done));
+    if(hasDoneSets&&!confirm('Switching away mode will swap exercises. Continue?'))return;
+  }
   S.awayMode=!S.awayMode;
   saveState();
   renderToday();
@@ -1285,7 +1292,13 @@ function routineForDayIdx(di){
   return di===1?0:1;
 }
 function switchRestMobRoutine(i){restMobRoutine=i;expandedMob=-1;renderToday();}
-function toggleRestMobCheck(i){setMobCheck(i,!getMobChecks(restMobPhase,restMobRoutine)[i],restMobPhase,restMobRoutine);renderToday();}
+function toggleRestMobCheck(i){
+  const wasComplete=MOB_DATA[restMobPhase].routines[restMobRoutine].items.every((_,idx)=>getMobChecks(restMobPhase,restMobRoutine)[idx]);
+  setMobCheck(i,!getMobChecks(restMobPhase,restMobRoutine)[i],restMobPhase,restMobRoutine);
+  renderToday();
+  const nowComplete=MOB_DATA[restMobPhase].routines[restMobRoutine].items.every((_,idx)=>getMobChecks(restMobPhase,restMobRoutine)[idx]);
+  if(!wasComplete&&nowComplete){document.getElementById('main').scrollTo({top:0,behavior:'smooth'});showToast('Mobility routine complete — logged!');}
+}
 function toggleRestMobExpand(i){expandedMob=expandedMob===i?-1:i;renderToday();}
 function clearRestMobChecks(){
   S.mobChecks[getMobCheckKey(restMobPhase,restMobRoutine)]={};
@@ -1432,7 +1445,6 @@ function renderToday(){
 
   // Missed banner
   if(missed.length>0&&missed.length!==_missedBannerDismissedCount&&!viewingSession)html+=`<div class="missed-banner"><div class="row" style="margin-bottom:6px;align-items:center"><span style="font-size:13px;font-weight:500;color:var(--red);flex:1">⚠ ${missed.length} missed session${missed.length>1?'s':''}</span><button class="btn btn-sm" onclick="openMissedModal()" style="border-color:var(--red);color:var(--red)">Review</button><button onclick="dismissMissedBanner()" aria-label="Dismiss" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;opacity:.7">×</button></div><div style="font-size:12px;color:var(--red);opacity:.8">Tap Review to slide your program forward</div></div>`;
-  if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
 
   // ── BRAND HEADER ──────────────────────────────────────────────────────────────
   // STR·45 disc mark (inline SVG)
@@ -1451,7 +1463,7 @@ function renderToday(){
     <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px">Week ${w} · Day ${di+1} of 3</div>
     <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
       <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${day.name.replace(' — ',' <span style="color:var(--muted);font-weight:500">(')}</span><span style="display:none"></span></div>
-      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Coming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-orange">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px;padding:5px 10px">Jump</button></div>
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Coming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-green">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px;padding:5px 10px">Jump</button></div>
     </div>
   </div>`;
 
@@ -1510,9 +1522,12 @@ function renderToday(){
   if(isDeload)html+=`<div class="alert alert-blue">Deload week — reduced intensity, same exercises.</div>`;
   if(day.note&&!S.awayMode)html+=`<div class="alert alert-amber">${day.note}</div>`;
 
-  // Warmup — collapsible
+  // Phase change nudge — shown before warmup so it's visible without scrolling
+  if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
+
+  // Warmup — collapsible (expanded by default)
   const awayWarmup="5 min of jumping jacks, high knees, or brisk walk · arm circles × 10 · hip circles × 10 · bodyweight squat × 10";
-  html+=`<button class="warmup-box" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'"><span style="display:flex;align-items:center;gap:8px"><span style="color:var(--amber);font-size:15px">🔥</span><span style="font-weight:500;color:var(--text);font-size:13px">Warmup</span><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">~3 min</span></span><span style="color:var(--muted);font-size:16px">›</span></button><div style="display:none;padding:0 4px 14px;font-size:13px;color:var(--muted);line-height:1.6">${S.awayMode?awayWarmup:day.warmup}</div>`;
+  html+=`<button class="warmup-box" onclick="const n=this.nextElementSibling;n.style.display=n.style.display==='none'?'block':'none'"><span style="display:flex;align-items:center;gap:8px"><span style="color:var(--amber);font-size:15px">🔥</span><span style="font-weight:500;color:var(--text);font-size:13px">Warmup</span><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">~3 min</span></span><span style="color:var(--muted);font-size:16px">›</span></button><div style="display:block;padding:0 4px 14px;font-size:13px;color:var(--muted);line-height:1.6">${S.awayMode?awayWarmup:day.warmup}</div>`;
 
   // Exercises
   exercises.forEach((ex,ei)=>{
@@ -1525,7 +1540,7 @@ function renderToday(){
     html+=`<div class="ex-card${exAllDone?' done':''}${isAway?' away-ex':''}">`;
     // For away exercises, fold the strength level into the detail line as a small badge
     const awayLvlBadge=isAway&&ex.ratio!=null?`<span style="font-size:10px;font-family:var(--mono);color:${getStrengthLevel(ex.ratio).color};margin-left:6px">${getStrengthLevel(ex.ratio).label}</span>`:'';
-    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
+    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" aria-label="How to do this exercise" title="How to do this exercise" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
 
     // Weight rec — gym only; away exercises need no separate box
     if(!isAway&&rec){
@@ -1825,7 +1840,7 @@ function completeSession(w,di,schedDate){
 
 function uncompleteSession(w,di){const l=getLog(w,di);delete l._completed;delete l._completedDate;delete l._scheduledDate;delete l._awayMode;setLog(w,di,l);renderToday();}
 
-function openMissedModal(){const m=getMissedSessions();let html=`<div class="alert alert-amber" style="margin-bottom:12px">You have ${m.length} unlogged session${m.length>1?'s':''} in the past. Tap "Slide schedule to today" to realign your schedule to today.</div>`;m.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx];html+=`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center"><span class="badge badge-red">Wk ${s.week}</span><div><div style="font-size:13px;color:var(--text)">${d.name}</div><div style="font-size:11px;color:var(--muted)">${formatDateDisplay(s.date)}</div></div></div>`;});document.getElementById('modal-missed-body').innerHTML=html;openModal('modal-missed');}
+function openMissedModal(){const m=getMissedSessions();let html=`<div class="alert alert-amber" style="margin-bottom:12px">You have ${m.length} unlogged session${m.length>1?'s':''} in the past. Tap "Slide schedule to today" to realign your schedule to today.</div>`;m.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx];html+=`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center"><span class="badge badge-red">Wk ${s.week}</span><div><div style="font-size:13px;color:var(--text)">${d.name}</div><div style="font-size:11px;color:var(--muted)">${formatDateDisplay(s.date)}</div></div></div>`;});if(m.length>5)html+=`<div style="font-size:11px;color:var(--muted);text-align:center;padding:8px 0">↑ Scroll to see all ${m.length} missed sessions</div>`;document.getElementById('modal-missed-body').innerHTML=html;openModal('modal-missed');}
 
 function openWeekPicker(){
   const sched=getSchedule(),today=todayStr(),grid=document.getElementById('week-picker-grid');
@@ -1855,9 +1870,9 @@ function openRef(name){
   if(ref.mistake){html+=`<div class="ref-section">Most common mistake</div><div class="ref-mistake">⚠ ${ref.mistake}</div>`;}
   if(ref.search){const q=encodeURIComponent(ref.search+' tutorial');html+=`<div class="ref-section">Watch a demo</div><a href="https://www.youtube.com/results?search_query=${q}" class="ref-link" target="_blank">▶ Search YouTube: "${ref.search}"</a>`;}
   html+=`<button class="btn btn-ghost" onclick="closeRef()" style="margin-top:8px">Close</button>`;
-  document.getElementById('ref-inner').innerHTML=html;document.getElementById('ref-panel').classList.add('open');
+  document.getElementById('ref-inner').innerHTML=html;document.getElementById('ref-panel').classList.add('open');document.getElementById('main').style.overflow='hidden';
 }
-function closeRef(){document.getElementById('ref-panel').classList.remove('open');}
+function closeRef(){document.getElementById('ref-panel').classList.remove('open');document.getElementById('main').style.overflow='';}
 
 // ─── CHART / VISUAL HELPERS ───────────────────────────────────────────────────
 let _chartUid=0;
@@ -2020,7 +2035,8 @@ function renderCalendar(){
   html+=`</div>`;
 
   // Upcoming sessions
-  const upcoming=sched.filter(s=>s.date>=today&&!isSessionDone(s.week,s.dayIdx)).slice(0,5);
+  const allUpcoming=sched.filter(s=>s.date>=today&&!isSessionDone(s.week,s.dayIdx));
+  const upcoming=allUpcoming.slice(0,5);
   html+=`<div class="section-label">Upcoming</div>`;
   if(!upcoming.length){html+=`<div class="card" style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Program complete 🎉</div>`;}
   else upcoming.forEach(s=>{
@@ -2032,6 +2048,7 @@ function renderCalendar(){
     const typeCol=s.dayIdx===1?'var(--blue)':'var(--accent)';
     html+=`<div class="card" style="cursor:pointer;padding:12px;margin-bottom:8px;${isT?'border-color:rgba(91,196,137,.35)':''}" onclick="jumpTo(${s.week},${s.dayIdx});showScreenById('today')"><div style="display:flex;align-items:center;gap:10px"><div style="text-align:center;min-width:34px"><div style="font-size:17px;font-weight:700;font-family:var(--mono);line-height:1;color:var(--text)">${dayN}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">${dow2}</div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:${typeBg};color:${typeCol};font-family:var(--mono)">${s.dayIdx===1?'L':'U'}${s.dayIdx+1}</span><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">Wk ${s.week} · ${ph.short}</span>${isT?'<span class="badge badge-green" style="margin-left:auto">Today</span>':''}</div><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${day.name}</div></div><span style="font-size:16px;color:var(--muted)">›</span></div></div>`;
   });
+  if(allUpcoming.length>5){html+=`<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0 4px">Showing 5 of ${allUpcoming.length} upcoming sessions.</div>`;}
 
   // Program start row
   if(S.startDate){
@@ -2049,12 +2066,16 @@ function changeStartDate(){const d=prompt('Enter new start date (YYYY-MM-DD):',S
 function renderStrength(){
   const bw=getLatestBW();
   const liftColor={bench:'#FF6B35',squat:'#60a5fa',deadlift:'#5BC489',ohp:'#E8B040',pullup:'#a78bfa'};
-  const big3=['bench','squat','deadlift'].map(id=>getRM(id)).filter(Boolean);
-  const big3Total=big3.reduce((a,b)=>a+b,0);
+  const big3Ids=['bench','squat','deadlift'];
+  const big3Values=big3Ids.map(id=>getRM(id));
+  const big3Available=big3Values.filter(Boolean);
+  const big3Total=big3Available.reduce((a,b)=>a+b,0);
   const big3Mult=bw&&big3Total?(big3Total/bw).toFixed(2):null;
+  const big3Missing=big3Ids.filter((_,i)=>!big3Values[i]);
+  const big3SubLabel=big3Missing.length>0?` (${3-big3Missing.length} of 3 logged)`:'';
 
   // Header
-  let html=`<div style="padding:14px 0 8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="page-title">Strength</div><div class="page-sub">1RM Tracker</div></div>${big3Total?`<div style="text-align:right"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:3px">BIG·3 TOTAL</div><div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--accent)">${big3Total}<span style="font-size:11px;color:var(--muted);font-weight:400"> kg</span></div></div>`:''}</div></div>`;
+  let html=`<div style="padding:14px 0 8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="page-title">Strength</div><div class="page-sub">1RM Tracker</div></div><div style="text-align:right"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:3px">BIG·3 TOTAL</div><div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--accent)">${big3Total||'—'}${big3Total?`<span style="font-size:11px;color:var(--muted);font-weight:400"> kg</span>`:''}</div>${big3SubLabel?`<div style="font-size:10px;color:var(--muted);margin-top:1px">${big3SubLabel}</div>`:''}</div></div></div>`;
 
   // Strength snapshot hero card
   html+=`<div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,var(--surf),var(--surf2))"><div class="strength-snap">`;
@@ -2445,7 +2466,13 @@ function renderMobility(){
   html+=`<div style="height:8px"></div>`;
   document.getElementById('screen-mobility').innerHTML=html;
 }
-function toggleMobCheck(i){setMobCheck(i,!getMobChecks(mobPhaseView,mobRoutineView)[i]);renderMobility();}
+function toggleMobCheck(i){
+  const wasComplete=MOB_DATA[mobPhaseView].routines[mobRoutineView].items.every((_,idx)=>getMobChecks(mobPhaseView,mobRoutineView)[idx]);
+  setMobCheck(i,!getMobChecks(mobPhaseView,mobRoutineView)[i]);
+  renderMobility();
+  const nowComplete=MOB_DATA[mobPhaseView].routines[mobRoutineView].items.every((_,idx)=>getMobChecks(mobPhaseView,mobRoutineView)[idx]);
+  if(!wasComplete&&nowComplete){document.getElementById('main').scrollTo({top:0,behavior:'smooth'});showToast('Mobility routine complete — logged!');}
+}
 function toggleMobExpand(i){expandedMob=expandedMob===i?-1:i;renderMobility();}
 function clearMobChecks(){
   S.mobChecks[getMobCheckKey(mobPhaseView,mobRoutineView)]={};
