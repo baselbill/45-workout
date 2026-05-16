@@ -875,14 +875,21 @@ const MOB_DATA=[
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 const STORE_KEY='wkapp_v7';
+function isValidDate(s){return typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s);}
 function loadState(){try{const r=localStorage.getItem(STORE_KEY);if(r)return JSON.parse(r);}catch(e){}return{logs:{},rm:{},rmHistory:{},bw:[],startDate:null,trainingDays:[1,3,5],mobChecks:{},mobHistory:[],awayMode:false,exHistory:{}};}
 function saveState(){try{const t={logs:S.logs,rm:S.rm,rmHistory:S.rmHistory,bw:S.bw,startDate:S.startDate,trainingDays:S.trainingDays,mobChecks:S.mobChecks,mobHistory:S.mobHistory||[],awayMode:S.awayMode,exHistory:S.exHistory||{}};localStorage.setItem(STORE_KEY,JSON.stringify(t));}catch(e){}}
 let S=loadState();
+// E1-2: Validate all critical state fields on load — prevents crashes from corrupted/legacy data
 if(!S.rmHistory)S.rmHistory={};
 if(!S.mobChecks)S.mobChecks={};
 if(!S.mobHistory)S.mobHistory=[];
 if(!S.exHistory)S.exHistory={};
 if(S.awayMode===undefined)S.awayMode=false;
+if(!S.logs||typeof S.logs!=='object')S.logs={};
+if(!S.rm||typeof S.rm!=='object')S.rm={};
+if(!S.trainingDays||!Array.isArray(S.trainingDays)||S.trainingDays.length===0)S.trainingDays=[1,3,5];
+// E2-13: Validate startDate format on load
+if(S.startDate&&!isValidDate(S.startDate))S.startDate=null;
 
 // ─── EXERCISE HISTORY HELPERS ─────────────────────────────────────────────────
 // exHistory[exName] = [{date, week, sets:[{weight,reps}], bestWeight, bestReps, volume}]
@@ -981,7 +988,9 @@ function setMobCheck(idx,val,phaseIdx,routineIdx){const pi=phaseIdx!==undefined?
 
 // ─── SCHEDULE ─────────────────────────────────────────────────────────────────
 function buildSchedule(){if(!S.startDate||!S.trainingDays)return[];const start=new Date(S.startDate+'T00:00:00');const days=[...S.trainingDays].sort((a,b)=>a-b);const sessions=[];let count=0;let d=new Date(start);let itr=0;while(count<48&&itr<500){itr++;const dow=d.getDay();if(days.includes(dow)){sessions.push({date:dateStr(d),week:Math.floor(count/3)+1,dayIdx:count%3,sessionIdx:count});count++;}d.setDate(d.getDate()+1);}return sessions;}
-function getSchedule(){if(!S._sc||S._scS!==S.startDate||S._scD!==JSON.stringify(S.trainingDays)){S._sc=buildSchedule();S._scS=S.startDate;S._scD=JSON.stringify(S.trainingDays);}return S._sc;}
+// E1-3: Include todayStr() in the cache key so the schedule cache always expires at midnight.
+// Without this, getTodaySession() returns stale results for users who keep the app open overnight.
+function getSchedule(){if(!S._sc||S._scS!==S.startDate||S._scD!==JSON.stringify(S.trainingDays)||S._scDate!==todayStr()){S._sc=buildSchedule();S._scS=S.startDate;S._scD=JSON.stringify(S.trainingDays);S._scDate=todayStr();}return S._sc;}
 function getTodaySession(){return getSchedule().find(s=>s.date===todayStr())||null;}
 function getNextPendingSession(){const t=todayStr();for(const s of getSchedule()){if(s.date>=t&&!isSessionDone(s.week,s.dayIdx))return s;}return null;}
 function getMissedSessions(){const t=todayStr();return getSchedule().filter(s=>s.date<t&&!isSessionDone(s.week,s.dayIdx));}
@@ -1260,6 +1269,9 @@ function toggleAwayMode(){
 let viewingSession=null;
 let _missedBannerDismissedCount=-1; // count at time of dismiss; -1 means not dismissed
 function dismissMissedBanner(){_missedBannerDismissedCount=getMissedSessions().length;renderToday();}
+// E2-4: Persist warmup collapsed state across renderToday() calls (logging a set triggers re-render).
+// Without this, the warmup section snaps back open on every set tick.
+let warmupCollapsed=false;
 
 // ─── REST DAY MOBILITY ────────────────────────────────────────────────────────
 // On rest days the Today tab shows a mobility routine aligned to the user's
@@ -1273,9 +1285,17 @@ function getLastCompletedSession(){
 }
 // Consecutive days (counting back from today) with either a completed workout
 // or a completed mobility routine. A blank "today" doesn't break the streak.
+// Note: i===0 is today. If today has no entry, the loop doesn't break (i>0 guard),
+// so yesterday's entry still starts the count. This is intentional — rest days
+// between workout days should not reset the streak.
 function getTrainingStreak(){
   const sessSet=new Set();
-  Object.values(S.logs||{}).forEach(log=>{if(log._completed&&(log._scheduledDate||log._completedDate))sessSet.add(log._scheduledDate||log._completedDate);});
+  // E2-2: Use an explicit dateKey variable to avoid adding undefined/empty-string to the Set
+  // if both _scheduledDate and _completedDate are missing (legacy data without either field).
+  Object.values(S.logs||{}).forEach(log=>{
+    const dateKey=log._scheduledDate||log._completedDate;
+    if(log._completed&&dateKey)sessSet.add(dateKey);
+  });
   const mobSet=new Set((S.mobHistory||[]).map(e=>e.date));
   const td=new Date(todayStr()+'T00:00:00');
   let streak=0;
@@ -1390,16 +1410,14 @@ function renderRestDayToday(missed){
   renderStickyTimer();
 }
 
-function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2900);}
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2850);}
 
-function openModal(id){
-  document.getElementById(id).classList.add('open');
-  document.getElementById('main').style.overflow='hidden';
-}
-function closeModal(id){
-  document.getElementById(id).classList.remove('open');
-  document.getElementById('main').style.overflow='';
-}
+// E2-1: Use a depth counter so that closing one modal/panel doesn't prematurely
+// unlock scroll when another is still open (e.g. ref panel + modal open simultaneously).
+let _modalDepth=0;
+function openModal(id){document.getElementById(id).classList.add('open');if(++_modalDepth===1)document.getElementById('main').style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(--_modalDepth<=0){_modalDepth=0;document.getElementById('main').style.overflow='';}}
+
 
 function renderToday(){
   if(!S.startDate){
@@ -1821,6 +1839,9 @@ function completeSession(w,di,schedDate){
   resolvedExercises.forEach((ex,ei)=>{
     const exLog=l[ei]||{};
     const sets=Object.values(exLog).filter(s=>s&&typeof s==='object'&&'done' in s);
+    // E1-4: Always record under the gym exercise name (ex.originalName for away subs, ex.n for gym).
+    // This ensures exHistory keys match between gym and away sessions so PRs and last-session
+    // lookups work correctly regardless of which mode the user was in.
     if(sets.length) recordExerciseHistory(ex.originalName||ex.n, sets, w);
   });
   // Auto-calculate 1RM from history after recording
@@ -1870,9 +1891,12 @@ function openRef(name){
   if(ref.mistake){html+=`<div class="ref-section">Most common mistake</div><div class="ref-mistake">⚠ ${ref.mistake}</div>`;}
   if(ref.search){const q=encodeURIComponent(ref.search+' tutorial');html+=`<div class="ref-section">Watch a demo</div><a href="https://www.youtube.com/results?search_query=${q}" class="ref-link" target="_blank">▶ Search YouTube: "${ref.search}"</a>`;}
   html+=`<button class="btn btn-ghost" onclick="closeRef()" style="margin-top:8px">Close</button>`;
-  document.getElementById('ref-inner').innerHTML=html;document.getElementById('ref-panel').classList.add('open');document.getElementById('main').style.overflow='hidden';
+  document.getElementById('ref-inner').innerHTML=html;
+  document.getElementById('ref-panel').classList.add('open');
+  // E2-1: Use the same depth counter as openModal so ref panel + modal don't conflict
+  if(++_modalDepth===1)document.getElementById('main').style.overflow='hidden';
 }
-function closeRef(){document.getElementById('ref-panel').classList.remove('open');document.getElementById('main').style.overflow='';}
+function closeRef(){document.getElementById('ref-panel').classList.remove('open');if(--_modalDepth<=0){_modalDepth=0;document.getElementById('main').style.overflow='';}}
 
 // ─── CHART / VISUAL HELPERS ───────────────────────────────────────────────────
 let _chartUid=0;
@@ -2018,6 +2042,11 @@ function renderCalendar(){
     let cls='',label='';
     if(entry){
       const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
+      // E1-1: A session appears as "completed" on its SCHEDULED date.
+      // Primary check: _scheduledDate===date (set by completeSession() since v7).
+      // Fallback: legacy data without _scheduledDate uses _completedDate===date.
+      // This correctly handles late completions (scheduled Wed, done Thu) by always
+      // rendering completion on the scheduled date, not the actual completion date.
       const done=!!doneLog._completed&&(doneLog._scheduledDate===date||(!doneLog._scheduledDate&&doneLog._completedDate===date)),wasAway=!!doneLog._awayMode;
       cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
       label=(entry.dayIdx===1?'L':'U')+(entry.dayIdx+1)+(wasAway&&done?' ✈':'');
@@ -2215,8 +2244,10 @@ function getPRsInMonth(monthStr){
 
 function getMonthlyStats(monthStr){
   let workouts=0;
+  // E2-2: Use explicit dateKey to avoid false positives from empty-string coercion
   Object.values(S.logs||{}).forEach(log=>{
-    if(log._completed&&(log._scheduledDate||log._completedDate)&&(log._scheduledDate||log._completedDate).startsWith(monthStr)) workouts++;
+    const dateKey=log._scheduledDate||log._completedDate;
+    if(log._completed&&dateKey&&dateKey.startsWith(monthStr)) workouts++;
   });
   const mobility=(S.mobHistory||[]).filter(e=>e.date.startsWith(monthStr)).length;
   const setsByEx={};let totalSets=0;
