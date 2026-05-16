@@ -72,6 +72,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .set-row{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
 .set-row.active-set{background:var(--accent-mute);border-color:var(--accent-dim)}
 .set-row.done-set{opacity:.7}
+.done-set .set-stepper,.done-set .set-val-input{opacity:.5;pointer-events:none}
 .set-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
 .set-num.active{background:var(--accent-dim);color:var(--accent)}
 .set-num.done{background:var(--success-dim);color:var(--success)}
@@ -229,6 +230,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
+/* Toast notification */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:600;background:var(--surf);border:1px solid var(--border2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:500;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none;animation:toastIn .25s cubic-bezier(.32,.72,0,1),toastOut .3s ease 2.5s forwards;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-8px)}}
 .modal{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--text)}
 input[type=date],input[type=number],input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
@@ -300,7 +305,7 @@ input[type=date]{color-scheme:dark}
   </div>
 </div>
 
-<div id="modal-bw" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-bw')">
+<div id="modal-bw" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-bw')" >
   <div class="modal">
     <div class="modal-title">Log bodyweight</div>
     <div style="margin-bottom:12px">
@@ -320,16 +325,17 @@ input[type=date]{color-scheme:dark}
   <div class="modal">
     <div class="modal-title">Missed workouts</div>
     <div id="modal-missed-body"></div>
-    <button class="btn btn-primary" onclick="slideProgramForward()">Slide program forward</button>
+    <button class="btn btn-primary" onclick="slideProgramForward()">Slide schedule to today</button>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin:-4px 0 8px">Shifts your program so today becomes your next session. Logged workouts stay.</div>
     <button class="btn btn-ghost" onclick="closeModal('modal-missed')">Dismiss</button>
   </div>
 </div>
 
-<div id="week-picker-modal" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+<div id="week-picker-modal" class="modal-overlay" onclick="if(event.target===this)closeModal('week-picker-modal')">
   <div class="modal">
     <div class="modal-title">Jump to session</div>
     <div id="week-picker-grid" class="week-grid"></div>
-    <button class="btn btn-ghost" onclick="document.getElementById('week-picker-modal').classList.remove('open')">Cancel</button>
+    <button class="btn btn-ghost" onclick="closeModal('week-picker-modal')">Cancel</button>
   </div>
 </div>
 
@@ -980,7 +986,7 @@ function getTodaySession(){return getSchedule().find(s=>s.date===todayStr())||nu
 function getNextPendingSession(){const t=todayStr();for(const s of getSchedule()){if(s.date>=t&&!isSessionDone(s.week,s.dayIdx))return s;}return null;}
 function getMissedSessions(){const t=todayStr();return getSchedule().filter(s=>s.date<t&&!isSessionDone(s.week,s.dayIdx));}
 function isSessionDone(w,d){return!!(S.logs[dayKey(w,d)]||{})._completed;}
-function slideProgramForward(){const missed=getMissedSessions();if(!missed.length){closeModal('modal-missed');return;}const e=missed[0].date;const td=new Date(todayStr()+'T00:00:00'),ed=new Date(e+'T00:00:00');const diff=Math.round((td-ed)/86400000);const ns=new Date(S.startDate+'T00:00:00');ns.setDate(ns.getDate()+diff);S.startDate=dateStr(ns);S._sc=null;saveState();closeModal('modal-missed');renderToday();}
+function slideProgramForward(){const missed=getMissedSessions();if(!missed.length){closeModal('modal-missed');return;}if(!confirm('This shifts your entire schedule so today becomes your next session. Your logged workouts are kept. Continue?'))return;const e=missed[0].date;const td=new Date(todayStr()+'T00:00:00'),ed=new Date(e+'T00:00:00');const diff=Math.round((td-ed)/86400000);const ns=new Date(S.startDate+'T00:00:00');ns.setDate(ns.getDate()+diff);S.startDate=dateStr(ns);S._sc=null;saveState();closeModal('modal-missed');renderToday();}
 
 // ─── 1RM ──────────────────────────────────────────────────────────────────────
 function getExRec(ex){const lid=LIFT_TO_RM[ex.n];if(!lid)return null;const pct=parsePct(ex.load);if(!pct)return null;const rm=getRM(lid);if(!rm)return null;return{kg:Math.round(rm*pct/2.5)*2.5,pct:Math.round(pct*100),rm};}
@@ -1232,9 +1238,9 @@ function initSetup(){
     dp.appendChild(b);
   });
   S.trainingDays=selected;
-  document.getElementById('modal-setup').classList.add('open');
+  openModal('modal-setup');
 }
-function saveSetup(){const v=document.getElementById('setup-date').value;if(!v){alert('Please pick a start date');return;}S.startDate=v;S._sc=null;saveState();closeModal('modal-setup');renderToday();}
+function saveSetup(){const v=document.getElementById('setup-date').value;if(!v){alert('Please pick a start date');return;}S.startDate=v;S._sc=null;saveState();closeModal('modal-setup');renderToday();showToast('Program started! Week 1, Day 1 ready.');}
 
 // ─── AWAY MODE TOGGLE ─────────────────────────────────────────────────────────
 function toggleAwayMode(){
@@ -1371,8 +1377,30 @@ function renderRestDayToday(missed){
   renderStickyTimer();
 }
 
+function showToast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2900);}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  document.getElementById('main').style.overflow='hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.getElementById('main').style.overflow='';
+}
+
 function renderToday(){
-  if(!S.startDate){initSetup();return;}
+  if(!S.startDate){
+    // Show a "Set up program" card on the Today screen instead of just the modal
+    const el=document.getElementById('screen-today');
+    el.innerHTML=`<div class="page-header"><div class="page-title">Today</div><div class="page-sub">Get started with your 16-week program</div></div>
+    <div class="card" style="text-align:center;padding:32px 20px;border-color:rgba(255,107,53,.3);background:var(--accent-dim);cursor:pointer" onclick="initSetup()">
+      <div style="font-size:36px;margin-bottom:12px">🏋️</div>
+      <div style="font-size:17px;font-weight:700;color:var(--accent);margin-bottom:6px">Set up your program →</div>
+      <div style="font-size:13px;color:var(--muted)">Tap to choose your start date and training days.</div>
+    </div>`;
+    initSetup();
+    return;
+  }
   const missed=getMissedSessions();
   const todaySess=getTodaySession();
   const next=getNextPendingSession();
@@ -1797,10 +1825,26 @@ function completeSession(w,di,schedDate){
 
 function uncompleteSession(w,di){const l=getLog(w,di);delete l._completed;delete l._completedDate;delete l._scheduledDate;delete l._awayMode;setLog(w,di,l);renderToday();}
 
-function openMissedModal(){const m=getMissedSessions();let html=`<div class="alert alert-amber" style="margin-bottom:12px">You have ${m.length} unlogged session${m.length>1?'s':''} in the past. Tap "Slide program forward" to realign your schedule to today.</div>`;m.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx];html+=`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center"><span class="badge badge-red">Wk ${s.week}</span><div><div style="font-size:13px;color:var(--text)">${d.name}</div><div style="font-size:11px;color:var(--muted)">${formatDateDisplay(s.date)}</div></div></div>`;});document.getElementById('modal-missed-body').innerHTML=html;document.getElementById('modal-missed').classList.add('open');}
+function openMissedModal(){const m=getMissedSessions();let html=`<div class="alert alert-amber" style="margin-bottom:12px">You have ${m.length} unlogged session${m.length>1?'s':''} in the past. Tap "Slide schedule to today" to realign your schedule to today.</div>`;m.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx];html+=`<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center"><span class="badge badge-red">Wk ${s.week}</span><div><div style="font-size:13px;color:var(--text)">${d.name}</div><div style="font-size:11px;color:var(--muted)">${formatDateDisplay(s.date)}</div></div></div>`;});document.getElementById('modal-missed-body').innerHTML=html;openModal('modal-missed');}
 
-function openWeekPicker(){const sched=getSchedule(),today=todayStr(),grid=document.getElementById('week-picker-grid');let h='';for(let w=1;w<=16;w++)for(let di=0;di<3;di++){const e=sched.find(s=>s.week===w&&s.dayIdx===di),done=isSessionDone(w,di),isT=e&&e.date===today,isCurr=viewingSession&&viewingSession.week===w&&viewingSession.dayIdx===di;h+=`<div class="week-cell${done?' done':isT||isCurr?' current':''}" onclick="jumpTo(${w},${di})" style="font-size:10px"><span class="wn" style="font-size:12px">W${w}</span><span>D${di+1}</span></div>`;}grid.innerHTML=h;document.getElementById('week-picker-modal').classList.add('open');}
-function jumpTo(w,di){viewingSession={week:w,dayIdx:di};document.getElementById('week-picker-modal').classList.remove('open');window.scrollTo(0,0);renderToday();}
+function openWeekPicker(){
+  const sched=getSchedule(),today=todayStr(),grid=document.getElementById('week-picker-grid');
+  // Build phase-labelled grid
+  let h='';
+  const phaseNames=['Phase 1: Wks 1–4','Phase 2: Wks 5–8','Phase 3: Wks 9–12','Phase 4: Wks 13–16'];
+  const phaseStarts=[1,5,9,13];
+  for(let w=1;w<=16;w++){
+    // Insert phase header before start of each phase
+    if(phaseStarts.includes(w)){
+      const phIdx=phaseStarts.indexOf(w);
+      h+=`<div style="grid-column:1/-1;font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin:${phIdx===0?'0':'8px'} 0 4px">${phaseNames[phIdx]}</div>`;
+    }
+    for(let di=0;di<3;di++){const e=sched.find(s=>s.week===w&&s.dayIdx===di),done=isSessionDone(w,di),isT=e&&e.date===today,isCurr=viewingSession&&viewingSession.week===w&&viewingSession.dayIdx===di;h+=`<div class="week-cell${done?' done':isT||isCurr?' current':w===16?'':''}" onclick="jumpTo(${w},${di})" style="font-size:10px"><span class="wn" style="font-size:12px">W${w}</span><span>D${di+1}</span></div>`;}
+  }
+  grid.innerHTML=h;
+  openModal('week-picker-modal');
+}
+function jumpTo(w,di){viewingSession={week:w,dayIdx:di};closeModal('week-picker-modal');window.scrollTo(0,0);renderToday();}
 
 // ─── REFERENCE PANEL ──────────────────────────────────────────────────────────
 function openRef(name){
@@ -2225,13 +2269,13 @@ function renderProgress(){
   ];
   html+=`<div class="kpi-grid">`;
   kpis.forEach(k=>{
-    html+=`<div class="kpi-tile"><div class="kpi-stripe" style="background:${k.stripe}"></div><div class="kpi-inner"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:8px">${k.label}</div><div style="font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-.02em;line-height:1;color:var(--text)">${k.val}${dSign(k.d)}</div></div></div>`;
+    html+=`<div class="kpi-tile"><div class="kpi-stripe" style="background:${k.stripe}"></div><div class="kpi-inner"><div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:8px">${k.label}</div><div style="font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-.02em;line-height:1;color:var(--text)">${k.val}${dSign(k.d)}</div></div></div>`;
   });
   html+=`</div>`;
 
   // Empty state
   if(mStats.workouts===0&&mStats.mobility===0&&mStats.totalSets===0){
-    html+=`<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0 12px">No activity logged${isCurrentMonth?' yet this month':' in this month'}.</div>`;
+    html+=`<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0 12px">No activity logged${isCurrentMonth?' yet this month':' in this month'}. <span style="color:var(--accent);text-decoration:underline;cursor:pointer" onclick="showScreen('today',document.querySelectorAll('.nav-item')[0])">Log your first session in the Today tab →</span></div>`;
   }
 
   // Muscle distribution donut
@@ -2329,7 +2373,7 @@ function renderProgress(){
   html+=`<div class="divider"></div><button class="btn btn-ghost btn-danger" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.removeItem('${STORE_KEY}');location.reload()}">Reset all data</button>`;
   document.getElementById('screen-progress').innerHTML=html;
 }
-function openBWModal(){document.getElementById('bw-date').value=todayStr();document.getElementById('bw-input').value='';document.getElementById('modal-bw').classList.add('open');}
+function openBWModal(){document.getElementById('bw-date').value=todayStr();document.getElementById('bw-input').value='';openModal('modal-bw');}
 function saveBW(){const w=parseFloat(document.getElementById('bw-input').value),d=document.getElementById('bw-date').value;if(!w||!d){alert('Please enter weight and date');return;}if(!S.bw)S.bw=[];S.bw=S.bw.filter(e=>e.date!==d);S.bw.push({date:d,weight:w});S.bw.sort((a,b)=>a.date.localeCompare(b.date));saveState();closeModal('modal-bw');renderStrength();}
 function deleteBW(date){S.bw=(S.bw||[]).filter(e=>e.date!==date);saveState();renderStrength();}
 
@@ -2430,8 +2474,6 @@ function showScreenById(id){
   if(id==='today')renderToday();
   if(id==='calendar')renderCalendar();
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 if(!S.startDate)initSetup();else renderToday();
 </script>
