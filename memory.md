@@ -1,5 +1,26 @@
 # 45-Workout — Project Memory
 
+## Engineering Review (2026-05-16)
+
+### Critical Issues (fix soon)
+1. **Calendar date logic still fragile** (line 1962) — Late completions (scheduled Wed, done Thu) won't show as done on Wed. The `_scheduledDate===date` check doesn't handle "completed late but for this scheduled day."
+2. **Training days not validated on load** — If `S.trainingDays` is corrupted/null in localStorage, `buildSchedule()` returns `[]` silently and all sessions disappear with no error.
+3. **Schedule cache never expires across days** — Invalidated only on `startDate`/`trainingDays` change, not on date change. App open past midnight shows stale sessions.
+
+### High Issues
+4. **Away mode history recorded under substitute name** — Completing in away mode logs history as "Push-Up" not "Bench Press". PRs and "last session" break when returning to gym.
+5. **Training streak edge case** — Rest days with no mobility can cause streak to count back from wrong anchor point.
+
+### Medium Issues
+6. **Multiple mobility routines same day collide** — Mob checks keyed by date; completing two routines overwrites the first in history.
+7. **Away rep targets use deadlift 1RM for horizontal pulls** — `pull_h` and `hinge` both map to deadlift, which is biomechanically wrong for rows.
+
+### Low Issues
+8. No upper bound on `ex.sets` loop — crafted localStorage data could hang the renderer.
+9. No input validation on weight/reps fields — malformed strings silently parsed.
+
+---
+
 ## Session Review (2026-05-16)
 
 ### What Was Done
