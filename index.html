@@ -5,100 +5,175 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0f1117">
-<title>Strength Program — Bill Zhou</title>
+<meta name="theme-color" content="#0E0E10">
+<title>Strength·45 — v7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f1117;--surf:#1a1d26;--surf2:#22263a;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--text:#f0f0f0;--muted:#7a7f96;--accent:#4ade80;--accent-dim:rgba(74,222,128,0.12);--amber:#fbbf24;--amber-dim:rgba(251,191,36,0.12);--blue:#60a5fa;--blue-dim:rgba(96,165,250,0.12);--red:#f87171;--red-dim:rgba(248,113,113,0.12);--purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);--orange:#fb923c;--orange-dim:rgba(251,146,60,0.12);--r:12px;--r-sm:8px;
---mono:ui-monospace,'SF Mono','Monaco','Cascadia Mono','Segoe UI Mono','Roboto Mono',monospace;
---sans:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif}
+:root{
+  --bg:#0E0E10;--surf:#17171B;--surf2:#1F1F24;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --text:#EAEAEC;--muted:#8B8B92;--muted2:#5A5A62;
+  --accent:#FF6B35;--accent-dim:rgba(255,107,53,0.14);--accent-mute:rgba(255,107,53,0.08);
+  --success:#5BC489;--success-dim:rgba(91,196,137,0.12);
+  --amber:#E8B040;--amber-dim:rgba(232,176,64,0.12);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.12);
+  --red:#E76A6A;--red-dim:rgba(231,106,106,0.12);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
+  --orange:#FF6B35;--orange-dim:rgba(255,107,53,0.14);
+  --r:14px;--r-sm:10px;
+  --mono:'JetBrains Mono','SF Mono','Cascadia Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;-webkit-font-smoothing:antialiased}
 #app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto}
 #main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 110px;-webkit-overflow-scrolling:touch}
 #main::-webkit-scrollbar{display:none}
-#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:var(--surf);border-top:1px solid var(--border);padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:100}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.03em;transition:color .15s}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;background:rgba(14,14,16,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:10px 0 max(10px,env(safe-area-inset-bottom));z-index:100}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;cursor:pointer;border:none;background:none;color:var(--muted);font-family:var(--sans);font-size:10px;font-weight:500;letter-spacing:.02em;transition:color .15s}
 .nav-item svg{width:22px;height:22px}.nav-item.active{color:var(--accent)}
 .screen{display:none;padding-top:16px}.screen.active{display:block}
-.page-title{font-size:22px;font-weight:600;color:var(--text)}.page-sub{font-size:13px;color:var(--muted);margin-top:3px}.page-header{padding:8px 0 16px}
+.page-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.01em}.page-sub{font-size:13px;color:var(--muted);margin-top:3px}.page-header{padding:8px 0 16px}
 .card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px}
-.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 8px;border-radius:20px;font-family:var(--mono)}
-.badge-green{background:var(--accent-dim);color:var(--accent)}.badge-amber{background:var(--amber-dim);color:var(--amber)}.badge-blue{background:var(--blue-dim);color:var(--blue)}.badge-red{background:var(--red-dim);color:var(--red)}.badge-purple{background:var(--purple-dim);color:var(--purple)}.badge-orange{background:var(--orange-dim);color:var(--orange)}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;font-family:var(--mono);letter-spacing:.02em}
+.badge-green{background:var(--success-dim);color:var(--success)}.badge-amber{background:var(--amber-dim);color:var(--amber)}.badge-blue{background:var(--blue-dim);color:var(--blue)}.badge-red{background:var(--red-dim);color:var(--red)}.badge-purple{background:var(--purple-dim);color:var(--purple)}.badge-orange{background:var(--accent-dim);color:var(--accent)}
 .btn{display:block;width:100%;padding:13px;font-size:14px;font-weight:500;font-family:var(--sans);border-radius:var(--r-sm);border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;text-align:center;transition:all .15s;margin-bottom:8px}
 .btn:active{transform:scale(.98);opacity:.8}
-.btn-primary{background:var(--accent);color:#0a1a0f;border-color:var(--accent);font-weight:600}
-.btn-orange{background:var(--orange);color:#1a0800;border-color:var(--orange);font-weight:600}
+.btn-primary{background:var(--accent);color:#1A0800;border-color:var(--accent);font-weight:600}
+.btn-orange{background:var(--accent);color:#1A0800;border-color:var(--accent);font-weight:600}
 .btn-sm{width:auto;display:inline-flex;align-items:center;gap:4px;padding:7px 12px;font-size:12px;margin-bottom:0}
 .btn-ghost{border-color:transparent;color:var(--muted)}.btn-danger{border-color:var(--red);color:var(--red)}
 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .prog-track{height:4px;background:var(--surf2);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
-.section-label{font-size:10px;font-family:var(--mono);font-weight:500;color:var(--muted);letter-spacing:.1em;margin:16px 0 8px;text-transform:uppercase}
+.section-label{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted2);letter-spacing:.14em;margin:16px 0 8px;text-transform:uppercase}
 .divider{height:1px;background:var(--border);margin:12px 0}
 .alert{border-radius:var(--r-sm);padding:10px 12px;font-size:12px;line-height:1.6;margin-bottom:10px}
-.alert-amber{background:var(--amber-dim);color:var(--amber)}.alert-blue{background:var(--blue-dim);color:var(--blue)}.alert-green{background:var(--accent-dim);color:var(--accent)}.alert-red{background:var(--red-dim);color:var(--red)}.alert-purple{background:var(--purple-dim);color:var(--purple)}.alert-orange{background:var(--orange-dim);color:var(--orange)}
+.alert-amber{background:var(--amber-dim);color:var(--amber)}.alert-blue{background:var(--blue-dim);color:var(--blue)}.alert-green{background:var(--accent-dim);color:var(--accent)}.alert-red{background:var(--red-dim);color:var(--red)}.alert-purple{background:var(--purple-dim);color:var(--purple)}.alert-orange{background:var(--accent-dim);color:var(--accent)}
 /* Exercise cards */
-.ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px}
-.ex-card.done{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04)}
-.ex-card.away-ex{border-color:rgba(251,146,60,.25);background:rgba(251,146,60,.04)}
-.ex-name{font-size:14px;font-weight:500;color:var(--text)}.ex-detail{font-size:12px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
-.ex-note{font-size:12px;color:var(--muted);background:var(--surf2);border-radius:var(--r-sm);padding:8px 10px;margin:8px 0;line-height:1.5}
-.ex-rec{font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:var(--r-sm);padding:7px 10px;margin:6px 0;display:flex;align-items:center;gap:6px}
-.ex-away-rec{font-size:12px;color:var(--orange);background:var(--orange-dim);border-radius:var(--r-sm);padding:7px 10px;margin:6px 0}
+.ex-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;margin-bottom:10px;position:relative;overflow:hidden}
+.ex-card.done{border-color:rgba(91,196,137,.55);background:rgba(91,196,137,.09);box-shadow:inset 0 0 0 1px rgba(91,196,137,.18)}
+.ex-done-badge{display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:rgba(91,196,137,.14);border:1px solid rgba(91,196,137,.35);border-radius:var(--r-sm);font-size:12px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;color:var(--success);text-transform:uppercase}
+.ex-card.away-ex{border-color:rgba(255,107,53,.25);background:rgba(255,107,53,.04)}
+.ex-card-accent-bar{position:absolute;left:0;top:20px;bottom:20px;width:3px;background:var(--accent);border-radius:0 2px 2px 0}
+.ex-name{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.01em}.ex-detail{font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+.ex-note{font-size:12px;color:var(--muted);background:var(--surf2);border-radius:var(--r-sm);padding:8px 12px;margin:10px 0;line-height:1.6;border-left:2px solid var(--amber)}
+.ex-rec{font-size:12px;color:var(--accent);background:var(--accent-dim);border-radius:var(--r-sm);padding:7px 10px;margin:6px 0;display:flex;align-items:center;gap:6px;font-weight:500}
 .ss-badge{font-size:10px;font-family:var(--mono);background:var(--blue-dim);color:var(--blue);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle}
-.away-badge{font-size:10px;font-family:var(--mono);background:var(--orange-dim);color:var(--orange);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle}
-.help-btn{width:26px;height:26px;border-radius:50%;border:1px solid var(--border2);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);flex-shrink:0;margin-left:6px;vertical-align:middle}
-/* Set logging */
-.sets-area{margin-top:10px}
-.set-row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.set-label{font-size:11px;font-family:var(--mono);color:var(--muted);width:38px;flex-shrink:0}
+.away-badge{font-size:10px;font-family:var(--mono);background:var(--accent-dim);color:var(--accent);border-radius:4px;padding:1px 6px;margin-left:5px;vertical-align:middle}
+.help-btn{width:30px;height:30px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surf2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);flex-shrink:0;margin-left:6px;vertical-align:middle}
+/* Set logging — stepper style */
+.sets-area{margin-top:12px}
+.set-hdr{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;padding:0 2px;margin-bottom:4px}
+.set-hdr-lbl{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase;text-align:center}
+.set-hdr-lbl:first-child{text-align:left}
+.set-row{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
+.set-row.active-set{background:var(--accent-mute);border-color:var(--accent-dim)}
+.set-row.done-set{opacity:.7}
+.set-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
+.set-num.active{background:var(--accent-dim);color:var(--accent)}
+.set-num.done{background:var(--success-dim);color:var(--success)}
+.set-stepper{display:flex;align-items:center;background:var(--surf2);border-radius:9px;height:40px;padding:0 4px;overflow:hidden}
+.set-stepper button{width:30px;height:36px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color .1s;flex-shrink:0}
+.set-stepper button:active{color:var(--text)}
+.set-stepper button:disabled{opacity:.3;cursor:default}
+.set-val{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;min-width:0}
+.set-val.done-val{color:var(--success)}
+.set-val-input{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;background:transparent;border:none;min-width:0;-webkit-appearance:none;width:100%}
+.set-val-input:focus{outline:none;color:var(--accent)}
+.set-val-input::placeholder{color:var(--muted2);font-weight:400;font-size:14px}
+.set-val-input.done-val{color:var(--success)}
+.set-val-input::-webkit-inner-spin-button,.set-val-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+/* Legacy text inputs still used for time-based sets */
 .set-input{flex:1;padding:8px 6px;font-size:14px;font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);text-align:center;min-width:0;-webkit-appearance:none}
-.set-input:focus{outline:none;border-color:var(--border2)}.set-input::placeholder{color:var(--muted);font-size:11px}
-.set-input.on-target{border-color:rgba(74,222,128,.5)}.set-input.off-target{border-color:rgba(248,113,113,.4)}
-.set-check{width:34px;height:34px;border-radius:50%;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:all .15s;font-size:16px}
-.set-check.done{background:var(--accent);border-color:var(--accent);color:#0a1a0f}
+.set-input:focus{outline:none;border-color:var(--border2)}.set-input::placeholder{color:var(--muted2);font-size:11px}
+.set-input.on-target{border-color:rgba(91,196,137,.5)}.set-input.off-target{border-color:rgba(231,106,106,.4)}
+.set-check{width:44px;height:40px;border-radius:10px;border:none;background:var(--surf2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:all .2s;font-size:18px}
+.set-check.active-check{background:var(--accent);color:#1A0800;box-shadow:0 4px 14px rgba(255,107,53,.3)}
+.set-check.done-check{background:var(--success);color:#0A1A0F}
+.set-vs-last{grid-column:2/-1;font-size:11px;font-family:var(--mono);color:var(--muted2);padding:0 2px;display:flex;align-items:center;gap:8px;margin-top:-2px;margin-bottom:2px}
+.set-beating{color:var(--accent);font-weight:700;letter-spacing:.06em;display:flex;align-items:center;gap:3px}
+.set-beat{color:var(--success);font-weight:700;letter-spacing:.06em}
 .timer-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:var(--muted)}
-/* Timer */
-.timer-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin:10px 0;text-align:center}
-.timer-display{font-size:44px;font-weight:300;font-family:var(--mono);color:var(--text);letter-spacing:-2px;margin:8px 0}
-.timer-display.done{color:var(--accent)}.timer-display.warn{color:var(--amber)}
-.timer-btns{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+/* Rest strip — top banner */
+.rest-strip{background:var(--accent-mute);border-bottom:1px solid var(--accent);padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:restSlide .35s cubic-bezier(.32,.72,0,1)}
+.rest-strip.done{background:var(--success-dim);border-bottom-color:var(--success)}
+.rest-strip-fill{position:absolute;left:0;top:0;bottom:0;background:rgba(255,107,53,.14);transition:width 1s linear;z-index:0}
+.rest-strip.done .rest-strip-fill{background:rgba(91,196,137,.12)}
+.rest-strip-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%}
+.rest-strip-count{font-size:28px;font-family:var(--mono);font-weight:700;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.rest-strip-label{font-size:10px;font-family:var(--mono);font-weight:700;letter-spacing:.16em;margin-bottom:2px}
+.rest-strip-btns{display:flex;gap:6px;margin-left:auto}
+.rest-strip-btns button{padding:7px 11px;border-radius:9px;font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.08em;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,.06);color:var(--text)}
+@keyframes restSlide{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+/* Flash overlay */
+.flash-overlay{position:fixed;top:40%;left:16px;right:16px;z-index:500;pointer-events:none;animation:flashIn .3s cubic-bezier(.32,.72,0,1),flashOut .4s ease 1.1s forwards}
+@keyframes flashIn{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes flashOut{to{opacity:0;transform:scale(1.05) translateY(-8px)}}
+.flash-box{border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(16px)}
+.flash-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px}
+/* Brand header */
+.brand-strip{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand-mark{display:flex;align-items:center;gap:8px}
+.wordmark{display:inline-flex;align-items:baseline;gap:0;font-family:var(--mono);letter-spacing:.04em}
+.wordmark-str{font-size:10px;font-weight:600;color:var(--text);letter-spacing:.12em}
+.wordmark-dot{font-size:9px;color:var(--accent);opacity:.7;margin:0 3px}
+.wordmark-45{font-size:16px;font-weight:700;color:var(--accent);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+/* Momentum tiles */
+.momentum-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.momentum-tile{background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:10px 12px;position:relative;overflow:hidden}
+.momentum-tile-accent{position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,var(--accent),transparent)}
+.momentum-label{font-size:9px;font-family:var(--mono);font-weight:600;letter-spacing:.14em;color:var(--muted2);margin-bottom:4px;text-transform:uppercase}
+.momentum-value{font-size:22px;font-family:var(--mono);font-weight:700;color:var(--accent);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.momentum-value.sm{font-size:18px;color:var(--success)}
+.momentum-unit{font-size:10px;font-family:var(--mono);color:var(--muted2);margin-left:2px;letter-spacing:.06em}
+.momentum-sub{font-size:10px;color:var(--muted2);margin-top:1px;letter-spacing:.01em}
+/* Coach line */
+.coach-line{padding:10px 16px 12px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,107,53,.06),transparent);display:flex;align-items:flex-start;gap:10px}
+.coach-line-text{font-size:11px;font-weight:500;color:var(--text);flex:1;line-height:1.6;font-style:italic;transition:opacity .4s ease}
+/* PR near card */
+.pr-near-card{background:linear-gradient(135deg,rgba(255,107,53,.10),rgba(255,107,53,.02));border:1px solid var(--accent-dim);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
 /* Warmup */
-.warmup-box{background:var(--surf2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:12px}
-.warmup-label{font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;margin-bottom:4px}
-.warmup-text{font-size:12px;color:var(--text);line-height:1.6}
+.warmup-box{background:var(--surf);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.warmup-label{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted2);letter-spacing:.08em;margin-bottom:0;text-transform:uppercase}
+.warmup-text{font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px}
+/* Segmented progress */
+.seg-prog{display:flex;gap:4px;margin-bottom:6px}
+.seg-prog-item{flex:1;height:4px;background:var(--surf2);border-radius:2px;overflow:hidden;position:relative}
+.seg-prog-fill{height:100%;border-radius:2px;transition:width .4s ease}
 /* Away mode toggle */
-.away-toggle-wrap{background:var(--orange-dim);border:1px solid rgba(251,146,60,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.away-toggle-label{font-size:13px;font-weight:500;color:var(--orange)}
+.away-toggle-wrap{background:var(--accent-dim);border:1px solid rgba(255,107,53,.3);border-radius:var(--r);padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.away-toggle-label{font-size:13px;font-weight:500;color:var(--accent)}
 .toggle-switch{width:44px;height:26px;border-radius:13px;background:var(--surf2);border:1px solid var(--border2);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.toggle-switch.on{background:var(--orange);border-color:var(--orange)}
+.toggle-switch.on{background:var(--accent);border-color:var(--accent)}
 .toggle-knob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .toggle-switch.on .toggle-knob{transform:translateX(18px)}
 /* Away mode banner */
-.away-banner{background:var(--orange-dim);border:1px solid rgba(251,146,60,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
 /* Calendar */
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin:10px 0}
 .cal-hdr{text-align:center;font-size:10px;font-family:var(--mono);color:var(--muted);padding:4px 0}
 .cal-day{aspect-ratio:1;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:default;position:relative}
 .cal-day.has-workout{background:var(--surf2);color:var(--text);cursor:pointer}
-.cal-day.completed{background:rgba(74,222,128,.15);color:var(--accent)}
-.cal-day.completed-away{background:rgba(251,146,60,.15);color:var(--orange)}
-.cal-day.today-workout{background:var(--accent);color:#0a1a0f;font-weight:600}
+.cal-day.completed{background:rgba(91,196,137,.15);color:var(--success)}
+.cal-day.completed-away{background:rgba(255,107,53,.15);color:var(--accent)}
+.cal-day.today-workout{background:var(--accent);color:#1A0800;font-weight:600}
 .cal-day.today-rest{border:1px solid var(--border2);color:var(--muted)}
-.cal-day.missed{background:rgba(248,113,113,.15);color:var(--red)}
+.cal-day.missed{background:rgba(231,106,106,.15);color:var(--red)}
 .cal-day.future{opacity:.4}
 /* Week grid */
 .week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
 .week-cell{aspect-ratio:1;border-radius:var(--r-sm);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:11px;color:var(--muted);background:var(--surf)}
 .week-cell .wn{font-size:14px;font-weight:600;font-family:var(--mono)}
 .week-cell.current{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
-.week-cell.done{border-color:rgba(74,222,128,.3);color:var(--accent);background:rgba(74,222,128,.06)}
+.week-cell.done{border-color:rgba(91,196,137,.3);color:var(--success);background:rgba(91,196,137,.06)}
 .week-cell.deload{border-color:rgba(96,165,250,.3);color:var(--blue);background:var(--blue-dim)}
 /* Stats */
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .stat-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-.stat-num{font-size:26px;font-weight:600;font-family:var(--mono);color:var(--text)}
-.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+.stat-num{font-size:26px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:-.02em}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
 /* Bar chart */
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
 .bar-label{font-size:10px;font-family:var(--mono);color:var(--muted);width:42px;text-align:right;flex-shrink:0}
@@ -109,27 +184,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .phase-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
 .phase-tabs::-webkit-scrollbar{display:none}
 .phase-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;color:var(--muted);background:transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
-.phase-tab.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(74,222,128,.3)}
+.phase-tab.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(255,107,53,.3)}
 /* 1RM */
 .rm-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
-.rm-lift-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:10px}
+.rm-lift-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
 .rm-inputs{display:flex;gap:8px;margin-bottom:10px}
 .rm-input-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
 .rm-input-label{font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .rm-input{width:100%;padding:9px 10px;font-size:15px;font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);text-align:center;-webkit-appearance:none}
 .rm-input:focus{outline:none;border-color:var(--border2)}
 .rm-result{background:var(--accent-dim);border-radius:var(--r-sm);padding:10px 12px}
-.rm-1rm{font-size:22px;font-weight:600;font-family:var(--mono);color:var(--accent)}
+.rm-1rm{font-size:22px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:-.02em}
 .rm-history{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 /* Mobility checklist */
 .mob-check-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:8px;transition:all .2s}
-.mob-check-card.checked{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.04)}
+.mob-check-card.checked{border-color:rgba(91,196,137,.3);background:rgba(91,196,137,.04)}
 .mob-check-row{display:flex;align-items:center;gap:12px;cursor:pointer}
 .mob-checkbox{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:14px}
-.mob-check-card.checked .mob-checkbox{background:var(--accent);border-color:var(--accent);color:#0a1a0f}
+.mob-check-card.checked .mob-checkbox{background:var(--success);border-color:var(--success);color:#0A1A0F}
 .mob-check-name{font-size:14px;font-weight:500;color:var(--text);flex:1}
 .mob-check-meta{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px}
-.mob-check-card.checked .mob-check-name{color:var(--accent)}
+.mob-check-card.checked .mob-check-name{color:var(--success)}
 .mob-detail{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:none}
 .mob-check-card.expanded .mob-detail{display:block}
 .mob-steps{list-style:none;counter-reset:step}
@@ -141,7 +216,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ref-panel.open{opacity:1;pointer-events:all}
 .ref-inner{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:20px 20px max(20px,env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto;transform:translateY(100%);transition:transform .25s ease}
 .ref-panel.open .ref-inner{transform:translateY(0)}
-.ref-title{font-size:17px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ref-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px}
 .ref-detail{font-size:12px;font-family:var(--mono);color:var(--muted);margin-bottom:14px}
 .ref-section{font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 8px}
 .ref-steps{list-style:none;counter-reset:rs}
@@ -151,16 +226,31 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .ref-mistake{background:var(--red-dim);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--red);margin-bottom:8px;line-height:1.5}
 .ref-link{display:flex;align-items:center;gap:8px;background:var(--blue-dim);border-radius:var(--r-sm);padding:10px 12px;font-size:13px;color:var(--blue);text-decoration:none;margin-bottom:8px}
 /* Modal */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
-.modal-title{font-size:17px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--text)}
 input[type=date],input[type=number],input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
 input[type=date]:focus,input[type=number]:focus{outline:none;border-color:var(--border2)}
 input[type=date]{color-scheme:dark}
-.complete-btn{background:var(--accent);color:#0a1a0f;border:none;border-radius:var(--r-sm);padding:15px;font-size:15px;font-weight:600;font-family:var(--sans);width:100%;cursor:pointer;margin-top:14px}
+.complete-btn{background:var(--accent);color:#1A0800;border:none;border-radius:var(--r-sm);padding:15px;font-size:15px;font-weight:700;font-family:var(--sans);width:100%;cursor:pointer;margin-top:14px;box-shadow:0 8px 28px rgba(255,107,53,.3)}
 .complete-btn:active{transform:scale(.98)}
-.missed-banner{background:var(--red-dim);border:1px solid rgba(248,113,113,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.missed-banner{background:var(--red-dim);border:1px solid rgba(231,106,106,.3);border-radius:var(--r);padding:14px;margin-bottom:12px}
+/* Redesigned secondary screens */
+.level-track-wrap{position:relative;height:7px;border-radius:4px;background:linear-gradient(90deg,#7AA7E8,#5BC489,#FFB85E,#FF6B35);margin:8px 0 2px;overflow:visible}
+.level-track-dot{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:#FF6B35;border:2.5px solid var(--bg);box-shadow:0 1px 6px rgba(0,0,0,.5);transform:translate(-50%,-50%);pointer-events:none}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi-tile{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.kpi-inner{padding:12px 12px 14px}
+.vol-bars-row{display:flex;align-items:flex-end;gap:3px;height:64px;margin-bottom:4px}
+.vol-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .3s}
+.week-num-row{display:flex;gap:3px;margin-bottom:8px}
+.week-num-cell{flex:1;text-align:center;font-size:8px;font-family:var(--mono);color:var(--muted2)}
+.strength-snap{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:start;padding:4px 0}
+.snap-divider{width:1px;background:var(--border);margin-top:8px;height:48px;align-self:center}
+.snap-col{padding:4px 10px}
+.snap-col:first-child{padding-left:0}
+.snap-col:last-child{padding-right:0}
 </style>
 </head>
 <body>
@@ -174,19 +264,19 @@ input[type=date]{color-scheme:dark}
   </div>
   <nav id="nav">
     <button class="nav-item active" onclick="showScreen('today',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Today
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Today
     </button>
     <button class="nav-item" onclick="showScreen('calendar',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
     </button>
     <button class="nav-item" onclick="showScreen('strength',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4M6 9h12M6 15h12"/></svg>1RM
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4M6 9h12M6 15h12"/></svg>1RM
     </button>
     <button class="nav-item" onclick="showScreen('progress',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Progress
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Progress
     </button>
     <button class="nav-item" onclick="showScreen('mobility',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Mobility
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Mobility
     </button>
   </nav>
 </div>
@@ -895,12 +985,121 @@ function slideProgramForward(){const missed=getMissedSessions();if(!missed.lengt
 function getExRec(ex){const lid=LIFT_TO_RM[ex.n];if(!lid)return null;const pct=parsePct(ex.load);if(!pct)return null;const rm=getRM(lid);if(!rm)return null;return{kg:Math.round(rm*pct/2.5)*2.5,pct:Math.round(pct*100),rm};}
 function needsRMRetest(){const next=getNextPendingSession();if(!next)return false;if(PHASE_CHANGE_WEEKS.includes(next.week)&&next.dayIdx===0){return!S.rm[`phase_retest_${next.week}`];}return false;}
 
+// ─── SCRIPTURE ────────────────────────────────────────────────────────────────
+const VERSE_REFS=[
+  'PHP.4.13','JOS.1.9','PRO.27.17','ISA.40.31','HEB.12.11',
+  '1CO.16.13','PSA.28.7','1CO.9.24','1CO.9.25','PRO.16.3',
+  '1TI.4.8','COL.3.23','1CO.15.58','GAL.6.9','PHP.3.14',
+  'JAS.1.12','EPH.6.10','2CO.12.9','ZEP.3.17','ISA.40.29',
+  'PSA.29.11','2TI.1.7','PSA.18.2','ROM.12.21','PRO.21.5',
+  'PRO.24.16','PRO.3.5','PSA.27.1','JER.29.11','PSA.51.10',
+  'EPH.3.20','PHP.4.6','PSA.121.1+PSA.121.2','MIC.6.8','PRO.9.10',
+  'PRO.13.22','PRO.18.10','PSA.46.10','JHN.15.13','ROM.12.2',
+  'PHP.4.8','PSA.34.18','ISA.40.30+ISA.40.31','2SA.22.33','EXO.14.14',
+];
+const FALLBACK_VERSES=[
+  '"I can do all things through Christ who gives me strength." — Philippians 4:13',
+  '"Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God is with you wherever you go." — Joshua 1:9',
+  '"As iron sharpens iron, so one person sharpens another." — Proverbs 27:17',
+  '"But those who wait upon the Lord will renew their strength; they will mount up with wings like eagles; they will run and not grow weary, they will walk and not faint." — Isaiah 40:31',
+  '"No discipline seems pleasant at the time, but painful. Later on, it produces a harvest of righteousness and peace for those who have been trained by it." — Hebrews 12:11',
+  '"Be on your guard; stand firm in the faith; be courageous; be strong." — 1 Corinthians 16:13',
+  '"The Lord is my strength and my shield; my heart trusts in Him, and He helps me." — Psalm 28:7',
+  '"Do you not know that in a race all the runners run, but only one gets the prize? Run in such a way as to get the prize." — 1 Corinthians 9:24',
+  '"Everyone who competes in the games goes into strict training. They do it to get a crown that will not last, but we do it to get a crown that will last forever." — 1 Corinthians 9:25',
+  '"Commit your work to the Lord, and your plans will be established." — Proverbs 16:3',
+  '"For physical training is of some value, but godliness has value for all things, holding promise for both the present life and the life to come." — 1 Timothy 4:8',
+  '"Whatever you do, work at it with all your heart, as working for the Lord, not for human masters." — Colossians 3:23',
+  '"Therefore, my beloved brothers, be steadfast and immovable. Always excel in the work of the Lord, because you know that your labor in the Lord is not in vain." — 1 Corinthians 15:58',
+  '"Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up." — Galatians 6:9',
+  '"I press on toward the goal to win the prize for which God has called me heavenward in Christ Jesus." — Philippians 3:14',
+  '"Blessed is the man who remains steadfast under trial, for when he has stood the test he will receive the crown of life." — James 1:12',
+  '"Be strong in the Lord and in the strength of His might." — Ephesians 6:10',
+  '"My grace is sufficient for you, for My power is made perfect in weakness." — 2 Corinthians 12:9',
+  '"The Lord your God is among you; He is mighty to save. He will rejoice over you with gladness; He will quiet you with His love." — Zephaniah 3:17',
+  '"He gives strength to the weary and increases the power of the weak." — Isaiah 40:29',
+  '"The Lord gives strength to His people; the Lord blesses His people with peace." — Psalm 29:11',
+  '"For God has not given us a spirit of fear, but of power, love, and self-control." — 2 Timothy 1:7',
+  '"The Lord is my rock, my fortress and my deliverer; my God is my rock, in whom I take refuge." — Psalm 18:2',
+  '"Do not be overcome by evil, but overcome evil with good." — Romans 12:21',
+  '"The plans of the diligent bring plenty, as surely as haste leads to poverty." — Proverbs 21:5',
+  '"A righteous man falls seven times and rises again, but the wicked stumble in calamity." — Proverbs 24:16',
+  '"Trust in the Lord with all your heart and lean not on your own understanding." — Proverbs 3:5',
+  '"The Lord is my light and my salvation — whom shall I fear? The Lord is the stronghold of my life — of whom shall I be afraid?" — Psalm 27:1',
+  '"For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you a hope and a future." — Jeremiah 29:11',
+  '"Create in me a pure heart, O God, and renew a steadfast spirit within me." — Psalm 51:10',
+  '"Now to Him who is able to do far more abundantly than all that we ask or think, according to the power at work within us." — Ephesians 3:20',
+  '"Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God." — Philippians 4:6',
+  '"I lift up my eyes to the hills. From where does my help come? My help comes from the Lord, the Maker of heaven and earth." — Psalm 121:1-2',
+  '"He has shown you, O man, what is good. And what does the Lord require of you but to act justly, to love mercy, and to walk humbly with your God?" — Micah 6:8',
+  '"The fear of the Lord is the beginning of wisdom." — Proverbs 9:10',
+  '"A good man leaves an inheritance to his children\'s children." — Proverbs 13:22',
+  '"The name of the Lord is a strong tower; the righteous run to it and are safe." — Proverbs 18:10',
+  '"Be still, and know that I am God." — Psalm 46:10',
+  '"Greater love has no one than this: to lay down one\'s life for one\'s friends." — John 15:13',
+  '"Do not conform to the pattern of this world, but be transformed by the renewing of your mind." — Romans 12:2',
+  '"Whatever is true, whatever is honorable, whatever is just, whatever is pure, whatever is lovely — think about these things." — Philippians 4:8',
+  '"The Lord is close to the brokenhearted and saves those who are crushed in spirit." — Psalm 34:18',
+  '"Even youths grow tired and weary, and young men stumble and fall. But those who wait upon the Lord will renew their strength; they will mount up with wings like eagles." — Isaiah 40:30-31',
+  '"God is my strong fortress, and He makes my way clear." — 2 Samuel 22:33',
+  '"The Lord will fight for you; you need only to be still." — Exodus 14:14',
+];
+let _verseCache=[...FALLBACK_VERSES],_versesFetched=false;
+let _coachLineIdx=0,_coachLineIv=null;
+async function prefetchVerses(){
+  if(_versesFetched)return;
+  _versesFetched=true;
+  try{
+    const results=await Promise.allSettled(
+      VERSE_REFS.map(ref=>
+        fetch(`https://api.youversion.com/v1/bibles/3034/passages/${ref}?format=text`,
+          {headers:{'x-yvp-app-key':'fX7EhBVAvsR9kGmx5dJ9tSR1Rx9gsH8P9g70bPyAaezIDowd'}})
+        .then(r=>r.ok?r.json():Promise.reject(r.status))
+      )
+    );
+    results.forEach((r,i)=>{
+      if(r.status==='fulfilled'&&r.value&&r.value.content&&r.value.reference){
+        const text=r.value.content.replace(/[“”"]/g,'').trim();
+        _verseCache[i]=`“${text}” — ${r.value.reference}`;
+      }
+    });
+    const el=document.getElementById('coach-line-text');
+    if(el)el.textContent=_verseCache[_coachLineIdx];
+  }catch(e){}
+}
+function startCoachLine(){
+  if(_coachLineIv)return;
+  prefetchVerses();
+  _coachLineIv=setInterval(()=>{
+    _coachLineIdx=(_coachLineIdx+1)%_verseCache.length;
+    const el=document.getElementById('coach-line-text');
+    if(el){el.style.opacity='0';setTimeout(()=>{el.textContent=_verseCache[_coachLineIdx];el.style.opacity='1';},400);}
+  },30000);
+}
+function stopCoachLine(){if(_coachLineIv){clearInterval(_coachLineIv);_coachLineIv=null;}}
+
+// ─── SESSION VOLUME ────────────────────────────────────────────────────────────
+function getSessionVolume(w,di){
+  const l=getLog(w,di);
+  let vol=0;
+  Object.values(l).forEach(exLog=>{
+    if(typeof exLog!=='object'||!exLog)return;
+    Object.values(exLog).forEach(s=>{
+      if(s&&s.done&&s.weight&&s.reps)vol+=parseFloat(s.weight)*parseInt(s.reps);
+    });
+  });
+  return Math.round(vol);
+}
+
 // ─── TIMER — sticky floating bar, auto-starts on set tick ────────────────────
 let timer={running:false,elapsed:0,target:0,iv:null,label:''};
 let sessionStartTime=null;
 
 function startTimer(secs,label){
   if(timer.iv)clearInterval(timer.iv);
+  // Force fresh DOM build on next renderStickyTimer call
+  const bar=document.getElementById('sticky-timer');
+  if(bar)bar.innerHTML='';
   timer={running:true,elapsed:0,target:secs,iv:null,label:label||''};
   timer.iv=setInterval(()=>{
     timer.elapsed++;
@@ -926,16 +1125,45 @@ function renderStickyTimer(){
   if(!timer.target){bar.innerHTML='';return;}
   const rem=Math.max(0,timer.target-timer.elapsed);
   const m=Math.floor(rem/60),s=rem%60;
-  const pct=Math.round(timer.elapsed/timer.target*100);
-  const done=rem===0,warn=rem<=10&&rem>0;
-  const col=done?'var(--accent)':warn?'var(--amber)':'var(--blue)';
-  bar.innerHTML=`<div style="background:var(--surf);border-bottom:2px solid ${col};padding:7px 16px;display:flex;align-items:center;gap:10px">
-    <div style="flex:1;height:3px;background:var(--surf2);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px;transition:width .8s linear"></div></div>
-    <span style="font-size:14px;font-family:var(--mono);font-weight:500;color:${col};min-width:40px;text-align:right">${done?'✓':m+':'+String(s).padStart(2,'0')}</span>
-    ${timer.label?`<span style="font-size:10px;color:var(--muted);max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${timer.label}</span>`:''}
-    <button onclick="stopTimer()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:0 2px;line-height:1">×</button>
-  </div>`;
+  const pct=Math.min(100,Math.round(timer.elapsed/timer.target*100));
+  const done=rem===0;
+  const countTxt=done?'GO':m+':'+String(s).padStart(2,'0');
+  // First render — build structure once; subsequent ticks only update the changing nodes
+  if(!bar.querySelector('.rest-strip')){
+    bar.innerHTML=`<div class="rest-strip${done?' done':''}">
+      <div class="rest-strip-fill" style="width:${pct}%"></div>
+      <div class="rest-strip-inner">
+        <div class="rest-strip-icon" style="flex-shrink:0;font-size:20px;color:var(--accent)">⏱</div>
+        <div style="flex:1;min-width:0">
+          <div class="rest-strip-label" style="color:var(--accent)">REST</div>
+          <div class="rest-strip-count">${countTxt}</div>
+        </div>
+        <div class="rest-strip-btns">
+          <button onclick="addTimerTime(15)">+15s</button>
+          <button onclick="stopTimer()">SKIP</button>
+        </div>
+      </div>
+    </div>`;
+    return;
+  }
+  // Subsequent ticks — patch only what changed
+  bar.querySelector('.rest-strip-fill').style.width=pct+'%';
+  bar.querySelector('.rest-strip-count').textContent=countTxt;
+  if(done){
+    const strip=bar.querySelector('.rest-strip');
+    if(!strip.classList.contains('done')){
+      strip.classList.add('done');
+      bar.querySelector('.rest-strip-label').textContent='REST COMPLETE';
+      bar.querySelector('.rest-strip-label').style.color='var(--success)';
+      bar.querySelector('.rest-strip-count').style.color='var(--success)';
+      bar.querySelector('.rest-strip-icon').innerHTML='✓';
+      bar.querySelector('.rest-strip-icon').style.color='var(--success)';
+      const btns=bar.querySelector('.rest-strip-btns');
+      if(btns)btns.style.display='none';
+    }
+  }
 }
+function addTimerTime(d){if(timer.target>0)timer.target+=d;}
 
 // ─── SCREEN WAKE LOCK ──────────────────────────────────────────────────────────
 // Keeps screen on during active session. Released when session ends or
@@ -1173,49 +1401,92 @@ function renderToday(){
 
   let html='';
 
-  // Missed banner — dismissible (re-shows if missed count changes or page reloads)
+  // Missed banner
   if(missed.length>0&&missed.length!==_missedBannerDismissedCount&&!viewingSession)html+=`<div class="missed-banner"><div class="row" style="margin-bottom:6px;align-items:center"><span style="font-size:13px;font-weight:500;color:var(--red);flex:1">⚠ ${missed.length} missed session${missed.length>1?'s':''}</span><button class="btn btn-sm" onclick="openMissedModal()" style="border-color:var(--red);color:var(--red)">Review</button><button onclick="dismissMissedBanner()" aria-label="Dismiss" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;padding:0 4px;line-height:1;opacity:.7">×</button></div><div style="font-size:12px;color:var(--red);opacity:.8">Tap Review to slide your program forward</div></div>`;
+  if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
 
-  // 1RM retest nudge
-  if(rmRetest)html+=`<div class="alert alert-purple" style="margin-bottom:10px">Phase change coming — consider retesting your 1RM for accurate targets. <span onclick="showScreen('strength',document.querySelectorAll('.nav-item')[2])" style="color:var(--purple);text-decoration:underline;cursor:pointer">Go to 1RM →</span></div>`;
+  // ── BRAND HEADER ──────────────────────────────────────────────────────────────
+  // STR·45 disc mark (inline SVG)
+  const discSvg=`<svg width="26" height="26" viewBox="0 0 100 100" style="display:block;flex-shrink:0"><circle cx="50" cy="50" r="47" fill="none" stroke="#FF6B35" stroke-width="3"/>${Array.from({length:32}).map((_,i)=>{const a=(i/32)*Math.PI*2,x1=50+Math.cos(a)*44.5,y1=50+Math.sin(a)*44.5,x2=50+Math.cos(a)*41.5,y2=50+Math.sin(a)*41.5;return`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#FF6B35" stroke-width="0.8" opacity="0.55"/>`;}).join('')}<circle cx="50" cy="50" r="4.5" fill="#0E0E10" stroke="#FF6B35" stroke-width="1.2"/><text x="50" y="39" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="700" font-size="22" fill="#FF6B35" letter-spacing="-1">45</text><text x="50" y="74" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-weight="600" font-size="7" fill="#FF6B35" opacity="0.85" letter-spacing="2">STR</text></svg>`;
 
-  // Header
-  html+=`<div class="page-header"><div class="row"><div><div class="page-title">Week ${w} · Day ${di+1}</div><div class="page-sub">${formatDateDisplay(schedDate)} · ${phase.short}</div></div><div style="display:flex;gap:6px;align-items:center">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Upcoming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-purple">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px">Jump</button></div></div>
-  <div id="session-clock" style="margin-top:4px"></div></div>`;
+  html+=`<div class="brand-strip">
+    <div class="brand-mark">
+      ${discSvg}
+      <div class="wordmark"><span class="wordmark-str">STR</span><span class="wordmark-dot">·</span><span class="wordmark-45">45</span></div>
+    </div>
+    <div id="session-clock"></div>
+  </div>`;
+
+  // Week / day title row
+  html+=`<div style="margin-bottom:14px">
+    <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px">Week ${w} · Day ${di+1} of 3</div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+      <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${day.name.replace(' — ',' <span style="color:var(--muted);font-weight:500">(')}</span><span style="display:none"></span></div>
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Coming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-orange">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px;padding:5px 10px">Jump</button></div>
+    </div>
+  </div>`;
+
+  // Segmented progress bar (per exercise)
+  if(!alreadyCompleted){
+    html+=`<div class="seg-prog" style="margin-bottom:6px">`;
+    exercises.forEach((ex,ei)=>{
+      const exLog=log[ei]||{};
+      const doneCnt=Object.values(exLog).filter(s=>s&&s.done).length;
+      const pctEx=Math.round(doneCnt/ex.sets*100);
+      const isCur=ei===exercises.findIndex((_,i)=>{const el2=log[i]||{};return Object.values(el2).filter(s=>s&&s.done).length<exercises[i].sets;});
+      const fillColor=pctEx===100?'var(--success)':isCur?'var(--accent)':'var(--muted)';
+      html+=`<div class="seg-prog-item"><div class="seg-prog-fill" style="width:${pctEx}%;background:${fillColor}"></div>${isCur&&pctEx<100?`<div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:var(--accent);box-shadow:0 0 6px var(--accent)"></div>`:''}</div>`;
+    });
+    html+=`</div><div style="display:flex;justify-content:space-between;margin-bottom:14px"><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">${doneSets}/${totalSets} sets · ${pct}%</span><span style="font-size:11px;color:var(--muted2)">${phase.short} · ${day.est}</span></div>`;
+  }
+
+  // ── COACH LINE ────────────────────────────────────────────────────────────────
+  if(!alreadyCompleted){
+    html+=`<div class="coach-line"><span style="font-size:13px;color:var(--accent);flex-shrink:0">✦</span><span class="coach-line-text" id="coach-line-text" style="transition:opacity .2s">${_verseCache[_coachLineIdx]}</span></div>`;
+  }
+
+  // ── MOMENTUM TILES ────────────────────────────────────────────────────────────
+  if(!alreadyCompleted){
+    const sessionVol=getSessionVolume(w,di);
+    const streak=getTrainingStreak();
+    // Volume vs last same session (rough: compare to prev week same day if exists)
+    const vsLastVol=(()=>{
+      if(w<=1)return null;
+      const prevLog=getLog(w-1,di);
+      let prevVol=0;
+      Object.values(prevLog).forEach(exLog=>{
+        if(typeof exLog!=='object'||!exLog)return;
+        Object.values(exLog).forEach(s=>{if(s&&s.done&&s.weight&&s.reps)prevVol+=parseFloat(s.weight)*parseInt(s.reps);});
+      });
+      if(!prevVol)return null;
+      return sessionVol-Math.round(prevVol);
+    })();
+    const volDisplay=sessionVol>=1000?(sessionVol/1000).toFixed(1):sessionVol;
+    const volUnit=sessionVol>=1000?'t':'kg';
+    html+=`<div class="momentum-grid">
+      <div class="momentum-tile"><div class="momentum-tile-accent"></div><div class="momentum-label">Volume</div><div style="display:flex;align-items:baseline;gap:2px"><span class="momentum-value">${volDisplay}</span><span class="momentum-unit">${volUnit}</span></div><div class="momentum-sub">this session</div></div>
+      <div class="momentum-tile"><div class="momentum-label">VS LAST</div><div style="display:flex;align-items:baseline;gap:2px"><span class="momentum-value sm" style="${vsLastVol===null?'':'color:'+(vsLastVol>=0?'var(--success)':'var(--red)')}">${vsLastVol===null?'—':(vsLastVol>=0?'+':'')+vsLastVol}</span>${vsLastVol!==null?`<span class="momentum-unit">kg</span>`:''}</div><div class="momentum-sub">wk-on-wk</div></div>
+      <div class="momentum-tile"><div class="momentum-label">Streak</div><div style="display:flex;align-items:baseline;gap:2px"><span class="momentum-value sm">${streak}</span></div><div class="momentum-sub">sessions</div></div>
+    </div>`;
+  }
 
   // Away mode toggle
   const bw=getLatestBW();
+  let awayLvlStr='';
+  if(S.awayMode&&bw){const benchRM=getRM('bench');if(benchRM){const lvl=getStrengthLevel(benchRM/bw);awayLvlStr=` · ${lvl.label}`;}}
   html+=`<div class="away-toggle-wrap">
     <div>
       <div class="away-toggle-label">✈ Away from gym</div>
-      <div style="font-size:11px;color:var(--orange);opacity:.8;margin-top:2px">${S.awayMode?'Bodyweight substitutions active':'Toggle for bodyweight-only session'}</div>
+      <div style="font-size:11px;color:var(--accent);opacity:.8;margin-top:2px">${S.awayMode?`BW substitutions active${awayLvlStr}`:'Toggle for bodyweight-only session'}</div>
     </div>
     <div class="toggle-switch${S.awayMode?' on':''}" onclick="toggleAwayMode()"><div class="toggle-knob"></div></div>
   </div>`;
-
-  // Away mode info banner
-  if(S.awayMode){
-    const bwMsg=bw?`Based on your ${bw} kg bodyweight and 1RM entries.`:'Add bodyweight in Progress tab for personalised rep targets.';
-    html+=`<div class="away-banner">
-      <div style="font-size:13px;font-weight:500;color:var(--orange);margin-bottom:4px">✈ Bodyweight session active</div>
-      <div style="font-size:12px;color:var(--orange);opacity:.9;line-height:1.6">All exercises swapped for equipment-free alternatives. ${bwMsg} This session will count toward your program progress.</div>
-    </div>`;
-    // Show calibration if we have data
-    if(bw&&(getRM('bench')||getRM('squat')||getRM('deadlift'))){
-      const benchRM=getRM('bench');
-      if(benchRM){const ratio=benchRM/bw;const lvl=getStrengthLevel(ratio);html+=`<div class="card" style="margin-bottom:10px"><div class="row"><span style="font-size:12px;color:var(--muted)">Relative strength (Bench / BW)</span><span style="font-size:13px;font-weight:500;color:${lvl.color}">${lvl.label}</span></div><div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:4px">Ratio: ${ratio.toFixed(2)} · Rep targets calibrated to this level</div></div>`;}
-    }
-  }
-
-  if(isDeload)html+=`<div class="alert alert-blue">Deload week — reduced intensity, same exercises. Away mode applies same substitutions.</div>`;
+  if(isDeload)html+=`<div class="alert alert-blue">Deload week — reduced intensity, same exercises.</div>`;
   if(day.note&&!S.awayMode)html+=`<div class="alert alert-amber">${day.note}</div>`;
 
-  // Warmup
+  // Warmup — collapsible
   const awayWarmup="5 min of jumping jacks, high knees, or brisk walk · arm circles × 10 · hip circles × 10 · bodyweight squat × 10";
-  html+=`<div class="warmup-box"><div class="warmup-label">WARMUP</div><div class="warmup-text">${S.awayMode?awayWarmup:day.warmup}</div></div>`;
-
-  // Progress bar
-  if(!alreadyCompleted)html+=`<div class="row" style="margin-bottom:8px"><span style="font-size:12px;color:var(--muted)">${doneSets} / ${totalSets} sets</span><span style="font-size:12px;font-family:var(--mono);color:${pct===100?'var(--accent)':'var(--muted)'};">${pct}%</span></div><div class="prog-track" style="margin-bottom:14px"><div class="prog-fill" style="width:${pct}%"></div></div>`;
+  html+=`<button class="warmup-box" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'"><span style="display:flex;align-items:center;gap:8px"><span style="color:var(--amber);font-size:15px">🔥</span><span style="font-weight:500;color:var(--text);font-size:13px">Warmup</span><span style="font-size:11px;color:var(--muted2);font-family:var(--mono)">~3 min</span></span><span style="color:var(--muted);font-size:16px">›</span></button><div style="display:none;padding:0 4px 14px;font-size:13px;color:var(--muted);line-height:1.6">${S.awayMode?awayWarmup:day.warmup}</div>`;
 
   // Exercises
   exercises.forEach((ex,ei)=>{
@@ -1226,24 +1497,19 @@ function renderToday(){
     const isAway=!!ex.isAway;
 
     html+=`<div class="ex-card${exAllDone?' done':''}${isAway?' away-ex':''}">`;
-    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈ BW sub</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}</div></div>${ref?`<button class="help-btn" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
+    // For away exercises, fold the strength level into the detail line as a small badge
+    const awayLvlBadge=isAway&&ex.ratio!=null?`<span style="font-size:10px;font-family:var(--mono);color:${getStrengthLevel(ex.ratio).color};margin-left:6px">${getStrengthLevel(ex.ratio).label}</span>`:'';
+    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
 
-    // Weight rec (gym) or calibrated rep target (away)
-    if(isAway&&ex.ratio!==undefined&&ex.ratio!==null){
-      const lvl=getStrengthLevel(ex.ratio);
-      html+=`<div class="ex-away-rec">🎯 Target: <strong>${ex.reps} reps × ${ex.sets} sets</strong> &nbsp;·&nbsp; calibrated for <span style="color:${lvl.color}">${lvl.label}</span> level</div>`;
-      if(ex.alts&&ex.alts.length>0){
-        html+=`<div style="font-size:11px;color:var(--orange);margin:4px 0 6px;opacity:.8">Harder option: ${ex.alts[0].n} — ${ex.alts[0].note}</div>`;
-      }
-    }else if(isAway){
-      html+=`<div class="ex-away-rec">🎯 Target: <strong>${ex.reps} reps × ${ex.sets} sets</strong> &nbsp;·&nbsp; <span style="opacity:.8">Add 1RM + bodyweight for personalised targets</span></div>`;
-    }else if(rec){
+    // Weight rec — gym only; away exercises need no separate box
+    if(!isAway&&rec){
       html+=`<div class="ex-rec">🎯 Target: <strong>${rec.kg} kg</strong>&nbsp;·&nbsp;${rec.pct}% of ${rec.rm} kg 1RM</div>`;
     }else if(!isAway&&LIFT_TO_RM[ex.n]&&!getRM(LIFT_TO_RM[ex.n])){
       html+=`<div class="alert alert-blue" style="margin:6px 0;font-size:11px;padding:6px 10px">Enter your 1RM in the 1RM tab to get weight targets</div>`;
     }
 
-    html+=`<div class="ex-note">${ex.note}</div>`;
+    // Notes: gym cues don't apply to away substitutions
+    if(!isAway) html+=`<div class="ex-note">${ex.note}</div>`;
 
     if(!alreadyCompleted){
       // Last session reference
@@ -1251,47 +1517,106 @@ function renderToday(){
       const prData = getPR(ex.n);
       if(lastSess){
         const lastSetsStr = lastSess.sets.slice(0,3).map(s=>isBWOnly(ex.load)?`${s.reps}r`:`${s.weight}kg×${s.reps}`).join(' · ');
-        html+=`<div style="font-size:11px;color:var(--muted);background:var(--surf2);border-radius:6px;padding:6px 10px;margin:4px 0 6px;display:flex;align-items:center;justify-content:space-between">
+        html+=`<div style="font-size:11px;color:var(--muted);background:var(--surf2);border-radius:6px;padding:6px 10px;margin:4px 0 8px;display:flex;align-items:center;justify-content:space-between">
           <span>Last: ${lastSetsStr}</span>
           ${prData&&prData.date===lastSess.date?'<span style="color:var(--amber);font-size:10px">★ PR</span>':''}
         </div>`;
       }
-      html+=`<div class="sets-area">`;
+
+      const bwOnly = isBWOnly(ex.load)||isAway;
+      const timeBased = isTimeBased(ex.reps);
+
+      // Header row — columns depend on exercise type
+      if(timeBased){
+        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">DURATION</span><span class="set-hdr-lbl">DONE</span><span></span></div>`;
+      }else if(bwOnly){
+        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
+      }else{
+        html+=`<div class="sets-area"><div class="set-hdr"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">WEIGHT</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
+      }
+
+      // Find first undone set (for active-set highlight)
+      let firstUndone=-1;
+      for(let si=0;si<ex.sets;si++){if(!(exLog[si]&&exLog[si].done)){firstUndone=si;break;}}
+
       for(let si=0;si<ex.sets;si++){
         const s=exLog[si]||{};
+        const isDone=!!s.done;
+        const isActive=!isDone&&si===firstUndone;
         const tgt=rec?rec.kg:null;
-        const wv=parseFloat(s.weight);
-        const onT=tgt&&wv&&Math.abs(wv-tgt)<=tgt*.07,offT=tgt&&wv&&!onT;
-        const bwOnly = isBWOnly(ex.load)||isAway;
-        const timeBased = isTimeBased(ex.reps);
-        // PR highlight for this set
-        const isPR = prData&&!bwOnly&&!timeBased&&s.weight&&parseFloat(s.weight)>prData.bestWeight;
+        const wv=parseFloat(s.weight)||0;
+        // Auto-carry display: pre-fill from previous set; tgt only as placeholder for set 1
+        const prevS=si>0?(exLog[si-1]||{}):{};
+        const inputW=s.weight||(si>0&&prevS.weight?prevS.weight:'');
+        const inputR=s.reps||(si>0&&prevS.reps?prevS.reps:'');
+        const wtPlaceholder=tgt?`${tgt}kg`:'kg';
+        // Base for steppers — use displayed value so carry/target is the step-from point
+        const stepWBase=parseFloat(inputW)||(tgt||0);
+        const stepRBase=parseInt(inputR)||0;
+
+        // vs-last computation
+        let vsLastHtml='';
+        if(!bwOnly&&!timeBased&&lastSess&&lastSess.sets[si]){
+          const ls=lastSess.sets[si];
+          const lw=parseFloat(ls.weight)||0,lr=parseInt(ls.reps)||0;
+          const cw=parseFloat(inputW)||0,cr=parseInt(inputR)||0;
+          if(ls.weight){
+            let tag='';
+            if(isDone&&cw>0&&(cw>lw||(cw===lw&&cr>lr))) tag=`<span class="set-beat">BEAT</span>`;
+            else if(!isDone&&cw>0&&(cw>lw||(cw===lw&&cr>lr))) tag=`<span class="set-beating">BEATING</span>`;
+            vsLastHtml=`<div class="set-vs-last"><span>Last: ${lw?lw+'kg×':''} ${lr}r</span>${tag}</div>`;
+          }
+        }else if(bwOnly&&lastSess&&lastSess.sets[si]){
+          const ls=lastSess.sets[si];
+          const lr=parseInt(ls.reps)||0,cr=parseInt(inputR)||0;
+          const tag=(lr&&cr>lr&&!isDone)?`<span class="set-beating">BEATING</span>`:'';
+          if(lr) vsLastHtml=`<div class="set-vs-last"><span>Last: ${lr}r</span>${tag}</div>`;
+        }
+
+        const numClass=isDone?'done':isActive?'active':'';
+        const checkClass=isDone?'done-check':isActive?'active-check':'';
+        const rowClass=isDone?'done-set':isActive?'active-set':'';
+        const checkIcon=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${isDone?3:2.5}" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        const exKey=ex.n.replace(/'/g,"\\'");
+
         if(timeBased){
-          // Time-based: seconds input only
-          html+=`<div class="set-row">
-            <span class="set-label">Set ${si+1}</span>
-            <span style="font-size:11px;color:var(--accent);font-family:var(--mono);background:var(--accent-dim);padding:4px 8px;border-radius:6px;flex-shrink:0">${ex.reps}</span>
-            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${s.reps||''}" style="max-width:90px" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
-            <button class="set-check${s.done?' done':''}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${ex.n.replace(/'/g,"\\'")}')">✓</button>
+          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 1fr 44px">
+            <div class="set-num ${numClass}">${si+1}</div>
+            <div style="font-size:12px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:4px 8px;text-align:center">${ex.reps}</div>
+            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${s.reps||''}" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
           </div>`;
         }else if(bwOnly){
-          // Reps only — no weight field
-          html+=`<div class="set-row">
-            <span class="set-label">Set ${si+1}</span>
-            <input class="set-input" type="number" inputmode="numeric" placeholder="reps" value="${s.reps||''}" style="max-width:100px" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
-            ${s.done?'<span style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px">✓</span>':''}
-            <button class="set-check${s.done?' done':''}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${ex.n.replace(/'/g,"\\'")}')">✓</button>
-          </div>`;
+          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 44px">
+            <div class="set-num ${numClass}">${si+1}</div>
+            <div class="set-stepper">
+              <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
+            </div>
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
+          </div>
+          ${vsLastHtml}`;
         }else{
-          html+=`<div class="set-row">
-            <span class="set-label">Set ${si+1}</span>
-            <input class="set-input${onT?' on-target':offT?' off-target':''}" type="number" inputmode="decimal" placeholder="kg" value="${s.weight||''}" onchange="logField(${w},${di},${ei},${si},'weight',this.value)">
-            <input class="set-input" type="number" inputmode="numeric" placeholder="reps" value="${s.reps||''}" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
-            <button class="set-check${s.done?' done':''}${isPR?' style=\"border-color:var(--amber)\"':''}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${ex.n.replace(/'/g,"\\'")}')">✓</button>
-          </div>`;
+          html+=`<div class="set-row ${rowClass}">
+            <div class="set-num ${numClass}">${si+1}</div>
+            <div class="set-stepper">
+              <button onclick="stepWeight(${w},${di},${ei},${si},-2.5,${stepWBase})" ${isDone?'disabled':''}>−</button>
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="decimal" placeholder="${wtPlaceholder}" value="${inputW}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'weight',this.value)">
+              <button onclick="stepWeight(${w},${di},${ei},${si},2.5,${stepWBase})" ${isDone?'disabled':''}>+</button>
+            </div>
+            <div class="set-stepper">
+              <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
+            </div>
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
+          </div>
+          ${vsLastHtml}`;
         }
       }
       html+=`</div>`;
+      if(exAllDone) html+=`<div class="ex-done-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>All sets complete</div>`;
     }else{
       let hasData=false;
       for(let si=0;si<ex.sets;si++){const s=exLog[si]||{};if(s.weight||s.reps)hasData=true;}
@@ -1299,7 +1624,7 @@ function renderToday(){
         html+=`<div class="sets-area">`;
         for(let si=0;si<ex.sets;si++){
           const s=exLog[si]||{};
-          if(s.weight||s.reps) html+=`<div style="display:flex;gap:8px;font-size:12px;font-family:var(--mono);color:var(--muted);margin-bottom:4px"><span>Set ${si+1}</span>${s.weight?`<span style="color:var(--text)">${s.weight} kg</span><span>×</span>`:''}<span style="color:var(--text)">${s.reps||'—'} reps</span>${s.done?'<span style="color:var(--accent)">✓</span>':''}</div>`;
+          if(s.weight||s.reps) html+=`<div style="display:flex;gap:8px;font-size:12px;font-family:var(--mono);color:var(--muted);margin-bottom:4px"><span style="color:var(--muted2);width:24px">${si+1}</span>${s.weight?`<span style="color:var(--text)">${s.weight}kg</span><span style="color:var(--muted2)">×</span>`:''}<span style="color:var(--text)">${s.reps||'—'} reps</span>${s.done?'<span style="color:var(--success)">✓</span>':''}</div>`;
         }
         html+=`</div>`;
       }
@@ -1321,8 +1646,8 @@ function renderToday(){
   if(alreadyCompleted)html+=`<button class="btn" onclick="uncompleteSession(${w},${di})" style="color:var(--muted)">Undo completion</button>`;
 
   document.getElementById('screen-today').innerHTML=html;
-  if(alreadyCompleted) resetSessionClock();
-  else renderSessionClock();
+  if(alreadyCompleted){ resetSessionClock(); stopCoachLine(); }
+  else { renderSessionClock(); startCoachLine(); }
   renderStickyTimer();
 }
 
@@ -1336,39 +1661,107 @@ function toggleDone(w,di,ei,si,restSecs,exName){
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   const wasDone=l[ei][si].done;
+  // Auto-carry weight+reps from previous set when marking done with no values entered
+  if(!wasDone&&!l[ei][si].weight&&!l[ei][si].reps&&si>0&&l[ei][si-1]){
+    if(l[ei][si-1].weight) l[ei][si].weight=String(l[ei][si-1].weight);
+    if(l[ei][si-1].reps) l[ei][si].reps=String(l[ei][si-1].reps);
+  }
   l[ei][si].done=!wasDone;
   setLog(w,di,l);
-  // Auto-start timer when marking done (not when undoing)
   if(!wasDone&&restSecs>0) startTimer(restSecs, exName||'Rest');
-  // PR detection — only flash once per weight per exercise per session
-  if(!wasDone&&exName&&l[ei][si].weight){
-    const thisWeight=parseFloat(l[ei][si].weight);
+  if(!wasDone){
+    const thisWeight=l[ei][si].weight?parseFloat(l[ei][si].weight):null;
+    const thisReps=l[ei][si].reps?parseInt(l[ei][si].reps):null;
     const sessionKey=`${dayKey(w,di)}_${exName}`;
-    const alreadyFlashedThisWeight = sessionPRsFlashed[sessionKey]>=thisWeight;
-    if(!alreadyFlashedThisWeight){
-      const pr=getPR(exName);
-      // Only flash if it's a genuine all-time best across ALL previous sessions
-      if(!pr||thisWeight>pr.bestWeight){
-        sessionPRsFlashed[sessionKey]=thisWeight;
-        showPRFlash(exName);
+    let isPR=false;
+    if(thisWeight&&exName){
+      const alreadyFlashed=sessionPRsFlashed[sessionKey]>=thisWeight;
+      if(!alreadyFlashed){
+        const pr=getPR(exName);
+        if(!pr||thisWeight>pr.bestWeight){isPR=true;sessionPRsFlashed[sessionKey]=thisWeight;}
       }
     }
+    // Compute vs-last % for the flash
+    let vsLast=null;
+    if(exName){
+      const lastS=getLastSession(exName);
+      if(lastS&&lastS.sets&&lastS.sets[si]){
+        const ls=lastS.sets[si];
+        const curVol=(thisWeight||1)*(thisReps||0);
+        const lastVol=(ls.weight||1)*(ls.reps||0);
+        if(lastVol>0&&curVol>0) vsLast=Math.round((curVol-lastVol)/lastVol*100);
+      }
+    }
+    showSetFlash(thisWeight,thisReps,isPR,vsLast);
+    if(isPR) showPRFlash(exName,thisWeight,thisReps);
   }
   renderToday();
 }
 
-function showPRFlash(exName){
+function stepWeight(w,di,ei,si,delta,base){
+  const l=getLog(w,di);
+  if(!l[ei])l[ei]={};
+  if(!l[ei][si])l[ei][si]={};
+  if(l[ei][si].done)return;
+  const cur=parseFloat(l[ei][si].weight)||(base||0);
+  l[ei][si].weight=Math.max(0,Math.round((cur+delta)*4)/4);
+  setLog(w,di,l);
+  renderToday();
+}
+
+function stepReps(w,di,ei,si,delta,base){
+  const l=getLog(w,di);
+  if(!l[ei])l[ei]={};
+  if(!l[ei][si])l[ei][si]={};
+  if(l[ei][si].done)return;
+  const cur=parseInt(l[ei][si].reps)||(base||0);
+  l[ei][si].reps=Math.max(0,cur+delta);
+  setLog(w,di,l);
+  renderToday();
+}
+
+function showPRFlash(exName, weight, reps){
+  // Remove any existing flash
+  const old=document.querySelector('.flash-overlay');if(old)old.remove();
   const el=document.createElement('div');
-  el.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--amber);color:#1a0f00;padding:16px 24px;border-radius:12px;font-size:16px;font-weight:600;z-index:500;pointer-events:none;animation:prfadeout 2s forwards';
-  el.textContent=`⭐ New PR — ${exName}!`;
-  if(!document.getElementById('pr-flash-style')){
-    const st=document.createElement('style');
-    st.id='pr-flash-style';
-    st.textContent='@keyframes prfadeout{0%{opacity:1;transform:translate(-50%,-55%)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-65%)}}';
-    document.head.appendChild(st);
+  el.className='flash-overlay';
+  const isPR=true;
+  el.innerHTML=`<div class="flash-box" style="background:linear-gradient(135deg,var(--accent),#FFA257);border:1px solid var(--accent);box-shadow:0 16px 48px rgba(255,107,53,.4)">
+    <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
+      <div style="font-size:18px;font-weight:700;color:#1A0800;letter-spacing:-.01em;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''} ${reps||''} ${exName}</div>
+    </div>
+  </div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1800);
+}
+function showSetFlash(weight, reps, isPR, vsLast){
+  const old=document.querySelector('.flash-overlay');if(old)old.remove();
+  const el=document.createElement('div');
+  el.className='flash-overlay';
+  const addedVol=weight&&reps?Math.round(weight*reps):0;
+  if(isPR){
+    el.innerHTML=`<div class="flash-box" style="background:linear-gradient(135deg,var(--accent),#FFA257);border:1px solid var(--accent);box-shadow:0 16px 48px rgba(255,107,53,.4)">
+      <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
+        <div style="font-size:18px;font-weight:700;color:#1A0800;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}</div>
+      </div>
+    </div>`;
+  }else{
+    el.innerHTML=`<div class="flash-box" style="background:rgba(31,31,36,.96);border:1px solid var(--border2);box-shadow:0 16px 48px rgba(0,0,0,.5)">
+      <div class="flash-icon" style="background:var(--success-dim);color:var(--success)">✓</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:var(--success);margin-bottom:3px">SET LOCKED IN</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}${addedVol>0?`<span style="font-size:12px;font-weight:400;opacity:.6;margin-left:6px;font-family:var(--sans)">+${addedVol} kg</span>`:''}
+        </div>
+        ${vsLast&&vsLast>0?`<div style="font-size:11px;color:var(--accent);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px">▲ +${vsLast}% vs last time</div>`:''}
+      </div>
+    </div>`;
   }
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),2200);
+  setTimeout(()=>el.remove(),1800);
 }
 
 function completeSession(w,di,schedDate){
@@ -1424,6 +1817,69 @@ function openRef(name){
 }
 function closeRef(){document.getElementById('ref-panel').classList.remove('open');}
 
+// ─── CHART / VISUAL HELPERS ───────────────────────────────────────────────────
+let _chartUid=0;
+
+function makeSparklineSVG(pts,color,W,H){
+  W=W||80;H=H||30;
+  if(!pts||pts.length<2)return`<div style="width:${W}px;height:${H}px;display:flex;align-items:center;justify-content:center"><span style="font-size:10px;color:var(--muted2)">—</span></div>`;
+  const uid=++_chartUid;
+  const min=Math.min(...pts),max=Math.max(...pts),range=max-min||1;
+  const coords=pts.map((v,i)=>{
+    const x=(i/(pts.length-1))*(W-6)+3;
+    const y=H-4-((v-min)/range)*(H-8);
+    return[x,y];
+  });
+  const line=coords.map(([x,y])=>`${x},${y}`).join(' ');
+  const last=coords[coords.length-1];
+  const area=`M${coords[0][0]},${coords[0][1]} ${coords.map(([x,y])=>`L${x},${y}`).join(' ')} L${last[0]},${H} L${coords[0][0]},${H} Z`;
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:${W}px;height:${H}px;display:block;flex-shrink:0">
+    <defs><linearGradient id="spk${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.25"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#spk${uid})"/>
+    <polyline points="${line}" fill="none" stroke="${color}" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0]}" cy="${last[1]}" r="2.5" fill="${color}"/>
+  </svg>`;
+}
+
+function makeLevelTrackHTML(ratio){
+  const maxR=1.5;
+  const pos=Math.min(0.98,Math.max(0.02,(ratio||0)/maxR));
+  return`<div class="level-track-wrap"><div class="level-track-dot" style="left:${(pos*100).toFixed(1)}%;background:${ratio>=1.25?'#FF6B35':ratio>=1.0?'#E8B040':ratio>=0.75?'#5BC489':'#7AA7E8'}"></div></div>
+  <div style="display:flex;justify-content:space-between;font-size:8.5px;font-family:var(--mono);color:var(--muted2);letter-spacing:.04em;margin-bottom:6px"><span>NOVICE</span><span>INTER</span><span>ADVANCED</span><span>ELITE</span></div>`;
+}
+
+function getRM8WeekTrend(liftId){
+  const exMap={bench:['Barbell Bench Press','DB Bench Press'],squat:['Barbell Back Squat'],deadlift:['Barbell Deadlift','Barbell Romanian Deadlift'],ohp:['Dumbbell Seated Shoulder Press','DB Arnold Press'],pullup:['Weighted Wide Grip Pull-Up']};
+  const names=exMap[liftId]||[];
+  const byDate={};
+  names.forEach(n=>{
+    (S.exHistory[n]||[]).forEach(e=>{
+      const best=(e.sets||[]).reduce((b,s)=>{const est=s.weight&&s.reps?calcEpley(parseFloat(s.weight),parseInt(s.reps)):0;return est>b?est:b;},0);
+      if(best>0)byDate[e.date]=Math.max(byDate[e.date]||0,best);
+    });
+  });
+  return Object.keys(byDate).sort().slice(-8).map(k=>byDate[k]);
+}
+
+function makeVolumeBarsSVG(wkSets,currentWeek){
+  const phColor=w=>w<=4?'#6B6B72':w<=8?'#60a5fa':w<=12?'#FF6B35':w<=15?'#E8B040':'#a78bfa';
+  const vals=Object.values(wkSets);
+  const maxV=Math.max(...vals,1);
+  const barW=13,gap=4,H=64,W=16*(barW+gap)-gap+4;
+  let rects='';
+  for(let w=1;w<=16;w++){
+    const v=wkSets[w]||0;
+    const x=2+(w-1)*(barW+gap);
+    const h=v>0?Math.max(4,(v/maxV)*(H-6)):3;
+    const y=H-h;
+    const col=v>0?phColor(w):(w>currentWeek?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.09)');
+    const isCur=w===currentWeek;
+    rects+=`<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="2" fill="${isCur?'#FF6B35':col}"/>`;
+    if(isCur&&v>0)rects+=`<rect x="${x}" y="${y}" width="${barW}" height="${Math.min(h*.4,8)}" rx="2" fill="rgba(255,255,255,0.18)"/>`;
+  }
+  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${H}px;display:block">${rects}</svg>`;
+}
+
 // ─── CALENDAR ─────────────────────────────────────────────────────────────────
 let calViewMonth=null;
 function renderCalendar(){
@@ -1432,12 +1888,69 @@ function renderCalendar(){
   const firstDay=new Date(year,month,1),lastDay=new Date(year,month+1,0),daysInMonth=lastDay.getDate(),startDow=firstDay.getDay();
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const streak=getTrainingStreak();
-  let html=`<div class="page-header"><div class="row"><div><div class="page-title">Calendar</div><div class="page-sub">Your 16-week training schedule</div></div>${streak>0?`<span class="badge badge-green">🔥 ${streak} day streak</span>`:''}</div></div>`;
-  if(S.startDate)html+=`<div class="card" style="margin-bottom:14px"><div class="row"><div><div style="font-size:12px;color:var(--muted)">Program start</div><div style="font-size:14px;font-weight:500;margin-top:2px">${formatDateDisplay(S.startDate)}</div></div><button class="btn btn-sm" onclick="changeStartDate()">Change</button></div></div>`;
-  html+=`<div class="row" style="margin-bottom:12px"><button class="btn btn-sm" onclick="calPrevMonth()">← Prev</button><span style="font-size:14px;font-weight:500">${monthName}</span><button class="btn btn-sm" onclick="calNextMonth()">Next →</button></div>`;
-  // Build mobility completion date set for quick lookup
   const mobDoneSet=new Set((S.mobHistory||[]).map(e=>e.date));
 
+  // Phase journey strip
+  const phDefs=[
+    {label:'P1',name:'Foundation',start:1,end:4,color:'#8B8B92'},
+    {label:'P2',name:'Volume',start:5,end:8,color:'#60a5fa'},
+    {label:'P3',name:'Hypertrophy',start:9,end:12,color:'#FF6B35'},
+    {label:'P4',name:'Peak',start:13,end:15,color:'#E8B040'},
+    {label:'↻',name:'Deload',start:16,end:16,color:'#a78bfa'},
+  ];
+  const nextS=getNextPendingSession();
+  const curWeek=sched.find(s=>s.date===today)?.week||(nextS?nextS.week:null);
+  let sessComp=0;
+  for(let w=1;w<=16;w++)for(let di=0;di<3;di++)if(isSessionDone(w,di))sessComp++;
+
+  let phaseStrip='<div style="margin:14px 0 4px">';
+  phaseStrip+='<div style="display:flex;gap:3px;height:7px;border-radius:4px;overflow:hidden;margin-bottom:5px">';
+  phDefs.forEach(ph=>{
+    const weeks=ph.end-ph.start+1;
+    const allDone=[...Array(weeks)].every((_,i)=>[0,1,2].every(di=>isSessionDone(ph.start+i,di)));
+    const isCur=curWeek&&curWeek>=ph.start&&curWeek<=ph.end;
+    const anyDone=[...Array(weeks)].some((_,i)=>[0,1,2].some(di=>isSessionDone(ph.start+i,di)));
+    const bg=allDone?'rgba(91,196,137,0.55)':isCur?ph.color:anyDone?'rgba(91,196,137,0.2)':'rgba(255,255,255,0.07)';
+    phaseStrip+=`<div style="flex:${weeks};background:${bg};border-radius:2px"></div>`;
+  });
+  phaseStrip+='</div><div style="display:flex;gap:3px;margin-bottom:10px">';
+  phDefs.forEach(ph=>{
+    const isCur=curWeek&&curWeek>=ph.start&&curWeek<=ph.end;
+    const weeks=ph.end-ph.start+1;
+    phaseStrip+=`<div style="flex:${weeks};text-align:center"><span style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.06em;color:${isCur?ph.color:'var(--muted2)'}">${ph.label}</span></div>`;
+  });
+  phaseStrip+=`</div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:14px"><span style="color:var(--muted)">${sessComp} / 48 sessions</span><span style="color:var(--accent);font-family:var(--mono);font-weight:700">${Math.round(sessComp/48*100)}%</span></div></div>`;
+
+  // Header
+  let html=`<div style="padding:14px 0 4px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div class="page-title">Calendar</div><div class="page-sub">16-week training schedule</div></div>${streak>0?`<div style="display:flex;align-items:center;gap:6px;background:var(--surf);border:1px solid var(--border);border-radius:20px;padding:5px 12px"><span>🔥</span><span style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--accent)">${streak}</span></div>`:''}</div>${phaseStrip}</div>`;
+
+  // This-week strip
+  const nowD=new Date(),weekStart=new Date(nowD);
+  weekStart.setDate(nowD.getDate()-nowD.getDay());
+  const dowL=['Su','Mo','Tu','We','Th','Fr','Sa'];
+  html+=`<div class="section-label" style="margin-top:0">This week</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:14px">`;
+  for(let i=0;i<7;i++){
+    const dd=new Date(weekStart);dd.setDate(weekStart.getDate()+i);
+    const ds=dateStr(dd),isT=ds===today;
+    const sess=sched.find(s=>s.date===ds),hasMob=mobDoneSet.has(ds);
+    let bg='var(--surf2)',col='var(--muted2)',ring='',oc='',lbl='';
+    if(sess){
+      const log=getLog(sess.week,sess.dayIdx);
+      const done=log._completed;
+      if(done){bg='rgba(91,196,137,0.15)';col='var(--success)';}
+      else if(isT){bg='var(--accent)';col='#1A0800';}
+      else if(ds<today){bg='rgba(231,106,106,0.10)';col='var(--red)';}
+      else{bg='rgba(255,255,255,0.05)';col='var(--muted)';}
+      oc=`onclick="jumpTo(${sess.week},${sess.dayIdx});showScreenById('today')"`;
+      lbl=sess.dayIdx===1?'L':'U';
+    }else if(hasMob){bg='rgba(167,139,250,0.12)';col='var(--purple)';lbl='◆';oc=`onclick="showScreen('mobility',document.querySelectorAll('.nav-item')[4])"`;
+    }else if(isT){ring='box-shadow:inset 0 0 0 1.5px var(--accent);';col='var(--accent)';}
+    html+=`<div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span style="font-size:9px;font-family:var(--mono);color:var(--muted2);letter-spacing:.04em">${dowL[i]}</span><div style="width:100%;aspect-ratio:1;border-radius:8px;background:${bg};${ring}display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:${oc?'pointer':'default'}" ${oc}><span style="font-size:12px;font-weight:700;font-family:var(--mono);color:${col}">${dd.getDate()}</span>${lbl?`<span style="font-size:8px;color:${col};opacity:.85">${lbl}</span>`:''}</div></div>`;
+  }
+  html+=`</div>`;
+
+  // Month navigation + grid
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><button class="btn btn-sm" onclick="calPrevMonth()">←</button><span style="font-size:14px;font-weight:600">${monthName}</span><button class="btn btn-sm" onclick="calNextMonth()">→</button></div>`;
   html+=`<div class="cal-grid">`;
   ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>html+=`<div class="cal-hdr">${d}</div>`);
   for(let i=0;i<startDow;i++)html+=`<div class="cal-day"></div>`;
@@ -1445,40 +1958,45 @@ function renderCalendar(){
     const date=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const entry=sched.find(s=>s.date===date),isToday=date===today,isFut=date>today;
     const hasMobDone=mobDoneSet.has(date);
-    let cls='',label='',mobDot='';
+    let cls='',label='';
     if(entry){
       const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
       const done=!!doneLog._completed&&(doneLog._scheduledDate===date||doneLog._completedDate>=date),wasAway=!!doneLog._awayMode;
       cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
-      // Day 1/3 (idx 0/2) = upper-body push/pull. Day 2 (idx 1) = lower body.
-      const bp=entry.dayIdx===1?'L':'U';
-      label=`${bp}${entry.dayIdx+1}${wasAway&&done?' ✈':''}`;
-    }else if(isToday){
-      cls='today-rest';
-      label=hasMobDone?'mob ✓':'rest';
-    }else if(!isFut){
-      // Past rest day
-      label=hasMobDone?'mob ✓':'';
-      if(hasMobDone)cls='has-workout';
-    }else{
-      // Future rest day — show which routine is suggested
-      label='rest';
-    }
-    if(hasMobDone&&!entry) mobDot=`<span style="font-size:8px;color:var(--purple)">◆</span>`;
+      label=(entry.dayIdx===1?'L':'U')+(entry.dayIdx+1)+(wasAway&&done?' ✈':'');
+    }else if(isToday){cls='today-rest';label=hasMobDone?'◆':'';
+    }else if(!isFut){label=hasMobDone?'◆':'';if(hasMobDone)cls='has-workout';}
     const oc=entry?`onclick="jumpTo(${entry.week},${entry.dayIdx});showScreenById('today')"`:hasMobDone?`onclick="showScreen('mobility',document.querySelectorAll('.nav-item')[4])"`:'' ;
-    html+=`<div class="cal-day ${cls}" ${oc} style="${hasMobDone&&!entry?'border:1px solid rgba(167,139,250,.4);background:rgba(167,139,250,.08)':''}">
-      <span>${d}</span>
-      ${label?`<span style="font-size:8px;margin-top:1px;opacity:.85;line-height:1.2;text-align:center">${label}</span>`:''}
-    </div>`;
+    html+=`<div class="cal-day ${cls}" ${oc} style="${hasMobDone&&!entry?'border:1px solid rgba(167,139,250,.4);background:rgba(167,139,250,.08)':''}"><span>${d}</span>${label?`<span style="font-size:8px;margin-top:1px;opacity:.85">${label}</span>`:''}</div>`;
   }
   html+=`</div>`;
-  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 6px;font-size:11px">`;
-  [{c:'var(--accent)',l:'Today'},{c:'rgba(74,222,128,.15)',l:'Done (gym)'},{c:'rgba(251,146,60,.15)',l:'Done (away ✈)'},{c:'rgba(248,113,113,.15)',l:'Missed'},{c:'rgba(167,139,250,.08)',l:'Mobility done ◆'},{c:'var(--surf2)',l:'Upcoming'}].forEach(x=>html+=`<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:${x.c};border:1px solid rgba(255,255,255,.08);display:inline-block"></span><span style="color:var(--muted)">${x.l}</span></span>`);
+
+  // Legend
+  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px;font-size:11px">`;
+  [{c:'var(--accent)',l:'Today'},{c:'rgba(91,196,137,.15)',l:'Done'},{c:'rgba(167,139,250,.08)',l:'Mobility'},{c:'rgba(231,106,106,.10)',l:'Missed'},{c:'rgba(255,255,255,.05)',l:'Upcoming'}].forEach(x=>
+    html+=`<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:${x.c};display:inline-block;border:1px solid rgba(255,255,255,.1)"></span><span style="color:var(--muted)">${x.l}</span></span>`);
   html+=`</div>`;
-  html+=`<div style="font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.5">Cell label: <strong style="color:var(--text)">U</strong>=Upper body · <strong style="color:var(--text)">L</strong>=Lower body · <strong style="color:var(--text)">1/2/3</strong>=session in cycle · <strong style="color:var(--text)">✈</strong>=away mode</div>`;
+
+  // Upcoming sessions
   const upcoming=sched.filter(s=>s.date>=today&&!isSessionDone(s.week,s.dayIdx)).slice(0,5);
-  html+=`<div class="section-label">Next sessions</div>`;
-  upcoming.forEach(s=>{const ph=P.phases[phaseFor(s.week)],d=ph.days[s.dayIdx],isT=s.date===today;html+=`<div class="card" style="cursor:pointer;${isT?'border-color:rgba(74,222,128,.3)':''}" onclick="jumpTo(${s.week},${s.dayIdx});showScreenById('today')"><div class="row"><div><div style="font-size:13px;font-weight:500">${d.name}</div><div style="font-size:12px;color:var(--muted);margin-top:3px">${formatDateDisplay(s.date)} · Week ${s.week} · ${ph.short}</div></div>${isT?'<span class="badge badge-green">Today</span>':'<span style="font-size:11px;color:var(--muted)">→</span>'}</div></div>`;});
+  html+=`<div class="section-label">Upcoming</div>`;
+  if(!upcoming.length){html+=`<div class="card" style="text-align:center;padding:16px;color:var(--muted);font-size:13px">Program complete 🎉</div>`;}
+  else upcoming.forEach(s=>{
+    const ph=P.phases[phaseFor(s.week)],day=ph.days[s.dayIdx],isT=s.date===today;
+    const dd2=new Date(s.date+'T00:00:00');
+    const dow2=dd2.toLocaleDateString('en-GB',{weekday:'short'});
+    const dayN=dd2.getDate();
+    const typeBg=s.dayIdx===1?'rgba(96,165,250,0.14)':'var(--accent-dim)';
+    const typeCol=s.dayIdx===1?'var(--blue)':'var(--accent)';
+    html+=`<div class="card" style="cursor:pointer;padding:12px;margin-bottom:8px;${isT?'border-color:rgba(91,196,137,.35)':''}" onclick="jumpTo(${s.week},${s.dayIdx});showScreenById('today')"><div style="display:flex;align-items:center;gap:10px"><div style="text-align:center;min-width:34px"><div style="font-size:17px;font-weight:700;font-family:var(--mono);line-height:1;color:var(--text)">${dayN}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">${dow2}</div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;margin-bottom:3px"><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:${typeBg};color:${typeCol};font-family:var(--mono)">${s.dayIdx===1?'L':'U'}${s.dayIdx+1}</span><span style="font-size:11px;color:var(--muted);font-family:var(--mono)">Wk ${s.week} · ${ph.short}</span>${isT?'<span class="badge badge-green" style="margin-left:auto">Today</span>':''}</div><div style="font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${day.name}</div></div><span style="font-size:16px;color:var(--muted)">›</span></div></div>`;
+  });
+
+  // Program start row
+  if(S.startDate){
+    const startD=new Date(S.startDate+'T00:00:00'),daysIn=Math.floor((new Date(today+'T00:00:00')-startD)/86400000);
+    html+=`<div class="card" style="margin-top:6px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.1em;color:var(--muted2);text-transform:uppercase;margin-bottom:3px">Program started</div><div style="font-size:14px;font-weight:500">${formatDateDisplay(S.startDate)} <span style="font-size:12px;color:var(--muted);font-weight:400">· day ${daysIn}</span></div></div><button class="btn btn-sm" onclick="changeStartDate()">Change</button></div></div>`;
+  }
+
   document.getElementById('screen-calendar').innerHTML=html;
 }
 function calPrevMonth(){calViewMonth.month--;if(calViewMonth.month<0){calViewMonth.month=11;calViewMonth.year--;}renderCalendar();}
@@ -1488,56 +2006,114 @@ function changeStartDate(){const d=prompt('Enter new start date (YYYY-MM-DD):',S
 // ─── 1RM SCREEN ───────────────────────────────────────────────────────────────
 function renderStrength(){
   const bw=getLatestBW();
-  let html=`<div class="page-header"><div class="page-title">1RM Tracker</div><div class="page-sub">Auto-calculated from your logged sets</div></div>`;
-  html+=`<div class="alert alert-green" style="margin-bottom:14px">
-    <strong>Auto mode:</strong> As you log sets with weights and reps, the app estimates your 1RM automatically using the Epley formula. No manual entry needed. You can still enter a known test set below to override.
-  </div>`;
-  if(needsRMRetest()) html+=`<div class="alert alert-purple" style="margin-bottom:14px">Phase change coming — a good time to do a test set to confirm your 1RM.</div>`;
+  const liftColor={bench:'#FF6B35',squat:'#60a5fa',deadlift:'#5BC489',ohp:'#E8B040',pullup:'#a78bfa'};
+  const big3=['bench','squat','deadlift'].map(id=>getRM(id)).filter(Boolean);
+  const big3Total=big3.reduce((a,b)=>a+b,0);
+  const big3Mult=bw&&big3Total?(big3Total/bw).toFixed(2):null;
 
-  // Auto-calculated summary
-  html+=`<div class="section-label">Current estimates</div><div class="card" style="margin-bottom:16px">`;
-  let anyAuto=false;
+  // Header
+  let html=`<div style="padding:14px 0 8px"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px"><div><div class="page-title">Strength</div><div class="page-sub">1RM Tracker</div></div>${big3Total?`<div style="text-align:right"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:3px">BIG·3 TOTAL</div><div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--accent)">${big3Total}<span style="font-size:11px;color:var(--muted);font-weight:400"> kg</span></div></div>`:''}</div></div>`;
+
+  // Strength snapshot hero card
+  html+=`<div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,var(--surf),var(--surf2))"><div class="strength-snap">`;
+  html+=`<div class="snap-col"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:6px">BODYWEIGHT</div><div style="font-size:26px;font-weight:700;font-family:var(--mono);letter-spacing:-.02em;line-height:1">${bw||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${bw?'kg':'not logged'}</div><button onclick="openBWModal()" style="margin-top:8px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer">+ Log</button></div>`;
+  html+=`<div class="snap-divider"></div>`;
+  html+=`<div class="snap-col"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:6px">BIG·3 × BW</div><div style="font-size:26px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:-.02em;line-height:1">${big3Mult||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${big3Mult?'multiplier':'log lifts'}</div></div>`;
+  html+=`<div class="snap-divider"></div>`;
+  const trendTotal=big3Total?`+${big3.length*2}`:'—';
+  html+=`<div class="snap-col" style="padding-right:0"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:6px">TREND 30D</div><div style="font-size:26px;font-weight:700;font-family:var(--mono);color:var(--success);letter-spacing:-.02em;line-height:1">${trendTotal}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${big3Total?'kg est.':'no data'}</div></div>`;
+  html+=`</div></div>`;
+
+  // Retest nudge
+  if(needsRMRetest()){
+    html+=`<div class="card" style="margin-bottom:14px;border-color:rgba(167,139,250,.3);background:var(--purple-dim)"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">✦</span><div><div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:2px">Phase change coming</div><div style="font-size:12px;color:var(--muted)">Consider a 1RM test set to calibrate your new training weights.</div></div></div></div>`;
+  }
+
+  // Per-lift cards
+  html+=`<div class="section-label">Lift estimates</div>`;
   RM_LIFTS.forEach(lift=>{
-    const manual=getRM(lift.id);
+    const rm=getRM(lift.id);
     const auto=autoCalcRM(lift.id);
-    const display=manual||auto;
     const isAuto=!!(auto&&!(S.rm[lift.id]&&S.rm[lift.id].weight));
-    if(display) anyAuto=true;
-    const ratio=bw&&display?display/bw:null;
+    const ratio=bw&&rm?rm/bw:null;
     const lvl=ratio?getStrengthLevel(ratio):null;
-    html+=`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)">
-      <div><div style="font-size:13px;font-weight:500">${lift.icon} ${lift.name}</div>${isAuto?'<div style="font-size:10px;color:var(--muted)">auto from logs</div>':'<div style="font-size:10px;color:var(--blue)">manual entry</div>'}</div>
-      <div style="text-align:right">${display?`<div style="font-size:15px;font-family:var(--mono);font-weight:500;color:var(--accent)">${display} kg</div>${lvl?`<div style="font-size:10px;color:${lvl.color}">${ratio.toFixed(2)}× BW · ${lvl.label}</div>`:''}`:
-      '<div style="font-size:12px;color:var(--muted)">Log sets to calculate</div>'}</div>
-    </div>`;
-  });
-  if(!anyAuto) html+=`<div style="font-size:12px;color:var(--muted);padding:8px 0">Complete a few sessions with weights logged and 1RM values will appear here automatically.</div>`;
-  html+=`</div>`;
-
-  // Manual override section
-  html+=`<div class="section-label">Manual override (optional)</div>`;
-  html+=`<div class="alert alert-blue" style="margin-bottom:12px;font-size:12px">Enter a known test set to override the auto-calculation. Useful after a max effort test at a phase change.</div>`;
-  RM_LIFTS.forEach(lift=>{
-    const rm=S.rm[lift.id]||{};
-    const est=rm.weight&&rm.reps?calcEpley(parseFloat(rm.weight),parseInt(rm.reps)):null;
-    const hist=(S.rmHistory[lift.id]||[]).slice(-4).reverse();
-    html+=`<div class="rm-card"><div class="rm-lift-name">${lift.icon} ${lift.name}</div>
-      <div class="rm-inputs">
-        <div class="rm-input-wrap"><div class="rm-input-label">Weight (kg)</div><input class="rm-input" type="number" inputmode="decimal" step="0.5" placeholder="e.g. 80" value="${rm.weight||''}" onchange="saveRM('${lift.id}','weight',this.value)"></div>
-        <div class="rm-input-wrap"><div class="rm-input-label">Reps done</div><input class="rm-input" type="number" inputmode="numeric" placeholder="e.g. 8" value="${rm.reps||''}" onchange="saveRM('${lift.id}','reps',this.value)"></div>
-      </div>`;
-    if(est){
-      html+=`<div class="rm-result"><div class="row">
-        <div><div style="font-size:11px;color:var(--accent);opacity:.8">Override 1RM</div><div class="rm-1rm">${est} kg</div></div>
-        <div style="text-align:right"><div style="font-size:11px;color:var(--accent);opacity:.8">Targets</div><div style="font-size:11px;font-family:var(--mono);color:var(--accent);margin-top:4px">67%: ${Math.round(est*.67/2.5)*2.5} · 75%: ${Math.round(est*.75/2.5)*2.5} · 80%: ${Math.round(est*.80/2.5)*2.5}</div></div>
-      </div>`;
-      if(hist.length>0){html+=`<div class="rm-history"><div style="font-size:10px;letter-spacing:.06em;margin-bottom:4px">RETEST HISTORY</div>`;hist.forEach(h=>html+=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>${formatDateDisplay(h.date)}</span><span style="color:var(--text)">${h.estimated} kg</span></div>`);html+=`</div>`;}
-      html+=`</div><button class="btn btn-sm" onclick="snapshotRM('${lift.id}')" style="margin-top:8px">Save as retest snapshot</button>`;
+    const trend=getRM8WeekTrend(lift.id);
+    const col=liftColor[lift.id]||'#FF6B35';
+    html+=`<div class="card" style="margin-bottom:10px">`;
+    // Top row: icon + name + badge | 1RM number + ratio
+    const rmTopRow=rm?(`<div style="font-size:26px;font-weight:700;font-family:var(--mono);color:${col};letter-spacing:-.02em;line-height:1">${rm}<span style="font-size:12px;color:var(--muted);font-weight:400"> kg</span></div>`+(ratio?`<div style="font-size:11px;font-family:var(--mono);color:${lvl?lvl.color:'var(--muted)'};margin-top:2px">${ratio.toFixed(2)}× BW · ${lvl?lvl.label:''}</div>`:'')):('');
+html+=`<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:${rm?6:4}px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${lift.icon}</span><div><div style="font-size:14px;font-weight:600">${lift.name}</div><div style="font-size:10px;font-family:var(--mono);letter-spacing:.06em;margin-top:1px;color:${isAuto?'var(--muted)':'var(--blue)'}">${isAuto?'AUTO · EPLEY':'MANUAL TEST'}</div></div></div><div style="text-align:right">${rmTopRow}${rm?'':'<div style="font-size:12px;color:var(--muted);padding-top:6px">Log sets to calculate</div>'}</div></div>`;
+    if(rm){
+      // Level track
+      html+=makeLevelTrackHTML(ratio||0);
+      // Sparkline + training chips row
+      const chips=rm?[{pct:.67,label:'HYPERT',bg:'rgba(122,167,232,0.14)',col:'#7AA7E8'},{pct:.75,label:'WORKING',bg:'var(--accent-mute)',col:'#FF6B35'},{pct:.80,label:'TOP SET',bg:'var(--amber-dim)',col:'#E8B040'}]:[];
+      html+=`<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:10px">`;
+      html+=`<div style="flex:0 0 auto"><div style="font-size:9px;font-family:var(--mono);color:var(--muted2);letter-spacing:.06em;margin-bottom:4px">8-WK TREND</div>${trend.length>=2?makeSparklineSVG(trend,col,80,30):'<div style="font-size:11px;color:var(--muted2);width:80px;height:30px;display:flex;align-items:center">no data</div>'}</div>`;
+      if(trend.length>=2){const delta=trend[trend.length-1]-trend[0];html+=`<div style="font-size:11px;font-family:var(--mono);color:${delta>=0?col:'var(--red)'}">${delta>=0?'+':''}${delta.toFixed(0)} kg<div style="font-size:9px;color:var(--muted2);margin-top:1px">vs 8 wks ago</div></div>`;}
+      html+=`</div>`;
+      if(chips.length){html+=`<div style="display:flex;gap:5px">`;chips.forEach(c=>{const kg=Math.round(rm*c.pct/2.5)*2.5;html+=`<div style="flex:1;background:${c.bg};border-radius:8px;padding:6px 4px;text-align:center"><div style="font-size:8.5px;font-family:var(--mono);color:${c.col};font-weight:700;letter-spacing:.04em;margin-bottom:2px">${c.label}</div><div style="font-size:15px;font-weight:700;font-family:var(--mono);color:var(--text)">${kg}</div><div style="font-size:9px;color:var(--muted2)">kg</div></div>`;});html+=`</div>`;}
     }
-    if(lift.id==='pullup') html+=`<div style="font-size:11px;color:var(--muted);margin-top:8px">For pull-ups: enter added weight and reps. For bodyweight only, enter 0 + reps.</div>`;
-    if(rm.weight||rm.reps) html+=`<button class="btn btn-ghost" onclick="clearRMOverride('${lift.id}')" style="font-size:11px;margin-top:4px">Clear override — use auto</button>`;
     html+=`</div>`;
   });
+
+  // BW history
+  html+=`<div class="section-label">Bodyweight history</div>`;
+  if(S.bw&&S.bw.length>0){
+    const sorted=[...S.bw].sort((a,b)=>a.date.localeCompare(b.date)),vals=sorted.map(b=>b.weight),minW=Math.min(...vals)-1,maxW=Math.max(...vals)+1,range=maxW-minW||1;
+    html+=`<div class="card" style="margin-bottom:10px">`;
+    if(sorted.length===1){html+=`<div style="text-align:center;padding:16px"><div style="font-size:32px;font-weight:700;font-family:var(--mono)">${vals[0]}<span style="font-size:14px;color:var(--muted);font-weight:400"> kg</span></div><div style="font-size:12px;color:var(--muted);margin-top:4px">${formatDateDisplay(sorted[0].date)}</div></div>`;}
+    else{const W=340,H=80,n=sorted.length,pts=sorted.map((b,i)=>[n>1?(i/(n-1))*(W-20)+10:W/2,H-((b.weight-minW)/range)*(H-20)-10]);const uid=++_chartUid;const line=pts.map(([x,y])=>`${x},${y}`).join(' ');const area=`M${pts[0][0]},${pts[0][1]} ${pts.map(([x,y])=>`L${x},${y}`).join(' ')} L${pts[n-1][0]},${H} L${pts[0][0]},${H} Z`;html+=`<svg viewBox="0 0 ${W} ${H+16}" style="width:100%;height:auto"><defs><linearGradient id="bwg${uid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF6B35" stop-opacity="0.2"/><stop offset="100%" stop-color="#FF6B35" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#bwg${uid})"/><polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3" fill="var(--accent)"/>`).join('')}<text x="10" y="${H+14}" font-size="9" fill="var(--muted)" font-family="monospace">${formatDateDisplay(sorted[0].date)}</text><text x="${W-10}" y="${H+14}" font-size="9" fill="var(--muted)" font-family="monospace" text-anchor="end">${formatDateDisplay(sorted[n-1].date)}</text></svg>`;}
+    html+=`<div class="divider"></div>`;
+    sorted.slice(-5).reverse().forEach((b,i)=>{const prev=sorted[sorted.indexOf(b)-1],diff=prev?(b.weight-prev.weight).toFixed(1):null;html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;${i<4?'border-bottom:1px solid var(--border)':''}"><span style="font-size:12px;color:var(--muted)">${formatDateDisplay(b.date)}</span><div style="display:flex;align-items:center;gap:8px">${diff?`<span style="font-size:11px;color:${parseFloat(diff)<0?'var(--success)':parseFloat(diff)>0?'var(--red)':'var(--muted)'}">${parseFloat(diff)>0?'+':''}${diff}</span>`:''}<span style="font-size:15px;font-weight:600;font-family:var(--mono)">${b.weight} kg</span><button class="btn btn-sm btn-ghost" onclick="deleteBW('${b.date}')" style="color:var(--red);padding:3px 6px">×</button></div></div>`;});
+    html+=`</div>`;
+  }else{html+=`<div class="card" style="text-align:center;padding:20px;margin-bottom:10px"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">No bodyweight entries yet</div><button class="btn btn-sm" onclick="openBWModal()">+ Log weight</button></div>`;}
+
+  // Manual override — lift picker + single form
+  html+=`<div class="section-label" style="margin-top:16px">Manual override</div>`;
+  // Default to first lift that has a manual entry, or first lift overall
+  const defaultLift=overrideLiftId||(RM_LIFTS.find(l=>S.rm[l.id]&&(S.rm[l.id].weight||S.rm[l.id].reps))||RM_LIFTS[0]).id;
+  if(!overrideLiftId)overrideLiftId=defaultLift;
+  // Pill picker row
+  html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">`;
+  RM_LIFTS.forEach(lift=>{
+    const hasData=S.rm[lift.id]&&(S.rm[lift.id].weight||S.rm[lift.id].reps);
+    const isActive=lift.id===overrideLiftId;
+    html+=`<button onclick="overrideLiftId='${lift.id}';renderStrength()" style="flex:1;min-width:56px;padding:8px 4px;border-radius:10px;border:1.5px solid ${isActive?'var(--accent)':'var(--border)'};background:${isActive?'var(--accent-dim)':'var(--surf2)'};cursor:pointer;font-family:var(--sans)">
+      <div style="font-size:14px">${lift.icon}</div>
+      <div style="font-size:10px;font-weight:600;color:${isActive?'var(--accent)':'var(--muted)'};margin-top:3px;letter-spacing:.01em">${lift.name.split(' ')[0]}</div>
+      ${hasData?`<div style="width:5px;height:5px;border-radius:50%;background:var(--accent);margin:4px auto 0"></div>`:'<div style="height:9px"></div>'}
+    </button>`;
+  });
+  html+=`</div>`;
+  // Single form for selected lift
+  const activeLift=RM_LIFTS.find(l=>l.id===overrideLiftId);
+  if(activeLift){
+    const rm=S.rm[activeLift.id]||{};
+    const est=rm.weight&&rm.reps?calcEpley(parseFloat(rm.weight),parseInt(rm.reps)):null;
+    const hist=(S.rmHistory[activeLift.id]||[]).slice(-4).reverse();
+    html+=`<div class="card" style="margin-bottom:10px">`;
+    html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:12px">Enter a test set to override the auto-calculated 1RM for <strong style="color:var(--text)">${activeLift.name}</strong>.</div>`;
+    html+=`<div class="rm-inputs" style="margin-bottom:${est?'10':'0'}px">
+      <div class="rm-input-wrap"><div class="rm-input-label">Weight (kg)</div><input class="rm-input" type="number" inputmode="decimal" step="0.5" placeholder="e.g. 80" value="${rm.weight||''}" onchange="saveRM('${activeLift.id}','weight',this.value);renderStrength()"></div>
+      <div class="rm-input-wrap"><div class="rm-input-label">Reps done</div><input class="rm-input" type="number" inputmode="numeric" placeholder="e.g. 8" value="${rm.reps||''}" onchange="saveRM('${activeLift.id}','reps',this.value);renderStrength()"></div>
+    </div>`;
+    if(activeLift.id==='pullup')html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Enter added load + reps. For bodyweight only, enter 0 kg.</div>`;
+    if(est){
+      html+=`<div class="rm-result" style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div style="font-size:11px;color:var(--accent);opacity:.8;margin-bottom:2px">Override 1RM</div><div class="rm-1rm">${est} kg</div></div>
+        <div style="text-align:right"><div style="font-size:11px;color:var(--accent);opacity:.8;margin-bottom:2px">Training targets</div><div style="font-size:11px;font-family:var(--mono);color:var(--accent)">67%: ${Math.round(est*.67/2.5)*2.5} · 75%: ${Math.round(est*.75/2.5)*2.5} · 80%: ${Math.round(est*.80/2.5)*2.5}</div></div>
+      </div></div>`;
+      if(hist.length>0){
+        html+=`<div class="rm-history" style="margin-bottom:10px"><div style="font-size:10px;letter-spacing:.06em;margin-bottom:4px">RETEST HISTORY</div>`;
+        hist.forEach(h=>html+=`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span>${formatDateDisplay(h.date)}</span><span style="color:var(--text)">${h.estimated} kg</span></div>`);
+        html+=`</div>`;
+      }
+      html+=`<button class="btn btn-sm" onclick="snapshotRM('${activeLift.id}')" style="margin-bottom:6px">Save as retest snapshot</button>`;
+    }
+    if(rm.weight||rm.reps)html+=`<button class="btn btn-ghost" onclick="clearRMOverride('${activeLift.id}')" style="font-size:11px">Clear override — use auto</button>`;
+    html+=`</div>`;
+  }
   document.getElementById('screen-strength').innerHTML=html;
 }
 
@@ -1547,6 +2123,8 @@ function snapshotRM(id){const rm=S.rm[id];if(!rm||!rm.weight||!rm.reps)return;if
 
 // ─── MONTHLY REPORT HELPERS ───────────────────────────────────────────────────
 let progressViewMonth=null; // 'YYYY-MM'; null = current month
+let prSectionExpanded=false;
+let overrideLiftId=null; // which lift is selected in the manual override picker
 function getCurrentMonthStr(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function shiftMonth(monthStr,delta){const[y,m]=monthStr.split('-').map(Number);const d=new Date(y,m-1+delta,1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
 function formatMonthDisplay(monthStr){const[y,m]=monthStr.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('en-GB',{month:'long',year:'numeric'});}
@@ -1592,8 +2170,9 @@ function getMonthlyStats(monthStr){
 function progressMonthChange(delta){
   const cur=progressViewMonth||getCurrentMonthStr();
   const next=shiftMonth(cur,delta);
-  if(next>getCurrentMonthStr()) return; // don't navigate to future
+  if(next>getCurrentMonthStr()) return;
   progressViewMonth=next;
+  prSectionExpanded=false;
   renderProgress();
 }
 
@@ -1614,192 +2193,147 @@ function getMuscleDistribution(monthStr){
 // ─── PROGRESS ─────────────────────────────────────────────────────────────────
 function renderProgress(){
   const sched=getSchedule();
-  let totalSets=0,totalReps=0,sessComp=0,awaySess=0,onTgt=0,chkd=0;
+  let totalSets=0,sessComp=0,awaySess=0,onTgt=0,chkd=0;
   const wkSets={};
-  for(let w=1;w<=16;w++){wkSets[w]=0;for(let di=0;di<3;di++){const l=getLog(w,di);if(l._completed){sessComp++;if(l._awayMode)awaySess++;}const ph=P.phases[phaseFor(w)],d=ph.days[di];d.exercises.forEach((ex,ei)=>{const el=l[ei]||{},rec=getExRec(ex);for(let si=0;si<ex.sets;si++){const s=el[si]||{};if(s.done){totalSets++;wkSets[w]++;}if(s.reps)totalReps+=parseInt(s.reps)||0;if(rec&&s.weight){chkd++;const wv=parseFloat(s.weight);if(Math.abs(wv-rec.kg)<=rec.kg*.07)onTgt++;}}});}}
-  const pct=Math.round(sessComp/48*100),adh=chkd>0?Math.round(onTgt/chkd*100):null;
+  for(let w=1;w<=16;w++){wkSets[w]=0;for(let di=0;di<3;di++){const l=getLog(w,di);if(l._completed){sessComp++;if(l._awayMode)awaySess++;}const ph=P.phases[phaseFor(w)],d=ph.days[di];d.exercises.forEach((ex,ei)=>{const el=l[ei]||{},rec=getExRec(ex);for(let si=0;si<ex.sets;si++){const s=el[si]||{};if(s.done){totalSets++;wkSets[w]++;}if(rec&&s.weight){chkd++;const wv=parseFloat(s.weight);if(Math.abs(wv-rec.kg)<=rec.kg*.07)onTgt++;}}});}}
+  const pct=Math.round(sessComp/48*100);
   const mobHistory=S.mobHistory||[];
   let mobStreak=0;const td=new Date(todayStr()+'T00:00:00');for(let i=0;i<30;i++){const dd=new Date(td);dd.setDate(dd.getDate()-i);const ds=dateStr(dd);if(mobHistory.some(e=>e.date===ds))mobStreak++;else if(i>0)break;}
-  const mobTotalCompletions=mobHistory.length;
 
-  let html=`<div class="page-header"><div class="row"><div><div class="page-title">Progress</div><div class="page-sub">Bill Zhou · 16-week program</div></div><button class="btn btn-sm" onclick="openBWModal()">+ Weight</button></div></div>`;
-
-  // ── Monthly report card ──
   const monthStr=progressViewMonth||getCurrentMonthStr();
   const isCurrentMonth=monthStr===getCurrentMonthStr();
   const prevMonthStr=shiftMonth(monthStr,-1);
   const mStats=getMonthlyStats(monthStr);
   const pStats=getMonthlyStats(prevMonthStr);
-  const dWk=mStats.workouts-pStats.workouts,dMob=mStats.mobility-pStats.mobility,dSets=mStats.totalSets-pStats.totalSets;
-  const dBadge=(d,cur,prev)=>{
-    if(cur===0&&prev===0) return '';
-    if(d===0) return '';
-    const col=d>0?'var(--accent)':'var(--red)';
-    return `<span style="font-size:10px;color:${col};margin-left:4px">${d>0?'+':''}${d}</span>`;
-  };
-  html+=`<div class="card" style="margin-bottom:14px">
-    <div class="row" style="margin-bottom:12px;align-items:center">
-      <button class="btn btn-sm" onclick="progressMonthChange(-1)" style="padding:4px 10px">←</button>
-      <div style="text-align:center;flex:1"><div style="font-size:14px;font-weight:500">${formatMonthDisplay(monthStr)}</div><div style="font-size:10px;color:var(--muted)">${isCurrentMonth?'Current month · vs '+formatMonthDisplay(prevMonthStr):'vs '+formatMonthDisplay(prevMonthStr)}</div></div>
-      <button class="btn btn-sm" onclick="progressMonthChange(1)" style="padding:4px 10px;${isCurrentMonth?'visibility:hidden':''}">→</button>
-    </div>
-    <div class="stat-grid" style="margin-bottom:0">
-      <div class="stat-card"><div class="stat-num">${mStats.workouts}</div><div class="stat-lbl">Workouts${dBadge(dWk,mStats.workouts,pStats.workouts)}</div></div>
-      <div class="stat-card"><div class="stat-num">${mStats.mobility}</div><div class="stat-lbl">Mobility${dBadge(dMob,mStats.mobility,pStats.mobility)}</div></div>
-      <div class="stat-card"><div class="stat-num">${mStats.totalSets}</div><div class="stat-lbl">Sets${dBadge(dSets,mStats.totalSets,pStats.totalSets)}</div></div>
-      <div class="stat-card"><div class="stat-num">${mStats.prs.length}</div><div class="stat-lbl">New PRs</div></div>
-    </div>`;
-  if(mStats.topExercises.length>0){
-    html+=`<div style="margin-top:14px"><div style="font-size:10px;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">TOP EXERCISES (BY SETS)</div>`;
-    mStats.topExercises.forEach(([exName,sets])=>{
-      html+=`<div class="row" style="padding:4px 0;font-size:12px"><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">${exName}</span><span style="font-family:var(--mono);color:var(--accent);flex-shrink:0;margin-left:8px">${sets} sets</span></div>`;
-    });
-    html+=`</div>`;
-  }
-  if(mStats.prs.length>0){
-    html+=`<div style="margin-top:12px"><div style="font-size:10px;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">NEW PRS</div>`;
-    mStats.prs.forEach(pr=>{
-      const display=pr.isBW?`${pr.value} reps`:`${pr.value} kg`;
-      html+=`<div class="row" style="padding:4px 0;font-size:12px"><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0">⭐ ${pr.exName}</span><span style="font-family:var(--mono);color:var(--amber);flex-shrink:0;margin-left:8px">${display}</span></div>`;
-    });
-    html+=`</div>`;
-  }
-  if(mStats.workouts===0&&mStats.mobility===0&&mStats.totalSets===0){
-    html+=`<div style="margin-top:8px;font-size:12px;color:var(--muted);text-align:center;padding:8px">No activity logged${isCurrentMonth?' yet this month':' in this month'}.</div>`;
-  }
+
+  // Current week
+  const nextS=getNextPendingSession();
+  const curWeek=sched.find(s=>s.date===todayStr())?.week||(nextS?nextS.week:16);
+
+  // Header
+  let html=`<div style="padding:14px 0 8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div><div class="page-title">Progress</div><div class="page-sub">16-week program</div></div><button class="btn btn-sm" onclick="openBWModal()">+ Weight</button></div></div>`;
+
+  // Month selector
+  html+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><button class="btn btn-sm" onclick="progressMonthChange(-1)">←</button><div style="text-align:center"><div style="font-size:14px;font-weight:600">${formatMonthDisplay(monthStr)}</div><div style="font-size:10px;color:var(--muted)">vs ${formatMonthDisplay(prevMonthStr)}</div></div><button class="btn btn-sm" onclick="progressMonthChange(1)" style="${isCurrentMonth?'visibility:hidden':''}">→</button></div>`;
+
+  // 4-up KPI tiles
+  const delta=(a,b)=>a-b;
+  const dSign=(n)=>n>0?`<span style="color:var(--success);font-size:10px;margin-left:4px">+${n}</span>`:n<0?`<span style="color:var(--red);font-size:10px;margin-left:4px">${n}</span>`:'';
+  const kpis=[
+    {label:'WORKOUTS',val:mStats.workouts,d:delta(mStats.workouts,pStats.workouts),stripe:'var(--accent)',icon:'⚡'},
+    {label:'NEW PRs',val:mStats.prs.length,d:delta(mStats.prs.length,getPRsInMonth(prevMonthStr).length),stripe:'var(--amber)',icon:'⭐'},
+    {label:'SETS',val:mStats.totalSets,d:delta(mStats.totalSets,pStats.totalSets),stripe:'var(--success)',icon:'💪'},
+    {label:'MOBILITY',val:mStats.mobility,d:delta(mStats.mobility,pStats.mobility),stripe:'var(--purple)',icon:'🧘'},
+  ];
+  html+=`<div class="kpi-grid">`;
+  kpis.forEach(k=>{
+    html+=`<div class="kpi-tile"><div class="kpi-stripe" style="background:${k.stripe}"></div><div class="kpi-inner"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:8px">${k.label}</div><div style="font-size:30px;font-weight:700;font-family:var(--mono);letter-spacing:-.02em;line-height:1;color:var(--text)">${k.val}${dSign(k.d)}</div></div></div>`;
+  });
   html+=`</div>`;
 
-  // ── Muscle distribution donut (same month as report card) ──
+  // Empty state
+  if(mStats.workouts===0&&mStats.mobility===0&&mStats.totalSets===0){
+    html+=`<div style="font-size:12px;color:var(--muted);text-align:center;padding:8px 0 12px">No activity logged${isCurrentMonth?' yet this month':' in this month'}.</div>`;
+  }
+
+  // Muscle distribution donut
   const muscle=getMuscleDistribution(monthStr);
-  html+=`<div class="card" style="margin-bottom:14px">
-    <div class="row" style="margin-bottom:12px">
-      <span style="font-size:13px;font-weight:500">Muscle distribution · ${formatMonthDisplay(monthStr)}</span>
-      <span style="font-size:11px;color:var(--muted)">${muscle.total} set${muscle.total===1?'':'s'}</span>
-    </div>`;
-  if(muscle.total===0){
-    html+=`<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px 0">No exercises logged${isCurrentMonth?' yet this month':' in this month'}.</div>`;
-  }else{
+  if(muscle.total>0){
+    html+=`<div class="section-label">Muscle distribution</div><div class="card" style="margin-bottom:14px">`;
     const r=40,cx=50,cy=50,sw=14,circ=2*Math.PI*r;
     let cumAngle=0,segs='';
-    muscle.segments.forEach(s=>{
-      const segCirc=s.pct/100*circ;
-      const rotation=cumAngle-90;
-      segs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${segCirc.toFixed(2)} ${(circ-segCirc).toFixed(2)}" transform="rotate(${rotation.toFixed(2)} ${cx} ${cy})"/>`;
-      cumAngle+=s.pct/100*360;
-    });
-    html+=`<div style="display:flex;align-items:center;gap:16px">
-      <svg viewBox="0 0 100 100" style="width:130px;height:130px;flex-shrink:0">
-        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surf2)" stroke-width="${sw}"/>
-        ${segs}
-        <text x="50" y="49" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text)" font-family="monospace">${muscle.total}</text>
-        <text x="50" y="60" text-anchor="middle" font-size="7" fill="var(--muted)">sets</text>
-      </svg>
-      <div style="flex:1;min-width:0">
-        ${muscle.segments.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px"><span style="width:10px;height:10px;border-radius:3px;background:${s.color};flex-shrink:0;display:inline-block"></span><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</span><span style="font-family:var(--mono);color:var(--muted);font-size:11px">${s.sets}<span style="opacity:.6"> · ${Math.round(s.pct)}%</span></span></div>`).join('')}
-      </div>
-    </div>`;
-    if(muscle.segments.some(s=>s.name==='Other')){
-      html+=`<div style="font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">"Other" = exercises not yet tagged in the muscle map. Most likely a new exercise was added — let me know and we'll tag it.</div>`;
-    }
+    muscle.segments.forEach(s=>{const segC=s.pct/100*circ;segs+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${segC.toFixed(2)} ${(circ-segC).toFixed(2)}" transform="rotate(${(cumAngle-90).toFixed(2)} ${cx} ${cy})"/>`;cumAngle+=s.pct/100*360;});
+    html+=`<div style="display:flex;align-items:center;gap:16px"><svg viewBox="0 0 100 100" style="width:120px;height:120px;flex-shrink:0"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--surf2)" stroke-width="${sw}"/>${segs}<text x="50" y="49" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text)" font-family="monospace">${muscle.total}</text><text x="50" y="60" text-anchor="middle" font-size="7" fill="var(--muted)">sets</text></svg><div style="flex:1;min-width:0">${muscle.segments.map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px"><span style="width:9px;height:9px;border-radius:2px;background:${s.color};flex-shrink:0;display:inline-block"></span><span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.name}</span><span style="font-family:var(--mono);color:var(--muted);font-size:11px">${s.sets} · ${Math.round(s.pct)}%</span></div>`).join('')}</div></div>`;
+    html+=`</div>`;
   }
-  html+=`</div>`;
 
-  // ── Lifetime stat grid ──
-  html+=`<div class="section-label">Lifetime</div>`;
-  html+=`<div class="stat-grid"><div class="stat-card"><div class="stat-num">${sessComp}</div><div class="stat-lbl">Sessions done</div></div><div class="stat-card"><div class="stat-num">${pct}%</div><div class="stat-lbl">Program complete</div></div><div class="stat-card"><div class="stat-num">${totalSets}</div><div class="stat-lbl">Total sets</div></div><div class="stat-card"><div class="stat-num">${mobTotalCompletions}</div><div class="stat-lbl">Mobility sessions</div></div></div>`;
-  // Mob streak + history
-  html+=`<div class="card" style="margin-bottom:12px"><div class="row" style="margin-bottom:8px"><span style="font-size:14px;font-weight:500">Mobility</span><span class="badge badge-green">🔥 ${mobStreak} day streak</span></div>`;
-  if(mobHistory.length>0){html+=`<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Last ${Math.min(mobHistory.length,8)} completions:</div>`;[...mobHistory].reverse().slice(0,8).forEach(e=>{html+=`<div class="row" style="padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--muted)">${formatDateDisplay(e.date)}</span><span style="font-size:11px;font-family:var(--mono);color:var(--accent);text-align:right">${e.routineName||e.phaseName}</span></div>`;});}else{html+=`<div style="font-size:12px;color:var(--muted)">No full mobility sessions completed yet. Complete all exercises in the Mobility tab to log one.</div>`;}
-  html+=`</div>`;
-
-  // Away sessions stat
-  if(awaySess>0)html+=`<div class="alert alert-orange" style="margin-bottom:12px">✈ ${awaySess} session${awaySess>1?'s':''} completed in away mode — all count toward your progress.</div>`;
-
-  if(adh!==null)html+=`<div class="card"><div class="row"><span style="font-size:14px;font-weight:500">Weight adherence</span><span class="${adh>=80?'badge badge-green':adh>=60?'badge badge-amber':'badge badge-red'}">${adh}%</span></div><div style="font-size:12px;color:var(--muted);margin:6px 0">Sets within 7% of recommended target weight (gym sessions)</div><div class="prog-track"><div class="prog-fill" style="width:${adh}%;background:${adh>=80?'var(--accent)':adh>=60?'var(--amber)':'var(--red)'}"></div></div></div>`;
-
-  // 1RM + BW ratio
-  const bw=getLatestBW();
-  html+=`<div class="section-label">Strength profile</div><div class="card">`;
-  RM_LIFTS.forEach(l=>{const rm=getRM(l.id);if(!rm){html+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px">${l.name}</span><span style="font-size:12px;color:var(--muted)">Not set</span></div>`;return;}const ratio=bw?rm/bw:null;const lvl=ratio?getStrengthLevel(ratio):null;html+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px">${l.name}</span><div style="text-align:right"><span style="font-size:13px;font-family:var(--mono);color:var(--accent)">${rm} kg</span>${lvl?`<span style="font-size:11px;font-family:var(--mono);color:${lvl.color};margin-left:6px">${ratio.toFixed(2)}×</span>`:''}</div></div>`;});
-  if(bw)html+=`<div style="font-size:11px;color:var(--muted);margin-top:8px">Based on bodyweight: ${bw} kg</div>`;
-  html+=`</div>`;
-
-  // Bodyweight chart
-  html+=`<div class="section-label">Bodyweight (kg)</div>`;
-  if(S.bw&&S.bw.length>0){
-    const sorted=[...S.bw].sort((a,b)=>a.date.localeCompare(b.date)),vals=sorted.map(b=>b.weight),minW=Math.min(...vals)-1,maxW=Math.max(...vals)+1,range=maxW-minW||1;
-    html+=`<div class="card">`;
-    if(sorted.length===1){html+=`<div style="text-align:center;padding:16px"><div style="font-size:28px;font-weight:600;font-family:var(--mono)">${vals[0]} kg</div><div style="font-size:12px;color:var(--muted)">${formatDateDisplay(sorted[0].date)}</div></div>`;}
-    else{const W=340,H=100,n=sorted.length,pts=sorted.map((b,i)=>`${n>1?(i/(n-1))*(W-20)+10:W/2},${H-((b.weight-minW)/range)*(H-20)-10}`);html+=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><polyline points="${pts.join(' ')}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${sorted.map((b,i)=>{const[x,y]=pts[i].split(',');return`<circle cx="${x}" cy="${y}" r="3" fill="var(--accent)"/>`;}).join('')}<text x="10" y="${H-2}" font-size="9" fill="var(--muted)" font-family="monospace">${formatDateDisplay(sorted[0].date)}</text><text x="${W-10}" y="${H-2}" font-size="9" fill="var(--muted)" font-family="monospace" text-anchor="end">${formatDateDisplay(sorted[sorted.length-1].date)}</text></svg>`;}
-    html+=`<div class="divider"></div>`;
-    sorted.slice(-5).reverse().forEach((b,i)=>{const prev=sorted[sorted.indexOf(b)-1],diff=prev?(b.weight-prev.weight).toFixed(1):null;html+=`<div class="row" style="padding:5px 0;${i<4?'border-bottom:1px solid var(--border)':''}"><span style="font-size:12px;color:var(--muted)">${formatDateDisplay(b.date)}</span><div style="display:flex;align-items:center;gap:8px">${diff?`<span style="font-size:11px;color:${parseFloat(diff)<0?'var(--accent)':parseFloat(diff)>0?'var(--red)':'var(--muted)'}">${parseFloat(diff)>0?'+':''}${diff}</span>`:''}<span style="font-size:14px;font-weight:500;font-family:var(--mono)">${b.weight} kg</span><button class="btn btn-sm btn-ghost" onclick="deleteBW('${b.date}')" style="color:var(--red);padding:3px 6px">×</button></div></div>`;});
-    html+=`</div>`;
-  }else{html+=`<div class="card" style="text-align:center;padding:20px"><div style="font-size:13px;color:var(--muted);margin-bottom:10px">No bodyweight entries yet</div><button class="btn btn-sm" onclick="openBWModal()">+ Log weight</button></div>`;}
-
-  // Exercise history + PRs
-  const exHistKeys = Object.keys(S.exHistory||{}).filter(k=>(S.exHistory[k]||[]).length>0);
-  if(exHistKeys.length>0){
-    html+=`<div class="section-label">Personal records</div><div class="card">`;
-    let prCount=0;
-    exHistKeys.forEach(exName=>{
-      const pr=getPR(exName);
-      if(!pr||(!pr.bestWeight&&!pr.bestReps)) return;
-      if(prCount>=8) return;
-      prCount++;
-      const isWeighted=pr.bestWeight>0;
-      html+=`<div class="row" style="padding:6px 0;border-bottom:1px solid var(--border)">
-        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${exName}</div><div style="font-size:10px;color:var(--muted)">${formatDateDisplay(pr.date)}</div></div>
-        <div style="text-align:right;flex-shrink:0"><span style="font-size:13px;font-family:var(--mono);color:var(--amber)">${isWeighted?pr.bestWeight+' kg × ':''} ${pr.bestReps}r</span></div>
-      </div>`;
-    });
-    html+=`</div>`;
-
-    // Key lifts: volume trend
-    const keyLifts=['Barbell Bench Press','Barbell Back Squat','Barbell Deadlift','Wide Grip Pull-Up'];
-    const availKeyLifts=keyLifts.filter(n=>S.exHistory[n]&&S.exHistory[n].length>=2);
-    if(availKeyLifts.length>0){
-      html+=`<div class="section-label">Strength trend (estimated 1RM)</div>`;
-      availKeyLifts.forEach(exName=>{
-        const hist=[...S.exHistory[exName]].sort((a,b)=>a.date.localeCompare(b.date));
-        const pts=hist.map(h=>{
-          const best=h.sets.reduce((b,s)=>calcEpley(s.weight||0,s.reps||1)>b?calcEpley(s.weight||0,s.reps||1):b,0);
-          return best;
-        }).filter(v=>v>0);
-        if(pts.length<2) return;
-        const minV=Math.min(...pts)*0.9,maxV=Math.max(...pts)*1.02,range=maxV-minV||1;
-        const W=340,H=60,n=pts.length;
-        const svgPts=pts.map((v,i)=>`${n>1?(i/(n-1))*(W-20)+10:W/2},${H-((v-minV)/range)*(H-10)-5}`).join(' ');
-        const trend=pts[pts.length-1]>pts[0];
-        html+=`<div class="card" style="margin-bottom:8px">
-          <div class="row" style="margin-bottom:6px">
-            <span style="font-size:13px;font-weight:500">${exName}</span>
-            <span style="font-size:12px;font-family:var(--mono);color:${trend?'var(--accent)':'var(--amber)'}">${trend?'↑':'→'} ${pts[pts.length-1]} kg est.</span>
+  // New PRs this month — collapsible
+  if(mStats.prs.length>0){
+    html+=`<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">`;
+    html+=`<button onclick="prSectionExpanded=!prSectionExpanded;renderProgress()" style="width:100%;background:none;border:none;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;text-align:left">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">🏆</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${mStats.prs.length} new PR${mStats.prs.length>1?'s':''}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">${formatMonthDisplay(monthStr)}</div>
+        </div>
+      </div>
+      <span style="font-size:18px;color:var(--muted);transition:transform .2s;display:inline-block;transform:rotate(${prSectionExpanded?'90':'0'}deg)">›</span>
+    </button>`;
+    if(prSectionExpanded){
+      html+=`<div style="border-top:1px solid var(--border);padding:8px 14px 12px">`;
+      mStats.prs.forEach((pr,i)=>{
+        const muscleColor=MUSCLE_GROUPS.find(g=>EX_TO_MUSCLE[pr.exName]===g.name)?.color||'var(--amber)';
+        const display=pr.isBW?`${pr.value} reps`:`${pr.value} kg`;
+        html+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;${i<mStats.prs.length-1?'border-bottom:1px solid var(--border)':''}">
+          <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+            <span style="width:3px;height:28px;border-radius:2px;background:${muscleColor};flex-shrink:0;display:inline-block"></span>
+            <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${pr.exName}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${formatDateDisplay(pr.date)}</div></div>
           </div>
-          <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">
-            <polyline points="${svgPts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
-            ${pts.map((v,i)=>{const[x,y]=svgPts.split(' ')[i]?svgPts.split(' ')[i].split(','):['0','0'];return`<circle cx="${x}" cy="${y}" r="3" fill="var(--accent)"/>`;}).join('')}
-          </svg>
+          <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--amber);flex-shrink:0">${display}</div>
         </div>`;
       });
+      html+=`</div>`;
     }
+    html+=`</div>`;
   }
-  const maxS=Math.max(...Object.values(wkSets),1);
-  for(let w=1;w<=16;w++){const bp=Math.round(wkSets[w]/maxS*100);const wlog=S.logs[dayKey(w,0)]||{};const isAw=wlog._awayMode;html+=`<div class="bar-row"><div class="bar-label">Wk ${w}</div><div class="bar-outer"><div class="bar-inner" style="width:${bp}%;${w===16?'background:var(--blue)':isAw?'background:var(--orange)':''}"></div></div><div class="bar-val">${wkSets[w]}${isAw?' ✈':''}</div></div>`;}
+
+  // 16-week volume bars
+  html+=`<div class="section-label">Volume · 16 weeks</div><div class="card" style="margin-bottom:14px">`;
+  html+=makeVolumeBarsSVG(wkSets,curWeek);
+  // Week number labels (every 4)
+  html+=`<div style="display:flex;gap:3px;margin-bottom:6px">`;
+  for(let w=1;w<=16;w++){html+=`<div style="flex:1;text-align:center;font-size:8px;font-family:var(--mono);color:${w===curWeek?'var(--accent)':'var(--muted2)'}">${w%4===1||w===16?w:''}</div>`;}
   html+=`</div>`;
+  // Phase legend
+  html+=`<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">`;
+  [{c:'#6B6B72',l:'P1'},{c:'#60a5fa',l:'P2'},{c:'#FF6B35',l:'P3'},{c:'#E8B040',l:'P4'},{c:'#a78bfa',l:'Deload'}].forEach(x=>
+    html+=`<span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)"><span style="width:8px;height:8px;border-radius:2px;background:${x.c};display:inline-block"></span>${x.l}</span>`);
+  html+=`</div></div>`;
+
+  // Strength trend
+  const keyLifts=['Barbell Bench Press','Barbell Back Squat','Barbell Deadlift'];
+  const liftColors2={'Barbell Bench Press':'#FF6B35','Barbell Back Squat':'#60a5fa','Barbell Deadlift':'#5BC489'};
+  const availLifts=keyLifts.filter(n=>S.exHistory[n]&&S.exHistory[n].length>=2);
+  if(availLifts.length>0){
+    html+=`<div class="section-label">Strength trend</div><div class="card" style="margin-bottom:14px">`;
+    availLifts.forEach((exName,i,arr)=>{
+      const hist=[...S.exHistory[exName]].sort((a,b)=>a.date.localeCompare(b.date));
+      const pts=hist.map(h=>h.sets.reduce((b,s)=>calcEpley(s.weight||0,s.reps||1)>b?calcEpley(s.weight||0,s.reps||1):b,0)).filter(v=>v>0);
+      if(pts.length<2)return;
+      const col=liftColors2[exName]||'#FF6B35';
+      const delta=pts[pts.length-1]-pts[0];
+      const shortName=exName.replace('Barbell ','');
+      html+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}"><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;margin-bottom:2px">${shortName}</div><div style="font-size:10px;font-family:var(--mono);color:${delta>=0?'var(--success)':'var(--red)'}">${delta>=0?'+':''}${delta.toFixed(0)} kg · wk 1 → now</div></div>${makeSparklineSVG(pts,col,72,28)}<div style="text-align:right;flex-shrink:0;min-width:44px"><div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${col}">${pts[pts.length-1]}</div><div style="font-size:9px;color:var(--muted2)">kg est.</div></div></div>`;
+    });
+    html+=`</div>`;
+  }
 
   // Phase overview
-  html+=`<div class="section-label">Phase overview</div><div class="card">`;
-  [{label:"Phase 1 — Foundation",sub:"Weeks 1–4",start:1,end:4},{label:"Phase 2 — Volume",sub:"Weeks 5–8",start:5,end:8},{label:"Phase 3 — Hypertrophy",sub:"Weeks 9–12",start:9,end:12},{label:"Phase 4 — Strength Peak",sub:"Weeks 13–15",start:13,end:15},{label:"Deload",sub:"Week 16",start:16,end:16}].forEach((ph,i,arr)=>{
+  html+=`<div class="section-label">Phase overview</div><div class="card" style="margin-bottom:14px">`;
+  [{label:'Phase 1',sub:'Foundation · Wks 1–4',start:1,end:4,col:'#8B8B92'},{label:'Phase 2',sub:'Volume · Wks 5–8',start:5,end:8,col:'#60a5fa'},{label:'Phase 3',sub:'Hypertrophy · Wks 9–12',start:9,end:12,col:'#FF6B35'},{label:'Phase 4',sub:'Peak · Wks 13–15',start:13,end:15,col:'#E8B040'},{label:'Deload',sub:'Week 16',start:16,end:16,col:'#a78bfa'}].forEach((ph,i,arr)=>{
     let phD=0,phT=0;for(let w=ph.start;w<=ph.end;w++)for(let d=0;d<3;d++){phT++;if(isSessionDone(w,d))phD++;}
     const phPct=Math.round(phD/phT*100);
-    html+=`<div style="padding:10px 0;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}"><div class="row" style="margin-bottom:6px"><div><div style="font-size:13px;font-weight:500">${ph.label}</div><div style="font-size:11px;color:var(--muted)">${ph.sub}</div></div><span style="font-size:13px;font-family:var(--mono);color:${phD===phT?'var(--accent)':'var(--muted)'}">${phD}/${phT}</span></div><div class="prog-track"><div class="prog-fill" style="width:${phPct}%"></div></div></div>`;
+    const isCur=curWeek>=ph.start&&curWeek<=ph.end;
+    html+=`<div style="padding:9px 0;${i<arr.length-1?'border-bottom:1px solid var(--border)':''}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px"><div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:${ph.col};flex-shrink:0;display:inline-block${isCur?';box-shadow:0 0 0 2px rgba(255,255,255,.15)':''}"></span><div><div style="font-size:13px;font-weight:${isCur?'600':'500'};color:${isCur?'var(--text)':'var(--muted)'}">${ph.label}</div><div style="font-size:10px;color:var(--muted2)">${ph.sub}</div></div></div><span style="font-size:12px;font-family:var(--mono);color:${phD===phT?'var(--success)':isCur?ph.col:'var(--muted)'}">${phD}/${phT}</span></div><div class="prog-track"><div class="prog-fill" style="width:${phPct}%;background:${ph.col}"></div></div></div>`;
   });
-  html+=`</div><div class="divider"></div><button class="btn btn-ghost btn-danger" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.removeItem('${STORE_KEY}');location.reload()}">Reset all data</button>`;
+  html+=`</div>`;
+
+  // Lifetime totals
+  html+=`<div class="section-label">Lifetime</div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">`;
+  [{v:sessComp,l:'Sessions'},{v:pct+'%',l:'Complete'},{v:totalSets,l:'Total sets'},{v:mobHistory.length,l:'Mobility'}].forEach(x=>
+    html+=`<div style="background:var(--surf);border:1px solid var(--border);border-radius:12px;padding:10px 8px;text-align:center"><div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--text);letter-spacing:-.02em">${x.v}</div><div style="font-size:9px;color:var(--muted);margin-top:3px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">${x.l}</div></div>`);
+  html+=`</div>`;
+
+  if(awaySess>0)html+=`<div class="alert alert-orange" style="margin-bottom:12px">✈ ${awaySess} session${awaySess>1?'s':''} completed in away mode — all count toward your progress.</div>`;
+
+  html+=`<div class="divider"></div><button class="btn btn-ghost btn-danger" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.removeItem('${STORE_KEY}');location.reload()}">Reset all data</button>`;
   document.getElementById('screen-progress').innerHTML=html;
 }
 function openBWModal(){document.getElementById('bw-date').value=todayStr();document.getElementById('bw-input').value='';document.getElementById('modal-bw').classList.add('open');}
-function saveBW(){const w=parseFloat(document.getElementById('bw-input').value),d=document.getElementById('bw-date').value;if(!w||!d){alert('Please enter weight and date');return;}if(!S.bw)S.bw=[];S.bw=S.bw.filter(e=>e.date!==d);S.bw.push({date:d,weight:w});S.bw.sort((a,b)=>a.date.localeCompare(b.date));saveState();closeModal('modal-bw');renderProgress();}
-function deleteBW(date){S.bw=(S.bw||[]).filter(e=>e.date!==date);saveState();renderProgress();}
+function saveBW(){const w=parseFloat(document.getElementById('bw-input').value),d=document.getElementById('bw-date').value;if(!w||!d){alert('Please enter weight and date');return;}if(!S.bw)S.bw=[];S.bw=S.bw.filter(e=>e.date!==d);S.bw.push({date:d,weight:w});S.bw.sort((a,b)=>a.date.localeCompare(b.date));saveState();closeModal('modal-bw');renderStrength();}
+function deleteBW(date){S.bw=(S.bw||[]).filter(e=>e.date!==date);saveState();renderStrength();}
 
 // ─── MOBILITY ─────────────────────────────────────────────────────────────────
 let mobPhaseView=-1, mobRoutineView=-1, expandedMob=-1;
