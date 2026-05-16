@@ -1,5 +1,29 @@
 # 45-Workout — Project Memory
 
+## Session Review (2026-05-16)
+
+### What Was Done
+1. **Bug Investigation** — Identified why Friday's workout was showing as completed on Saturday. Root cause: `completeSession()` didn't validate that sessions matched their scheduled dates.
+2. **Implementation** — Fixed the bug in workout_app_v7.html:
+   - Added date validation to prevent completing future sessions
+   - Stores both `_scheduledDate` and `_completedDate` for accuracy
+   - Calendar now validates completion dates match scheduled dates
+   - Training streak and stats count by scheduled date, not completion date
+3. **Deployment** — Created PR #1, got it merged, then updated index.html to sync with v7
+4. **Documentation** — Created CLAUDE.md (technical) and memory.md (user-facing context)
+
+### Key Learnings
+- **Workflow Note:** When fixing a bug that affects the production file (index.html), update both the version file AND index.html in the same PR. Don't merge and then update separately.
+- **Date Validation Pattern:** For session-based apps, always validate that actions (like completion) happen on the intended date, not just today's date.
+- **Storage Design:** Dual-field approach (`_scheduledDate` + `_completedDate`) is cleaner than trying to infer dates from completion status alone.
+
+### Current Status
+- ✅ Bug fixed and deployed to main
+- ✅ Code changes committed and pushed
+- ✅ Documentation created
+- ✅ index.html in sync with v7
+- No outstanding issues
+
 ## Project Purpose
 A strength training program tracker for Bill Zhou's 16-week training cycle. Logs workouts, tracks progression, manages away-mode (bodyweight-only) sessions, and provides statistics on consistency and strength.
 
