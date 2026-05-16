@@ -1,6 +1,12 @@
 # 45-Workout — Project Memory
 
-## UX Review (2026-05-16)
+## Status (2026-05-16)
+✅ All 20 UX issues fixed (commits 209af95, 6329703)
+✅ All 19 engineering issues fixed (commits 019d146, 11a711f)
+
+---
+
+## UX Review (2026-05-16) — RESOLVED
 
 ### Critical
 1. **Setup flow has no recovery** — accidental modal dismiss leaves user with blank screen and no way back. No onboarding card in main UI.
@@ -29,7 +35,7 @@
 
 ---
 
-## Engineering Review #2 (2026-05-16) — Post UX Fixes
+## Engineering Review #2 (2026-05-16) — RESOLVED
 
 ### Critical
 E2-1. **openModal/closeModal overflow stacking bug** — `openModal()` and `openRef()` both set `#main overflow:hidden`. Closing either one resets to `''`, unlocking scroll even if the other overlay is still open. Needs a reference counter.
@@ -54,7 +60,7 @@ E2-13. **Date strings not validated before storage** — `_scheduledDate` and `_
 
 ---
 
-## Engineering Review #1 (2026-05-16)
+## Engineering Review #1 (2026-05-16) — RESOLVED
 
 ### Critical
 E1-1. **Calendar date logic still fragile** — Late completions (scheduled Wed, done Thu) won't show as done on Wed. `_scheduledDate===date` doesn't handle "completed late but for this day."
