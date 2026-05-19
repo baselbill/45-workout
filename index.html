@@ -1710,7 +1710,7 @@ function renderToday(){
     </div>`;
   }
 
-  if(allDone)html+=`<button class="complete-btn" onclick="completeSession(${w},${di},'${schedDate}')"${isFuture?' disabled style="opacity:.5;cursor:not-allowed"':''}>Mark session complete →</button>`;
+  if(allDone&&schedDate)html+=`<button class="complete-btn" onclick="completeSession(${w},${di},'${schedDate}')"${isFuture?' disabled style="opacity:.5;cursor:not-allowed"':''}>Mark session complete →</button>`;
   if(alreadyCompleted)html+=`<button class="btn" onclick="uncompleteSession(${w},${di})" style="color:var(--muted)">Undo completion</button>`;
 
   document.getElementById('screen-today').innerHTML=html;
@@ -1842,6 +1842,8 @@ function showSetFlash(weight, reps, isPR, vsLast){
 
 function completeSession(w,di,schedDate){
   const today=todayStr();
+  // E2-14: Guard against string 'null' or invalid dates from onclick interpolation
+  if(schedDate==='null'||typeof schedDate!=='string'||!isValidDate(schedDate)){schedDate=null;}
   if(schedDate&&schedDate>today){alert('Cannot complete future sessions');return;}
   // E2-13: Validate date strings before storing — both todayStr() and schedule dates
   // are always YYYY-MM-DD, but guard against any future caller passing invalid values.
