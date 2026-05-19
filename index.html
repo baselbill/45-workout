@@ -1448,7 +1448,7 @@ function renderToday(){
   if(!sess){if(todaySess&&!isSessionDone(todaySess.week,todaySess.dayIdx))sess={week:todaySess.week,dayIdx:todaySess.dayIdx};else if(next)sess={week:next.week,dayIdx:next.dayIdx};else sess={week:16,dayIdx:2};}
   const w=sess.week,di=sess.dayIdx,pi=phaseFor(w),phase=P.phases[pi],day=phase.days[di],log=getLog(w,di);
   const sched=getSchedule(),schedEntry=sched.find(s=>s.week===w&&s.dayIdx===di),schedDate=schedEntry?schedEntry.date:null;
-  const isDeload=w===16,today=todayStr(),isToday=schedDate===today,isFuture=schedDate&&schedDate>today,alreadyCompleted=!!log._completed,wasAway=!!log._awayMode;
+  const isDeload=w===16,today=todayStr(),isToday=schedDate===today,isFuture=schedDate&&schedDate>today,alreadyCompleted=!!log._completed&&(log._scheduledDate===schedDate||(!log._scheduledDate&&log._completedDate===schedDate)),wasAway=!!log._awayMode;
   const rmRetest=needsRMRetest();
 
   // Build exercise list — away mode swaps equipment exercises
