@@ -2134,7 +2134,7 @@ function renderStrength(){
   html+=`<div class="snap-divider"></div>`;
   html+=`<div class="snap-col"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:6px">BIG·3 × BW</div><div style="font-size:26px;font-weight:700;font-family:var(--mono);color:var(--accent);letter-spacing:-.02em;line-height:1">${big3Mult||'—'}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${big3Mult?'multiplier':'log lifts'}</div></div>`;
   html+=`<div class="snap-divider"></div>`;
-  const trendTotal=big3Total?`+${big3.length*2}`:'—';
+  const trendTotal=big3Total?`+${big3Available.length*2}`:'—';
   html+=`<div class="snap-col" style="padding-right:0"><div style="font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:.12em;color:var(--muted2);margin-bottom:6px">TREND 30D</div><div style="font-size:26px;font-weight:700;font-family:var(--mono);color:var(--success);letter-spacing:-.02em;line-height:1">${trendTotal}</div><div style="font-size:11px;color:var(--muted);margin-top:2px">${big3Total?'kg est.':'no data'}</div></div>`;
   html+=`</div></div>`;
 
