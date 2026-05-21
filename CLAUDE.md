@@ -58,6 +58,24 @@ Stored in `S` (global state object) in localStorage:
 
 ## Recent Fixes
 
+### Slide Schedule to Today Modal (Current)
+**Bug:** "Slide schedule to today" button showed native `confirm()` dialog that didn't respond to clicks.
+**Root cause:** Native `confirm()` dialog is unreliable on mobile, doesn't layer properly with custom modals.
+**Fix:**
+- Added `showConfirm(title, body, onOk)` reusable confirmation modal function
+- Created `modal-confirm` HTML element styled to match app design
+- `slideProgramForward()` now uses custom modal instead of native `confirm()`
+- Provides consistent UX and works reliably across all devices
+
+### Cool Down Timer Background Running (Current)
+**Bug:** Rest timer paused when app lost focus (browser tab inactive).
+**Root cause:** Used `setInterval()` with counter; browsers throttle intervals when tab is inactive.
+**Fix:**
+- Added `startTime` field to timer, set to `Date.now()` when starting
+- Calculate elapsed time from actual time: `(Date.now() - startTime) / 1000` instead of counter
+- `setInterval()` still runs for UI updates, but elapsed calculation is always from wall clock
+- Timer continues running accurately in background; correct when app returns to focus
+
 ### Workout Completion Date Validation (v7)
 **Bug:** Sessions marked complete on wrong dates would still show as completed on their scheduled date.
 **Root cause:** No validation that completion matched scheduled date.
