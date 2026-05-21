@@ -1120,7 +1120,7 @@ function getSessionVolume(w,di){
 }
 
 // ─── TIMER — sticky floating bar, auto-starts on set tick ────────────────────
-let timer={running:false,elapsed:0,target:0,iv:null,label:''};
+let timer={running:false,elapsed:0,target:0,iv:null,label:'',startTime:null};
 let sessionStartTime=null;
 
 function startTimer(secs,label){
@@ -1128,9 +1128,9 @@ function startTimer(secs,label){
   // Force fresh DOM build on next renderStickyTimer call
   const bar=document.getElementById('sticky-timer');
   if(bar)bar.innerHTML='';
-  timer={running:true,elapsed:0,target:secs,iv:null,label:label||''};
+  timer={running:true,elapsed:0,target:secs,iv:null,label:label||'',startTime:Date.now()};
   timer.iv=setInterval(()=>{
-    timer.elapsed++;
+    if(timer.running&&timer.startTime){timer.elapsed=Math.floor((Date.now()-timer.startTime)/1000);}
     if(timer.elapsed>=timer.target){
       clearInterval(timer.iv);timer.running=false;
       try{const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,a.currentTime);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.6);o.start();o.stop(a.currentTime+0.6);}catch(e){}
@@ -1143,7 +1143,7 @@ function startTimer(secs,label){
 
 function stopTimer(){
   if(timer.iv)clearInterval(timer.iv);
-  timer={running:false,elapsed:0,target:0,iv:null,label:''};
+  timer={running:false,elapsed:0,target:0,iv:null,label:'',startTime:null};
   renderStickyTimer();
 }
 
