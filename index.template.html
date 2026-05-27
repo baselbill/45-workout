@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0E0E10">
+<title>Strength·45</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- CSS -->
+</head>
+<body>
+<div id="app">
+  <div id="main">
+    <div id="screen-today"    class="screen active"></div>
+    <div id="screen-calendar" class="screen"></div>
+    <div id="screen-strength" class="screen"></div>
+    <div id="screen-progress" class="screen"></div>
+    <div id="screen-mobility" class="screen"></div>
+  </div>
+  <nav id="nav">
+    <button class="nav-item active" onclick="showScreen('today',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Today
+    </button>
+    <button class="nav-item" onclick="showScreen('calendar',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar
+    </button>
+    <button class="nav-item" onclick="showScreen('strength',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v16M18 4v16M2 9h4M18 9h4M2 15h4M18 15h4M6 9h12M6 15h12"/></svg>1RM
+    </button>
+    <button class="nav-item" onclick="showScreen('progress',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Progress
+    </button>
+    <button class="nav-item" onclick="showScreen('mobility',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>Mobility
+    </button>
+  </nav>
+</div>
+
+<!-- Reference panel (exercise form guide — slides up from bottom) -->
+<div id="ref-panel" class="ref-panel" onclick="if(event.target===this)closeRef()">
+  <div class="ref-inner" id="ref-inner"></div>
+</div>
+
+<!-- ─── MODALS ─────────────────────────────────────────────────────────────── -->
+
+<!-- Setup wizard (first run) -->
+<div id="modal-setup" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Set up your program</div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Program start date</div>
+      <input type="date" id="setup-date" style="margin-bottom:12px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Training days (pick 3)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="day-picker"></div>
+    </div>
+    <button class="btn btn-primary" onclick="saveSetup()">Start program</button>
+  </div>
+</div>
+
+<!-- Log bodyweight -->
+<div id="modal-bw" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-bw')">
+  <div class="modal">
+    <div class="modal-title">Log bodyweight</div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Weight (kg)</div>
+      <input type="number" id="bw-input" placeholder="e.g. 82.5" step="0.1" inputmode="decimal">
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Date</div>
+      <input type="date" id="bw-date">
+    </div>
+    <button class="btn btn-primary" onclick="saveBW()">Save</button>
+    <button class="btn btn-ghost" onclick="closeModal('modal-bw')">Cancel</button>
+  </div>
+</div>
+
+<!-- Missed sessions modal -->
+<div id="modal-missed" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Missed workouts</div>
+    <div id="modal-missed-body"></div>
+    <button class="btn btn-primary" onclick="slideProgramForward()">Slide schedule to today</button>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin:-4px 0 8px">Shifts your program so today becomes your next session. Logged workouts stay.</div>
+    <button class="btn btn-ghost" onclick="closeModal('modal-missed')">Dismiss</button>
+  </div>
+</div>
+
+<!-- Week/session picker -->
+<div id="week-picker-modal" class="modal-overlay" onclick="if(event.target===this)closeModal('week-picker-modal')">
+  <div class="modal">
+    <div class="modal-title">Jump to session</div>
+    <div id="week-picker-grid" class="week-grid"></div>
+    <button class="btn btn-ghost" onclick="closeModal('week-picker-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- Generic confirmation dialog -->
+<div id="modal-confirm" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="confirm-title"></div>
+    <div id="confirm-body" style="margin-bottom:16px;font-size:14px;color:var(--text);line-height:1.6"></div>
+    <button class="btn btn-primary" id="confirm-ok">OK</button>
+    <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Cancel</button>
+  </div>
+</div>
+
+<!-- Toast notification container — styled by .toast CSS -->
+<div id="toast-container"></div>
+
+<!-- JS -->
+</body>
+</html>
