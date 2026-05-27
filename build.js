@@ -77,6 +77,24 @@ function build() {
 
   html = html.replace('<!-- JS -->', `<script>\n${js}\n</script>`);
 
+  // ── Structural sanity checks ──────────────────────────────────────────────
+  // Catch common authoring mistakes before shipping a broken build.
+  const checks = [
+    { pattern: /:root\s*\{/,       label: ':root{ block (CSS custom properties)' },
+    { pattern: /<style>/,           label: '<style> tag (CSS inlined)' },
+    { pattern: /<\/style>/,         label: '</style> closing tag' },
+    { pattern: /<script>/,          label: '<script> tag (JS inlined)' },
+    { pattern: /<\/script>/,        label: '</script> closing tag' },
+    { pattern: /id="screen-today"/, label: '#screen-today element' },
+    { pattern: /id="nav"/,          label: '#nav element' },
+  ];
+  const failed = checks.filter(c => !c.pattern.test(html));
+  if (failed.length) {
+    console.error('BUILD FAILED — structural checks did not pass:');
+    failed.forEach(c => console.error(`  ✗ Missing: ${c.label}`));
+    process.exit(1);
+  }
+
   // Ensure dist/ exists
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, html, 'utf8');
