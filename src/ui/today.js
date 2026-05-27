@@ -11,7 +11,7 @@ function toggleAwayMode(){
     const sess=viewingSession||getTodaySession();
     const log=getLog(sess.week,sess.dayIdx);
     const hasDoneSets=Object.values(log).some(exLog=>typeof exLog==='object'&&exLog&&Object.values(exLog).some(s=>s&&s.done));
-    if(hasDoneSets&&!confirm('Switching away mode will swap exercises. Continue?'))return;
+    if(hasDoneSets){showConfirm('Switch away mode?','Exercises will be swapped. Your logged sets will stay.',()=>{S.awayMode=!S.awayMode;saveState();renderToday();});return;}
   }
   S.awayMode=!S.awayMode;
   saveState();

@@ -209,10 +209,10 @@ function renderProgress(){
 
   if(awaySess>0)html+=`<div class="alert alert-orange" style="margin-bottom:12px">✈ ${awaySess} session${awaySess>1?'s':''} completed in away mode — all count toward your progress.</div>`;
 
-  html+=`<div class="divider"></div><button class="btn btn-ghost btn-danger" onclick="if(confirm('Reset ALL data? Cannot be undone.')){localStorage.removeItem('${STORE_KEY}');location.reload()}">Reset all data</button>`;
+  html+=`<div class="divider"></div><button class="btn btn-ghost btn-danger" onclick="showConfirm('Reset all data?','This permanently deletes all workouts, 1RM values, and settings. Cannot be undone.',()=>{localStorage.removeItem('${STORE_KEY}');location.reload()})">Reset all data</button>`;
   document.getElementById('screen-progress').innerHTML=html;
 }
 function openBWModal(){document.getElementById('bw-date').value=todayStr();document.getElementById('bw-input').value='';openModal('modal-bw');}
-function saveBW(){const w=parseFloat(document.getElementById('bw-input').value),d=document.getElementById('bw-date').value;if(!w||!d){alert('Please enter weight and date');return;}if(!S.bw)S.bw=[];S.bw=S.bw.filter(e=>e.date!==d);S.bw.push({date:d,weight:w});S.bw.sort((a,b)=>a.date.localeCompare(b.date));saveState();closeModal('modal-bw');renderStrength();}
+function saveBW(){const w=parseFloat(document.getElementById('bw-input').value),d=document.getElementById('bw-date').value;if(!w||!d){showToast('Please enter weight and date','error');return;}if(!S.bw)S.bw=[];S.bw=S.bw.filter(e=>e.date!==d);S.bw.push({date:d,weight:w});S.bw.sort((a,b)=>a.date.localeCompare(b.date));saveState();closeModal('modal-bw');renderStrength();}
 function deleteBW(date){S.bw=(S.bw||[]).filter(e=>e.date!==date);saveState();renderStrength();}
 

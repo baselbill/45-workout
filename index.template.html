@@ -48,7 +48,8 @@
 <!-- ─── MODALS ─────────────────────────────────────────────────────────────── -->
 
 <!-- Setup wizard (first run) -->
-<div id="modal-setup" class="modal-overlay">
+<!-- backdrop-click only closes if already configured (S.startDate set) — first-run is intentionally locked -->
+<div id="modal-setup" class="modal-overlay" onclick="if(event.target===this&&S&&S.startDate)closeModal('modal-setup')">
   <div class="modal">
     <div class="modal-title">Set up your program</div>
     <div style="margin-bottom:12px">
@@ -79,7 +80,7 @@
 </div>
 
 <!-- Missed sessions modal -->
-<div id="modal-missed" class="modal-overlay">
+<div id="modal-missed" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-missed')">
   <div class="modal">
     <div class="modal-title">Missed workouts</div>
     <div id="modal-missed-body"></div>

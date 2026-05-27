@@ -20,4 +20,7 @@ function showScreenById(id){
   window.scrollTo(0,0);
   if(id==='today')renderToday();
   if(id==='calendar')renderCalendar();
+  if(id==='strength')renderStrength();
+  if(id==='progress')renderProgress();
+  if(id==='mobility'){mobRoutineView=-1;expandedMob=-1;renderMobility();}
 }

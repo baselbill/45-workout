@@ -61,6 +61,35 @@ function showConfirm(title, body, onOk, onCancel) {
   openModal('modal-confirm');
 }
 
+// showPrompt(title, currentVal, onSave)
+// Re-uses #modal-confirm but injects a date input into the body area.
+function showPrompt(title, currentVal, onSave) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-body').innerHTML =
+    `<input type="date" id="modal-prompt-input" style="width:100%;margin-bottom:4px">`;
+  const inp = document.getElementById('modal-prompt-input');
+  if (currentVal) inp.value = currentVal;
+  const okBtn = document.getElementById('confirm-ok');
+  const fresh = okBtn.cloneNode(true);
+  fresh.textContent = 'Save';
+  okBtn.parentNode.replaceChild(fresh, okBtn);
+  fresh.onclick = () => {
+    const v = inp.value;
+    closeModal('modal-confirm');
+    document.getElementById('confirm-body').textContent = '';
+    if (v && onSave) onSave(v);
+  };
+  const modal = document.getElementById('modal-confirm');
+  modal.onclick = (e) => { if (e.target === modal) closeModal('modal-confirm'); };
+  const cancelBtn = modal.querySelector('.btn-ghost');
+  if (cancelBtn) cancelBtn.onclick = () => {
+    closeModal('modal-confirm');
+    document.getElementById('confirm-body').textContent = '';
+  };
+  openModal('modal-confirm');
+  setTimeout(() => inp && inp.focus(), 80);
+}
+
 // Reference panel (exercise form guide — slides up from bottom)
 function openRef(name) {
   const ref = EXREF[name];

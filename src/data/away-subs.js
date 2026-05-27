@@ -76,7 +76,7 @@ function getStrengthLevel(ratio) {
   if (ratio < 0.75) return {label:'Building',color:'var(--blue)'};
   if (ratio < 1.0)  return {label:'Intermediate',color:'var(--accent)'};
   if (ratio < 1.25) return {label:'Strong',color:'var(--amber)'};
-  return {label:'Very strong',color:'var(--orange)'};
+  return {label:'Very strong',color:'var(--accent)'};
 }
 
 // Get the best 1RM ratio for a given exercise pattern

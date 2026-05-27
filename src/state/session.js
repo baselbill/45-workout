@@ -12,7 +12,7 @@ function completeSession(w, di, schedDate) {
   if (schedDate === 'null' || typeof schedDate !== 'string' || !isValidDate(schedDate)) {
     schedDate = null;
   }
-  if (schedDate && schedDate > today) { alert('Cannot complete future sessions'); return; }
+  if (schedDate && schedDate > today) { showToast('Cannot complete future sessions', 'error'); return; }
   // Validate date strings before storing
   const safeScheduledDate = (schedDate && isValidDate(schedDate)) ? schedDate : today;
   const l = getLog(w, di);

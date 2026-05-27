@@ -191,5 +191,5 @@ function renderCalendar(){
 }
 function calPrevMonth(){calViewMonth.month--;if(calViewMonth.month<0){calViewMonth.month=11;calViewMonth.year--;}renderCalendar();}
 function calNextMonth(){calViewMonth.month++;if(calViewMonth.month>11){calViewMonth.month=0;calViewMonth.year++;}renderCalendar();}
-function changeStartDate(){const d=prompt('Enter new start date (YYYY-MM-DD):',S.startDate);if(d&&/^\d{4}-\d{2}-\d{2}$/.test(d)){S.startDate=d;S._sc=null;saveState();renderCalendar();}}
+function changeStartDate(){showPrompt('Change program start date',S.startDate,(d)=>{if(/^\d{4}-\d{2}-\d{2}$/.test(d)){S.startDate=d;S._sc=null;saveState();renderCalendar();}else showToast('Invalid date format','error');});}
 
