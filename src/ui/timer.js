@@ -31,7 +31,8 @@ function stopTimer(){
 function renderStickyTimer(){
   let bar=document.getElementById('sticky-timer');
   if(!bar){bar=document.createElement('div');bar.id='sticky-timer';bar.style.cssText='position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:150';document.body.appendChild(bar);}
-  if(!timer.target){bar.innerHTML='';return;}
+  if(!timer.target){bar.innerHTML='';document.getElementById('main').classList.remove('timer-active');return;}
+  document.getElementById('main').classList.add('timer-active');
   const rem=Math.max(0,timer.target-timer.elapsed);
   const m=Math.floor(rem/60),s=rem%60;
   const pct=Math.min(100,Math.round(timer.elapsed/timer.target*100));

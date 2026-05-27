@@ -11,7 +11,7 @@ function toggleAwayMode(){
     const sess=viewingSession||getTodaySession();
     const log=getLog(sess.week,sess.dayIdx);
     const hasDoneSets=Object.values(log).some(exLog=>typeof exLog==='object'&&exLog&&Object.values(exLog).some(s=>s&&s.done));
-    if(hasDoneSets&&!confirm('Switching away mode will swap exercises. Continue?'))return;
+    if(hasDoneSets){showConfirm('Switch away mode?','Exercises will be swapped. Your logged sets will stay.',()=>{S.awayMode=!S.awayMode;saveState();renderToday();});return;}
   }
   S.awayMode=!S.awayMode;
   saveState();
@@ -25,6 +25,35 @@ function dismissMissedBanner(){_missedBannerDismissedCount=getMissedSessions().l
 // E2-4: Persist warmup collapsed state across renderToday() calls (logging a set triggers re-render).
 // Without this, the warmup section snaps back open on every set tick.
 let warmupCollapsed=false;
+
+// ─── COACH LINES ─────────────────────────────────────────────────────────────
+// Motivational phrases that cycle every 12 s during an active workout session.
+const _COACH_LINES=[
+  "Focus on form — every clean rep compounds.",
+  "Show up. The rest follows.",
+  "Progressive overload is the only rule.",
+  "Consistency beats intensity over a year.",
+  "Every session moves the needle.",
+  "Technique today, weight tomorrow.",
+  "Your future self is watching.",
+  "Grip it. Own it. One more clean rep.",
+  "Rest is where strength is built.",
+  "Small weights today, heavy weights later.",
+];
+let _verseCache=[..._COACH_LINES].sort(()=>Math.random()-.5);
+let _coachLineIdx=0;
+let _coachLineInterval=null;
+function startCoachLine(){
+  if(_coachLineInterval)return;
+  _coachLineInterval=setInterval(()=>{
+    _coachLineIdx=(_coachLineIdx+1)%_verseCache.length;
+    const el=document.getElementById('coach-line-text');
+    if(!el)return;
+    el.style.opacity='0';
+    setTimeout(()=>{if(!el.isConnected)return;el.textContent=_verseCache[_coachLineIdx];el.style.opacity='1';},200);
+  },12000);
+}
+function stopCoachLine(){clearInterval(_coachLineInterval);_coachLineInterval=null;}
 
 // ─── REST DAY MOBILITY ────────────────────────────────────────────────────────
 // On rest days the Today tab shows a mobility routine aligned to the user's
@@ -227,7 +256,7 @@ function renderToday(){
   html+=`<div style="margin-bottom:14px">
     <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px">Week ${w} · Day ${di+1} of 3</div>
     <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-      <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${day.name.replace(' — ',' <span style="color:var(--muted);font-weight:500">(')}</span><span style="display:none"></span></div>
+      <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${(()=>{const[h,...r]=day.name.split(' — ');return r.length?h+' <span style="color:var(--muted);font-weight:500;font-size:18px">('+r.join(' — ')+')</span>':h;})()}</div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Coming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-green">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px;padding:5px 10px">Jump</button></div>
     </div>
   </div>`;

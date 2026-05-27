@@ -23,6 +23,6 @@ function initSetup(){
   S.trainingDays=selected;
   openModal('modal-setup');
 }
-function saveSetup(){const v=document.getElementById('setup-date').value;if(!v){alert('Please pick a start date');return;}S.startDate=v;S._sc=null;saveState();closeModal('modal-setup');renderToday();showToast('Program started! Week 1, Day 1 ready.');}
+function saveSetup(){const v=document.getElementById('setup-date').value;if(!v){showToast('Please pick a start date','error');return;}S.startDate=v;S._sc=null;saveState();closeModal('modal-setup');renderToday();showToast('Program started! Week 1, Day 1 ready.');}
 
 // toggleAwayMode is in today.js
