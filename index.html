@@ -229,10 +229,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.open{display:flex}
-/* Toast notification */
-.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:600;background:var(--surf);border:1px solid var(--border2);border-radius:12px;padding:10px 18px;font-size:13px;font-weight:500;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.5);pointer-events:none;animation:toastIn .25s cubic-bezier(.32,.72,0,1),toastOut .3s ease 2.5s forwards;white-space:nowrap}
-@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-@keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-8px)}}
 .modal{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--text)}
 input[type=date],input[type=number],input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
@@ -246,6 +242,7 @@ input[type=date]{color-scheme:dark}
 .level-track-dot{position:absolute;top:50%;width:13px;height:13px;border-radius:50%;background:#FF6B35;border:2.5px solid var(--bg);box-shadow:0 1px 6px rgba(0,0,0,.5);transform:translate(-50%,-50%);pointer-events:none}
 .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .kpi-tile{background:var(--surf);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.kpi-stripe{display:block;height:4px;width:100%}
 .kpi-inner{padding:12px 12px 14px}
 .vol-bars-row{display:flex;align-items:flex-end;gap:3px;height:64px;margin-bottom:4px}
 .vol-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px;transition:height .3s}
@@ -1705,6 +1702,35 @@ function dismissMissedBanner(){_missedBannerDismissedCount=getMissedSessions().l
 // Without this, the warmup section snaps back open on every set tick.
 let warmupCollapsed=false;
 
+// ─── COACH LINES ─────────────────────────────────────────────────────────────
+// Motivational phrases that cycle every 12 s during an active workout session.
+const _COACH_LINES=[
+  "Focus on form — every clean rep compounds.",
+  "Show up. The rest follows.",
+  "Progressive overload is the only rule.",
+  "Consistency beats intensity over a year.",
+  "Every session moves the needle.",
+  "Technique today, weight tomorrow.",
+  "Your future self is watching.",
+  "Grip it. Own it. One more clean rep.",
+  "Rest is where strength is built.",
+  "Small weights today, heavy weights later.",
+];
+let _verseCache=[..._COACH_LINES].sort(()=>Math.random()-.5);
+let _coachLineIdx=0;
+let _coachLineInterval=null;
+function startCoachLine(){
+  if(_coachLineInterval)return;
+  _coachLineInterval=setInterval(()=>{
+    _coachLineIdx=(_coachLineIdx+1)%_verseCache.length;
+    const el=document.getElementById('coach-line-text');
+    if(!el)return;
+    el.style.opacity='0';
+    setTimeout(()=>{if(!el.isConnected)return;el.textContent=_verseCache[_coachLineIdx];el.style.opacity='1';},200);
+  },12000);
+}
+function stopCoachLine(){clearInterval(_coachLineInterval);_coachLineInterval=null;}
+
 // ─── REST DAY MOBILITY ────────────────────────────────────────────────────────
 // On rest days the Today tab shows a mobility routine aligned to the user's
 // last completed workout, instead of teasing the next workout's exercises.
@@ -1906,7 +1932,7 @@ function renderToday(){
   html+=`<div style="margin-bottom:14px">
     <div style="font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--muted2);text-transform:uppercase;margin-bottom:4px">Week ${w} · Day ${di+1} of 3</div>
     <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-      <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${day.name.replace(' — ',' <span style="color:var(--muted);font-weight:500">(')}</span><span style="display:none"></span></div>
+      <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1">${(()=>{const[h,...r]=day.name.split(' — ');return r.length?h+' <span style="color:var(--muted);font-weight:500;font-size:18px">('+r.join(' — ')+')</span>':h;})()}</div>
       <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">${isToday?'<span class="badge badge-green">Today</span>':''}${isFuture?'<span class="badge badge-blue">Coming</span>':''}${alreadyCompleted?(wasAway?'<span class="badge badge-orange">✈ Away</span>':'<span class="badge badge-green">Done ✓</span>'):''}<button class="btn btn-sm" onclick="openWeekPicker()" style="font-size:11px;padding:5px 10px">Jump</button></div>
     </div>
   </div>`;
