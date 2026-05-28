@@ -488,7 +488,7 @@ function renderToday(){
 
   document.getElementById('screen-today').innerHTML=html;
   if(alreadyCompleted){ resetSessionClock(); stopCoachLine(); }
-  else { renderSessionClock(); startCoachLine(); }
+  else { startSessionClock(); startCoachLine(); }
   renderStickyTimer();
 }
 
@@ -541,6 +541,21 @@ function toggleDone(w,di,ei,si,restSecs,exName){
     }
     showSetFlash(thisWeight,thisReps,isPR,vsLast);
     if(isPR) showPRFlash(exName,thisWeight,thisReps);
+    // Auto-complete: check if every set across all exercises is now done
+    const _pi=phaseFor(w),_phDay=P.phases[_pi].days[di];
+    const _exList=_phDay.exercises.map(ex=>{if(S.awayMode){const sub=getAwayExercise(ex);return sub||ex;}return ex;});
+    let _done=0,_total=0;
+    _exList.forEach((ex,ei2)=>{const sc=Math.min(ex.sets||0,20);_total+=sc;const el2=l[ei2]||{};for(let s2=0;s2<sc;s2++)if(el2[s2]&&el2[s2].done)_done++;});
+    if(_done===_total&&_total>0){
+      const _sched=getSchedule(),_entry=_sched.find(s=>s.week===w&&s.dayIdx===di),_sd=_entry?_entry.date:null;
+      if(!_sd||_sd<=todayStr()){
+        stopTimer();
+        renderToday();
+        showToast('Session complete — great work!','success',3500);
+        setTimeout(()=>completeSession(w,di,_sd||todayStr()),1500);
+        return;
+      }
+    }
   }
   renderToday();
 }
