@@ -9,7 +9,7 @@
 <title>Strength·45</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0E0E10;--surf:#17171B;--surf2:#1F1F24;
@@ -21,9 +21,9 @@
   --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.12);
   --red:#E76A6A;--red-dim:rgba(231,106,106,0.12);
   --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
-  --r:14px;--r-sm:10px;
+  --r:10px;--r-sm:6px;
   --mono:'JetBrains Mono','SF Mono','Cascadia Mono',monospace;
-  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --sans:'Geist','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;-webkit-font-smoothing:antialiased}
@@ -2187,7 +2187,7 @@ function renderToday(){
 
   document.getElementById('screen-today').innerHTML=html;
   if(alreadyCompleted){ resetSessionClock(); stopCoachLine(); }
-  else { renderSessionClock(); startCoachLine(); }
+  else { startSessionClock(); startCoachLine(); }
   renderStickyTimer();
 }
 
@@ -2240,6 +2240,21 @@ function toggleDone(w,di,ei,si,restSecs,exName){
     }
     showSetFlash(thisWeight,thisReps,isPR,vsLast);
     if(isPR) showPRFlash(exName,thisWeight,thisReps);
+    // Auto-complete: check if every set across all exercises is now done
+    const _pi=phaseFor(w),_phDay=P.phases[_pi].days[di];
+    const _exList=_phDay.exercises.map(ex=>{if(S.awayMode){const sub=getAwayExercise(ex);return sub||ex;}return ex;});
+    let _done=0,_total=0;
+    _exList.forEach((ex,ei2)=>{const sc=Math.min(ex.sets||0,20);_total+=sc;const el2=l[ei2]||{};for(let s2=0;s2<sc;s2++)if(el2[s2]&&el2[s2].done)_done++;});
+    if(_done===_total&&_total>0){
+      const _sched=getSchedule(),_entry=_sched.find(s=>s.week===w&&s.dayIdx===di),_sd=_entry?_entry.date:null;
+      if(!_sd||_sd<=todayStr()){
+        stopTimer();
+        renderToday();
+        showToast('Session complete — great work!','success',3500);
+        setTimeout(()=>completeSession(w,di,_sd||todayStr()),1500);
+        return;
+      }
+    }
   }
   renderToday();
 }
@@ -2976,6 +2991,21 @@ function switchMobRoutine(i){mobRoutineView=i;expandedMob=-1;renderMobility();}
 // ─── 45-WORKOUT v2: app ───
 // Application initialization and entry point.
 // All modules are loaded above this file (see build.js for order).
+
+// ─── ORIENTATION LOCK ────────────────────────────────────────────────────────
+// Keep portrait during active lifting. Works on installed PWAs; silently
+// no-ops on regular browser tabs where the API is unavailable or rejected.
+(function(){
+  function _lockPortrait(){
+    if(screen.orientation&&screen.orientation.lock){
+      screen.orientation.lock('portrait').catch(()=>{});
+    }
+  }
+  _lockPortrait();
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') _lockPortrait();
+  });
+})();
 
 // ─── V1 DATA MIGRATION ───────────────────────────────────────────────────────
 // Detect v1 localStorage data (stored under 'wkapp_v7') and prompt user.

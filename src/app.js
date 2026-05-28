@@ -2,6 +2,21 @@
 // Application initialization and entry point.
 // All modules are loaded above this file (see build.js for order).
 
+// ─── ORIENTATION LOCK ────────────────────────────────────────────────────────
+// Keep portrait during active lifting. Works on installed PWAs; silently
+// no-ops on regular browser tabs where the API is unavailable or rejected.
+(function(){
+  function _lockPortrait(){
+    if(screen.orientation&&screen.orientation.lock){
+      screen.orientation.lock('portrait').catch(()=>{});
+    }
+  }
+  _lockPortrait();
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') _lockPortrait();
+  });
+})();
+
 // ─── V1 DATA MIGRATION ───────────────────────────────────────────────────────
 // Detect v1 localStorage data (stored under 'wkapp_v7') and prompt user.
 // Both confirm and cancel paths clear v1 data — v1 schema is incompatible with v2.
