@@ -58,7 +58,38 @@ Stored in `S` (global state object) in localStorage:
 
 ## Recent Fixes
 
-### Slide Schedule to Today Modal (Current)
+### Set Logging Lost Weight/Reps ("null") (Current)
+**Bug:** Ticking a set sometimes logged nothing, or logged reps but not weight. Only fix was to untick and redo.
+**Root cause:** Three compounding issues.
+- Inputs committed on `onchange` (fires on blur only), but `toggleDone()` reads state directly. Every set tick and stepper tap calls `renderToday()`, which replaces `innerHTML` — a typed-but-unblurred value was discarded with the old DOM node.
+- The auto-carry in `toggleDone()` required **both** weight and reps to be empty, so touching one field dropped the other.
+- The carried value shown in sets 2+ was computed at render time only — displayed, but never in state until committed.
+**Fix:**
+- `logField()` commits on `oninput` (per keystroke), and an emptied box now clears the field instead of stranding the old value.
+- `toggleDone()` blurs the active set input first, then carries weight and reps **independently**.
+- Render pre-fill is null-aware (`!=null`, not truthiness) so a logged `0` displays and what the box shows is exactly what gets committed.
+- `showSetFlash()`/`showPRFlash()` build their text via `setValueText()` — a missing value can no longer render as the literal string "null".
+
+### Weight/Reps Numbers Clipped in Set Rows (Current)
+**Bug:** Entered numbers were cut off — a 3+ character weight showed only its first digit.
+**Root cause:** The global `input[type=number]` rule (specificity 0,1,1) outranked `.set-val-input` (0,1,0), forcing 12px horizontal padding, 14px font and a border onto the stepper inputs. That left ~31px of text area inside a ~55px box.
+**Fix:**
+- Global form-input rule now excludes `.set-val-input`/`.set-input` via `:not()`, so the in-row controls keep their own borderless, zero-padding styling.
+- `.set-row` columns re-proportioned `28px 1.1fr .9fr 44px` (weight needs 5 chars, reps 2), stepper buttons 36→32px, stepper padding 4→2px, input 17→16px (DESIGN.md allows 15–17px).
+- Inline `grid-template-columns` in today.js replaced with a `.bw-cols` class so header and rows can't drift apart.
+- Completed sets were rendered at 0.7 × 0.5 = **0.35** opacity. Now only the disabled +/− buttons dim; the logged numbers stay readable.
+
+### Rest Timer Strip Was Transparent (Current)
+**Bug:** Page content scrolled visibly through the rest timer, making both unreadable.
+**Root cause:** `.rest-strip` background was `var(--accent-mute)` — 8% alpha — on a `position:fixed` element.
+**Fix:** Opaque `var(--surf)` background; the accent identity comes from the border and the progress fill.
+
+### Last-Session Reference Never Appeared (Current)
+**Bug:** "Last: …" and the per-set vs-last comparison stayed hidden until an exercise had two prior sessions.
+**Root cause:** `getLastSession()` bailed on `hist.length < 2`; filtering out today's entry is the only guard actually needed.
+**Fix:** Removed the length check.
+
+### Slide Schedule to Today Modal
 **Bug:** "Slide schedule to today" button showed native `confirm()` dialog that didn't respond to clicks.
 **Root cause:** Native `confirm()` dialog is unreliable on mobile, doesn't layer properly with custom modals.
 **Fix:**

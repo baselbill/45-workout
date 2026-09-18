@@ -365,9 +365,9 @@ function renderToday(){
 
       // Header row — columns depend on exercise type
       if(timeBased){
-        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">DURATION</span><span class="set-hdr-lbl">DONE</span><span></span></div>`;
+        html+=`<div class="sets-area"><div class="set-hdr"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">DURATION</span><span class="set-hdr-lbl">DONE</span><span></span></div>`;
       }else if(bwOnly){
-        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
+        html+=`<div class="sets-area"><div class="set-hdr bw-cols"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
       }else{
         html+=`<div class="sets-area"><div class="set-hdr"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">WEIGHT</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
       }
@@ -384,10 +384,12 @@ function renderToday(){
         const isActive=!isDone&&si===firstUndone;
         const tgt=rec?rec.kg:null;
         const wv=parseFloat(s.weight)||0;
-        // Auto-carry display: pre-fill from previous set; tgt only as placeholder for set 1
+        // Auto-carry display: pre-fill from previous set; tgt only as placeholder for set 1.
+        // Null-aware (not truthy) so a logged 0 shows as 0, and so what the box displays is
+        // exactly what toggleDone() commits — the two must not diverge.
         const prevS=si>0?(exLog[si-1]||{}):{};
-        const inputW=s.weight||(si>0&&prevS.weight?prevS.weight:'');
-        const inputR=s.reps||(si>0&&prevS.reps?prevS.reps:'');
+        const inputW=s.weight!=null?s.weight:(prevS.weight!=null?prevS.weight:'');
+        const inputR=s.reps!=null?s.reps:(prevS.reps!=null?prevS.reps:'');
         const wtPlaceholder=tgt?`${tgt}kg`:'kg';
         // Base for steppers — use displayed value so carry/target is the step-from point
         const stepWBase=parseFloat(inputW)||(tgt||0);
@@ -419,18 +421,18 @@ function renderToday(){
         const exKey=ex.n.replace(/'/g,"\\'");
 
         if(timeBased){
-          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 1fr 44px">
+          html+=`<div class="set-row ${rowClass}">
             <div class="set-num ${numClass}">${si+1}</div>
             <div style="font-size:12px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:4px 8px;text-align:center">${ex.reps}</div>
-            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${s.reps||''}" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${inputR}" oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
           </div>`;
         }else if(bwOnly){
-          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 44px">
+          html+=`<div class="set-row bw-cols ${rowClass}">
             <div class="set-num ${numClass}">${si+1}</div>
             <div class="set-stepper">
               <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
@@ -441,12 +443,12 @@ function renderToday(){
             <div class="set-num ${numClass}">${si+1}</div>
             <div class="set-stepper">
               <button onclick="stepWeight(${w},${di},${ei},${si},-2.5,${stepWBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="decimal" placeholder="${wtPlaceholder}" value="${inputW}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'weight',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="decimal" placeholder="${wtPlaceholder}" value="${inputW}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'weight',this.value)">
               <button onclick="stepWeight(${w},${di},${ei},${si},2.5,${stepWBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <div class="set-stepper">
               <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
@@ -492,11 +494,15 @@ function renderToday(){
   renderStickyTimer();
 }
 
+// Fires on every keystroke (oninput). Committing per-keystroke rather than on blur means a
+// value can't be lost when the next tap re-renders the row or ticks the set off.
 function logField(w,di,ei,si,f,v){
+  const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};
+  // Emptying the box clears the value instead of leaving the previous one stranded in state
+  if(String(v).trim()===''){delete l[ei][si][f];setLog(w,di,l);return;}
   // E1-9: Validate input before storing — ignore NaN and negative values
   const parsed=f==='weight'?parseFloat(v):parseInt(v);
   if(isNaN(parsed)||parsed<0)return;
-  const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};
   l[ei][si][f]=parsed;setLog(w,di,l);
 }
 
@@ -504,14 +510,19 @@ function logField(w,di,ei,si,f,v){
 const sessionPRsFlashed = {};
 
 function toggleDone(w,di,ei,si,restSecs,exName){
+  // Commit anything still being typed before reading state, and drop the keyboard
+  const ae=document.activeElement;
+  if(ae&&ae.tagName==='INPUT'&&ae.closest&&ae.closest('.set-row'))ae.blur();
   const l=getLog(w,di);
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   const wasDone=l[ei][si].done;
-  // Auto-carry weight+reps from previous set when marking done with no values entered
-  if(!wasDone&&!l[ei][si].weight&&!l[ei][si].reps&&si>0&&l[ei][si-1]){
-    if(l[ei][si-1].weight) l[ei][si].weight=String(l[ei][si-1].weight);
-    if(l[ei][si-1].reps) l[ei][si].reps=String(l[ei][si-1].reps);
+  // Commit the carried-forward values the row was already displaying. Weight and reps carry
+  // independently: entering one of them must not leave the other unlogged.
+  if(!wasDone&&si>0&&l[ei][si-1]){
+    const prev=l[ei][si-1];
+    if(l[ei][si].weight==null&&prev.weight!=null) l[ei][si].weight=prev.weight;
+    if(l[ei][si].reps==null&&prev.reps!=null) l[ei][si].reps=prev.reps;
   }
   l[ei][si].done=!wasDone;
   setLog(w,di,l);
@@ -565,7 +576,8 @@ function stepWeight(w,di,ei,si,delta,base){
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   if(l[ei][si].done)return;
-  const cur=parseFloat(l[ei][si].weight)||(base||0);
+  const stored=parseFloat(l[ei][si].weight);
+  const cur=Number.isFinite(stored)?stored:(base||0);
   l[ei][si].weight=Math.max(0,Math.round((cur+delta)*4)/4);
   setLog(w,di,l);
   renderToday();
@@ -576,10 +588,21 @@ function stepReps(w,di,ei,si,delta,base){
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   if(l[ei][si].done)return;
-  const cur=parseInt(l[ei][si].reps)||(base||0);
+  const stored=parseInt(l[ei][si].reps);
+  const cur=Number.isFinite(stored)?stored:(base||0);
   l[ei][si].reps=Math.max(0,cur+delta);
   setLog(w,di,l);
   renderToday();
+}
+
+// Renders whatever of weight/reps is actually logged, so a missing value can't reach the
+// overlay as the string "null". Reps stay unlabelled — the same field holds reps for
+// bodyweight sets and seconds for holds.
+function setValueText(weight,reps){
+  if(weight&&reps) return `${weight} kg × ${reps}`;
+  if(weight) return `${weight} kg`;
+  if(reps) return `${reps}`;
+  return 'Logged';
 }
 
 function showPRFlash(exName, weight, reps){
@@ -592,7 +615,7 @@ function showPRFlash(exName, weight, reps){
     <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
     <div style="flex:1;min-width:0">
       <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
-      <div style="font-size:18px;font-weight:700;color:#1A0800;letter-spacing:-.01em;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''} ${reps||''} ${exName}</div>
+      <div style="font-size:18px;font-weight:700;color:#1A0800;letter-spacing:-.01em;font-family:var(--mono);font-variant-numeric:tabular-nums">${setValueText(weight,reps)} · ${exName}</div>
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -604,12 +627,13 @@ function showSetFlash(weight, reps, isPR, vsLast){
   const el=document.createElement('div');
   el.className='flash-overlay';
   const addedVol=weight&&reps?Math.round(weight*reps):0;
+  const valTxt=setValueText(weight,reps);
   if(isPR){
     el.innerHTML=`<div class="flash-box" style="background:linear-gradient(135deg,var(--accent),#FFA257);border:1px solid var(--accent);box-shadow:0 16px 48px rgba(255,107,53,.4)">
       <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
-        <div style="font-size:18px;font-weight:700;color:#1A0800;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}</div>
+        <div style="font-size:18px;font-weight:700;color:#1A0800;font-family:var(--mono);font-variant-numeric:tabular-nums">${valTxt}</div>
       </div>
     </div>`;
   }else{
@@ -617,7 +641,7 @@ function showSetFlash(weight, reps, isPR, vsLast){
       <div class="flash-icon" style="background:var(--success-dim);color:var(--success)">✓</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:var(--success);margin-bottom:3px">SET LOCKED IN</div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}${addedVol>0?`<span style="font-size:12px;font-weight:400;opacity:.6;margin-left:6px;font-family:var(--sans)">+${addedVol} kg</span>`:''}
+        <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums">${valTxt}${addedVol>0?`<span style="font-size:12px;font-weight:400;opacity:.6;margin-left:6px;font-family:var(--sans)">+${addedVol} kg</span>`:''}
         </div>
         ${vsLast&&vsLast>0?`<div style="font-size:11px;color:var(--accent);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px">▲ +${vsLast}% vs last time</div>`:''}
       </div>
