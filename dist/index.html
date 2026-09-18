@@ -65,23 +65,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .help-btn{width:36px;height:36px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surf2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);flex-shrink:0;margin-left:6px;vertical-align:middle}
 /* Set logging — stepper style */
 .sets-area{margin-top:12px}
-.set-hdr{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;padding:0 2px;margin-bottom:4px}
+/* Weight column is wider than reps: weights run to 5 chars ("102.5"), reps to 2. */
+.set-hdr{display:grid;grid-template-columns:28px 1.1fr .9fr 44px;gap:6px;padding:0 2px;margin-bottom:4px}
 .set-hdr-lbl{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase;text-align:center}
 .set-hdr-lbl:first-child{text-align:left}
-.set-row{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
+.set-row{display:grid;grid-template-columns:28px 1.1fr .9fr 44px;gap:6px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
+/* Bodyweight sets have no weight column */
+.set-hdr.bw-cols,.set-row.bw-cols{grid-template-columns:28px 1fr 44px}
 .set-row.active-set{background:var(--accent-mute);border-color:var(--accent-dim)}
-.set-row.done-set{opacity:.7}
-.done-set .set-stepper,.done-set .set-val-input{opacity:.5;pointer-events:none}
-.set-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
+.set-row.done-set{opacity:.85}
+.done-set .set-stepper{pointer-events:none}
+.done-set .set-stepper button{opacity:.25}
+.set-num{width:28px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
 .set-num.active{background:var(--accent-dim);color:var(--accent)}
 .set-num.done{background:var(--success-dim);color:var(--success)}
-.set-stepper{display:flex;align-items:center;background:var(--surf2);border-radius:9px;height:44px;padding:0 4px;overflow:hidden}
-.set-stepper button{width:36px;height:44px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color .1s;flex-shrink:0}
+.set-stepper{display:flex;align-items:center;background:var(--surf2);border-radius:9px;height:44px;padding:0 2px;overflow:hidden}
+.set-stepper button{width:32px;height:44px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color .1s;flex-shrink:0}
 .set-stepper button:active{color:var(--text)}
 .set-stepper button:disabled{opacity:.3;cursor:default}
-.set-val{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;min-width:0}
+.set-val{flex:1;text-align:center;font-size:16px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;min-width:0}
 .set-val.done-val{color:var(--success)}
-.set-val-input{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;background:transparent;border:none;min-width:0;-webkit-appearance:none;width:100%}
+.set-val-input{flex:1;text-align:center;font-size:16px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;background:transparent;border:none;min-width:0;padding:0;-webkit-appearance:none;width:100%}
 .set-val-input:focus{outline:none;color:var(--accent)}
 .set-val-input::placeholder{color:var(--muted2);font-weight:400;font-size:14px}
 .set-val-input.done-val{color:var(--success)}
@@ -90,6 +94,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .set-input{flex:1;padding:8px 6px;font-size:14px;font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);text-align:center;min-width:0;-webkit-appearance:none}
 .set-input:focus{outline:none;border-color:var(--border2)}.set-input::placeholder{color:var(--muted2);font-size:11px}
 .set-input.on-target{border-color:rgba(91,196,137,.5)}.set-input.off-target{border-color:rgba(231,106,106,.4)}
+/* Small phones: trade stepper button width for digits, keeping 44px tap height */
+@media (max-width:380px){
+  .set-hdr,.set-row{gap:4px}
+  .set-stepper button{width:28px}
+  .set-val,.set-val-input{font-size:15px}
+}
 .set-check{width:44px;height:44px;border-radius:10px;border:none;background:var(--surf2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:all .2s;font-size:18px}
 .set-check.active-check{background:var(--accent);color:#1A0800;box-shadow:0 4px 14px rgba(255,107,53,.3)}
 .set-check.done-check{background:var(--success);color:#0A1A0F}
@@ -97,8 +107,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .set-beating{color:var(--accent);font-weight:700;letter-spacing:.06em;display:flex;align-items:center;gap:3px}
 .set-beat{color:var(--success);font-weight:700;letter-spacing:.06em}
 /* Rest strip — top banner */
-.rest-strip{background:var(--accent-mute);border-bottom:1px solid var(--accent);padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:restSlide .35s cubic-bezier(.32,.72,0,1)}
-.rest-strip.done{background:var(--success-dim);border-bottom-color:var(--success)}
+/* Opaque: the strip is fixed over scrolling content, so a tint alone leaves both unreadable */
+.rest-strip{background:var(--surf);border-bottom:1px solid var(--accent);padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:restSlide .35s cubic-bezier(.32,.72,0,1)}
+.rest-strip.done{border-bottom-color:var(--success)}
 .rest-strip-fill{position:absolute;left:0;top:0;bottom:0;background:rgba(255,107,53,.14);transition:width 1s linear;z-index:0}
 .rest-strip.done .rest-strip-fill{background:rgba(91,196,137,.12)}
 .rest-strip-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%}
@@ -221,8 +232,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .modal-overlay.open{display:flex}
 .modal{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--text)}
-input[type=date],input[type=number],input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
-input[type=date]:focus,input[type=number]:focus{outline:none;border-color:var(--border2)}
+/* Standalone form inputs only. The in-row set controls style themselves — without the
+   :not() they'd win on specificity here and inherit 12px padding + a border, which clips
+   the number inside the stepper. */
+input[type=date],input[type=number]:not(.set-val-input):not(.set-input),input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
+input[type=date]:focus,input[type=number]:not(.set-val-input):not(.set-input):focus{outline:none;border-color:var(--border2)}
 input[type=date]{color-scheme:dark}
 .complete-btn{background:var(--accent);color:#1A0800;border:none;border-radius:var(--r-sm);padding:15px;font-size:15px;font-weight:700;font-family:var(--sans);width:100%;cursor:pointer;margin-top:14px;box-shadow:0 8px 28px rgba(255,107,53,.3);position:relative;z-index:50}
 .complete-btn:active{transform:scale(.98)}
@@ -1246,8 +1260,8 @@ function recordExerciseHistory(exName, sets, week) {
 
 function getLastSession(exName) {
   const hist = (S.exHistory[exName] || []);
-  if (hist.length < 2) return null; // need at least 2 — today and a previous
-  // Return most recent entry that isn't today
+  // Most recent entry that isn't today. Filtering today out is the whole guard — requiring
+  // two entries hid the previous session for anyone with exactly one prior session logged.
   const prev = [...hist].filter(e => e.date !== todayStr()).sort((a,b) => b.date.localeCompare(a.date));
   return prev[0] || null;
 }
@@ -1382,6 +1396,7 @@ function showConfirm(title, body, onOk, onCancel) {
   const okBtn = document.getElementById('confirm-ok');
   // Replace button to clear any previous listeners
   const fresh = okBtn.cloneNode(true);
+  fresh.textContent = 'OK'; // showPrompt() renames this button to "Save"
   okBtn.parentNode.replaceChild(fresh, okBtn);
   fresh.onclick = () => {
     closeModal('modal-confirm');
@@ -2064,9 +2079,9 @@ function renderToday(){
 
       // Header row — columns depend on exercise type
       if(timeBased){
-        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">DURATION</span><span class="set-hdr-lbl">DONE</span><span></span></div>`;
+        html+=`<div class="sets-area"><div class="set-hdr"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">DURATION</span><span class="set-hdr-lbl">DONE</span><span></span></div>`;
       }else if(bwOnly){
-        html+=`<div class="sets-area"><div class="set-hdr" style="grid-template-columns:30px 1fr 44px"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
+        html+=`<div class="sets-area"><div class="set-hdr bw-cols"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
       }else{
         html+=`<div class="sets-area"><div class="set-hdr"><span class="set-hdr-lbl">SET</span><span class="set-hdr-lbl">WEIGHT</span><span class="set-hdr-lbl">REPS</span><span></span></div>`;
       }
@@ -2083,10 +2098,12 @@ function renderToday(){
         const isActive=!isDone&&si===firstUndone;
         const tgt=rec?rec.kg:null;
         const wv=parseFloat(s.weight)||0;
-        // Auto-carry display: pre-fill from previous set; tgt only as placeholder for set 1
+        // Auto-carry display: pre-fill from previous set; tgt only as placeholder for set 1.
+        // Null-aware (not truthy) so a logged 0 shows as 0, and so what the box displays is
+        // exactly what toggleDone() commits — the two must not diverge.
         const prevS=si>0?(exLog[si-1]||{}):{};
-        const inputW=s.weight||(si>0&&prevS.weight?prevS.weight:'');
-        const inputR=s.reps||(si>0&&prevS.reps?prevS.reps:'');
+        const inputW=s.weight!=null?s.weight:(prevS.weight!=null?prevS.weight:'');
+        const inputR=s.reps!=null?s.reps:(prevS.reps!=null?prevS.reps:'');
         const wtPlaceholder=tgt?`${tgt}kg`:'kg';
         // Base for steppers — use displayed value so carry/target is the step-from point
         const stepWBase=parseFloat(inputW)||(tgt||0);
@@ -2118,18 +2135,18 @@ function renderToday(){
         const exKey=ex.n.replace(/'/g,"\\'");
 
         if(timeBased){
-          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 1fr 44px">
+          html+=`<div class="set-row ${rowClass}">
             <div class="set-num ${numClass}">${si+1}</div>
             <div style="font-size:12px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:4px 8px;text-align:center">${ex.reps}</div>
-            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${s.reps||''}" onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+            <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${inputR}" oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
           </div>`;
         }else if(bwOnly){
-          html+=`<div class="set-row ${rowClass}" style="grid-template-columns:30px 1fr 44px">
+          html+=`<div class="set-row bw-cols ${rowClass}">
             <div class="set-num ${numClass}">${si+1}</div>
             <div class="set-stepper">
               <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
@@ -2140,12 +2157,12 @@ function renderToday(){
             <div class="set-num ${numClass}">${si+1}</div>
             <div class="set-stepper">
               <button onclick="stepWeight(${w},${di},${ei},${si},-2.5,${stepWBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="decimal" placeholder="${wtPlaceholder}" value="${inputW}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'weight',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="decimal" placeholder="${wtPlaceholder}" value="${inputW}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'weight',this.value)">
               <button onclick="stepWeight(${w},${di},${ei},${si},2.5,${stepWBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <div class="set-stepper">
               <button onclick="stepReps(${w},${di},${ei},${si},-1,${stepRBase})" ${isDone?'disabled':''}>−</button>
-              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} onchange="logField(${w},${di},${ei},${si},'reps',this.value)">
+              <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
             <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
@@ -2191,11 +2208,15 @@ function renderToday(){
   renderStickyTimer();
 }
 
+// Fires on every keystroke (oninput). Committing per-keystroke rather than on blur means a
+// value can't be lost when the next tap re-renders the row or ticks the set off.
 function logField(w,di,ei,si,f,v){
+  const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};
+  // Emptying the box clears the value instead of leaving the previous one stranded in state
+  if(String(v).trim()===''){delete l[ei][si][f];setLog(w,di,l);return;}
   // E1-9: Validate input before storing — ignore NaN and negative values
   const parsed=f==='weight'?parseFloat(v):parseInt(v);
   if(isNaN(parsed)||parsed<0)return;
-  const l=getLog(w,di);if(!l[ei])l[ei]={};if(!l[ei][si])l[ei][si]={};
   l[ei][si][f]=parsed;setLog(w,di,l);
 }
 
@@ -2203,14 +2224,19 @@ function logField(w,di,ei,si,f,v){
 const sessionPRsFlashed = {};
 
 function toggleDone(w,di,ei,si,restSecs,exName){
+  // Commit anything still being typed before reading state, and drop the keyboard
+  const ae=document.activeElement;
+  if(ae&&ae.tagName==='INPUT'&&ae.closest&&ae.closest('.set-row'))ae.blur();
   const l=getLog(w,di);
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   const wasDone=l[ei][si].done;
-  // Auto-carry weight+reps from previous set when marking done with no values entered
-  if(!wasDone&&!l[ei][si].weight&&!l[ei][si].reps&&si>0&&l[ei][si-1]){
-    if(l[ei][si-1].weight) l[ei][si].weight=String(l[ei][si-1].weight);
-    if(l[ei][si-1].reps) l[ei][si].reps=String(l[ei][si-1].reps);
+  // Commit the carried-forward values the row was already displaying. Weight and reps carry
+  // independently: entering one of them must not leave the other unlogged.
+  if(!wasDone&&si>0&&l[ei][si-1]){
+    const prev=l[ei][si-1];
+    if(l[ei][si].weight==null&&prev.weight!=null) l[ei][si].weight=prev.weight;
+    if(l[ei][si].reps==null&&prev.reps!=null) l[ei][si].reps=prev.reps;
   }
   l[ei][si].done=!wasDone;
   setLog(w,di,l);
@@ -2264,7 +2290,8 @@ function stepWeight(w,di,ei,si,delta,base){
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   if(l[ei][si].done)return;
-  const cur=parseFloat(l[ei][si].weight)||(base||0);
+  const stored=parseFloat(l[ei][si].weight);
+  const cur=Number.isFinite(stored)?stored:(base||0);
   l[ei][si].weight=Math.max(0,Math.round((cur+delta)*4)/4);
   setLog(w,di,l);
   renderToday();
@@ -2275,10 +2302,21 @@ function stepReps(w,di,ei,si,delta,base){
   if(!l[ei])l[ei]={};
   if(!l[ei][si])l[ei][si]={};
   if(l[ei][si].done)return;
-  const cur=parseInt(l[ei][si].reps)||(base||0);
+  const stored=parseInt(l[ei][si].reps);
+  const cur=Number.isFinite(stored)?stored:(base||0);
   l[ei][si].reps=Math.max(0,cur+delta);
   setLog(w,di,l);
   renderToday();
+}
+
+// Renders whatever of weight/reps is actually logged, so a missing value can't reach the
+// overlay as the string "null". Reps stay unlabelled — the same field holds reps for
+// bodyweight sets and seconds for holds.
+function setValueText(weight,reps){
+  if(weight&&reps) return `${weight} kg × ${reps}`;
+  if(weight) return `${weight} kg`;
+  if(reps) return `${reps}`;
+  return 'Logged';
 }
 
 function showPRFlash(exName, weight, reps){
@@ -2291,7 +2329,7 @@ function showPRFlash(exName, weight, reps){
     <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
     <div style="flex:1;min-width:0">
       <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
-      <div style="font-size:18px;font-weight:700;color:#1A0800;letter-spacing:-.01em;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''} ${reps||''} ${exName}</div>
+      <div style="font-size:18px;font-weight:700;color:#1A0800;letter-spacing:-.01em;font-family:var(--mono);font-variant-numeric:tabular-nums">${setValueText(weight,reps)} · ${exName}</div>
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -2303,12 +2341,13 @@ function showSetFlash(weight, reps, isPR, vsLast){
   const el=document.createElement('div');
   el.className='flash-overlay';
   const addedVol=weight&&reps?Math.round(weight*reps):0;
+  const valTxt=setValueText(weight,reps);
   if(isPR){
     el.innerHTML=`<div class="flash-box" style="background:linear-gradient(135deg,var(--accent),#FFA257);border:1px solid var(--accent);box-shadow:0 16px 48px rgba(255,107,53,.4)">
       <div class="flash-icon" style="background:rgba(0,0,0,.18);color:#1A0800">🏆</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:#1A0800;margin-bottom:3px">NEW PR · LOCKED IN</div>
-        <div style="font-size:18px;font-weight:700;color:#1A0800;font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}</div>
+        <div style="font-size:18px;font-weight:700;color:#1A0800;font-family:var(--mono);font-variant-numeric:tabular-nums">${valTxt}</div>
       </div>
     </div>`;
   }else{
@@ -2316,7 +2355,7 @@ function showSetFlash(weight, reps, isPR, vsLast){
       <div class="flash-icon" style="background:var(--success-dim);color:var(--success)">✓</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-family:var(--mono);font-weight:700;letter-spacing:.14em;color:var(--success);margin-bottom:3px">SET LOCKED IN</div>
-        <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums">${weight?weight+' kg × ':''}${reps}${addedVol>0?`<span style="font-size:12px;font-weight:400;opacity:.6;margin-left:6px;font-family:var(--sans)">+${addedVol} kg</span>`:''}
+        <div style="font-size:18px;font-weight:700;color:var(--text);font-family:var(--mono);font-variant-numeric:tabular-nums">${valTxt}${addedVol>0?`<span style="font-size:12px;font-weight:400;opacity:.6;margin-left:6px;font-family:var(--sans)">+${addedVol} kg</span>`:''}
         </div>
         ${vsLast&&vsLast>0?`<div style="font-size:11px;color:var(--accent);font-weight:600;margin-top:3px;display:flex;align-items:center;gap:4px">▲ +${vsLast}% vs last time</div>`:''}
       </div>

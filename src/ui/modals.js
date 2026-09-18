@@ -37,6 +37,7 @@ function showConfirm(title, body, onOk, onCancel) {
   const okBtn = document.getElementById('confirm-ok');
   // Replace button to clear any previous listeners
   const fresh = okBtn.cloneNode(true);
+  fresh.textContent = 'OK'; // showPrompt() renames this button to "Save"
   okBtn.parentNode.replaceChild(fresh, okBtn);
   fresh.onclick = () => {
     closeModal('modal-confirm');

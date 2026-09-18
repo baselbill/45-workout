@@ -25,8 +25,8 @@ function recordExerciseHistory(exName, sets, week) {
 
 function getLastSession(exName) {
   const hist = (S.exHistory[exName] || []);
-  if (hist.length < 2) return null; // need at least 2 — today and a previous
-  // Return most recent entry that isn't today
+  // Most recent entry that isn't today. Filtering today out is the whole guard — requiring
+  // two entries hid the previous session for anyone with exactly one prior session logged.
   const prev = [...hist].filter(e => e.date !== todayStr()).sort((a,b) => b.date.localeCompare(a.date));
   return prev[0] || null;
 }

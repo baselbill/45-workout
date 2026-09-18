@@ -52,23 +52,27 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .help-btn{width:36px;height:36px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surf2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);flex-shrink:0;margin-left:6px;vertical-align:middle}
 /* Set logging — stepper style */
 .sets-area{margin-top:12px}
-.set-hdr{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;padding:0 2px;margin-bottom:4px}
+/* Weight column is wider than reps: weights run to 5 chars ("102.5"), reps to 2. */
+.set-hdr{display:grid;grid-template-columns:28px 1.1fr .9fr 44px;gap:6px;padding:0 2px;margin-bottom:4px}
 .set-hdr-lbl{font-size:10px;font-family:var(--mono);font-weight:600;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase;text-align:center}
 .set-hdr-lbl:first-child{text-align:left}
-.set-row{display:grid;grid-template-columns:30px 1fr 1fr 44px;gap:8px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
+.set-row{display:grid;grid-template-columns:28px 1.1fr .9fr 44px;gap:6px;align-items:center;margin-bottom:6px;padding:6px 2px;border-radius:10px;border:1px solid transparent;transition:all .2s}
+/* Bodyweight sets have no weight column */
+.set-hdr.bw-cols,.set-row.bw-cols{grid-template-columns:28px 1fr 44px}
 .set-row.active-set{background:var(--accent-mute);border-color:var(--accent-dim)}
-.set-row.done-set{opacity:.7}
-.done-set .set-stepper,.done-set .set-val-input{opacity:.5;pointer-events:none}
-.set-num{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
+.set-row.done-set{opacity:.85}
+.done-set .set-stepper{pointer-events:none}
+.done-set .set-stepper button{opacity:.25}
+.set-num{width:28px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--mono);background:var(--surf2);color:var(--muted);flex-shrink:0}
 .set-num.active{background:var(--accent-dim);color:var(--accent)}
 .set-num.done{background:var(--success-dim);color:var(--success)}
-.set-stepper{display:flex;align-items:center;background:var(--surf2);border-radius:9px;height:44px;padding:0 4px;overflow:hidden}
-.set-stepper button{width:36px;height:44px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color .1s;flex-shrink:0}
+.set-stepper{display:flex;align-items:center;background:var(--surf2);border-radius:9px;height:44px;padding:0 2px;overflow:hidden}
+.set-stepper button{width:32px;height:44px;border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:color .1s;flex-shrink:0}
 .set-stepper button:active{color:var(--text)}
 .set-stepper button:disabled{opacity:.3;cursor:default}
-.set-val{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;min-width:0}
+.set-val{flex:1;text-align:center;font-size:16px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;min-width:0}
 .set-val.done-val{color:var(--success)}
-.set-val-input{flex:1;text-align:center;font-size:17px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;background:transparent;border:none;min-width:0;-webkit-appearance:none;width:100%}
+.set-val-input{flex:1;text-align:center;font-size:16px;font-weight:600;font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums;background:transparent;border:none;min-width:0;padding:0;-webkit-appearance:none;width:100%}
 .set-val-input:focus{outline:none;color:var(--accent)}
 .set-val-input::placeholder{color:var(--muted2);font-weight:400;font-size:14px}
 .set-val-input.done-val{color:var(--success)}
@@ -77,6 +81,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .set-input{flex:1;padding:8px 6px;font-size:14px;font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);text-align:center;min-width:0;-webkit-appearance:none}
 .set-input:focus{outline:none;border-color:var(--border2)}.set-input::placeholder{color:var(--muted2);font-size:11px}
 .set-input.on-target{border-color:rgba(91,196,137,.5)}.set-input.off-target{border-color:rgba(231,106,106,.4)}
+/* Small phones: trade stepper button width for digits, keeping 44px tap height */
+@media (max-width:380px){
+  .set-hdr,.set-row{gap:4px}
+  .set-stepper button{width:28px}
+  .set-val,.set-val-input{font-size:15px}
+}
 .set-check{width:44px;height:44px;border-radius:10px;border:none;background:var(--surf2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted);transition:all .2s;font-size:18px}
 .set-check.active-check{background:var(--accent);color:#1A0800;box-shadow:0 4px 14px rgba(255,107,53,.3)}
 .set-check.done-check{background:var(--success);color:#0A1A0F}
@@ -84,8 +94,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .set-beating{color:var(--accent);font-weight:700;letter-spacing:.06em;display:flex;align-items:center;gap:3px}
 .set-beat{color:var(--success);font-weight:700;letter-spacing:.06em}
 /* Rest strip — top banner */
-.rest-strip{background:var(--accent-mute);border-bottom:1px solid var(--accent);padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:restSlide .35s cubic-bezier(.32,.72,0,1)}
-.rest-strip.done{background:var(--success-dim);border-bottom-color:var(--success)}
+/* Opaque: the strip is fixed over scrolling content, so a tint alone leaves both unreadable */
+.rest-strip{background:var(--surf);border-bottom:1px solid var(--accent);padding:12px 16px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;animation:restSlide .35s cubic-bezier(.32,.72,0,1)}
+.rest-strip.done{border-bottom-color:var(--success)}
 .rest-strip-fill{position:absolute;left:0;top:0;bottom:0;background:rgba(255,107,53,.14);transition:width 1s linear;z-index:0}
 .rest-strip.done .rest-strip-fill{background:rgba(91,196,137,.12)}
 .rest-strip-inner{position:relative;z-index:1;display:flex;align-items:center;gap:12px;width:100%}
@@ -208,8 +219,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .modal-overlay.open{display:flex}
 .modal{background:var(--surf);border-radius:var(--r) var(--r) 0 0;padding:24px 20px max(24px,env(safe-area-inset-bottom));width:100%;max-width:480px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--text)}
-input[type=date],input[type=number],input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
-input[type=date]:focus,input[type=number]:focus{outline:none;border-color:var(--border2)}
+/* Standalone form inputs only. The in-row set controls style themselves — without the
+   :not() they'd win on specificity here and inherit 12px padding + a border, which clips
+   the number inside the stepper. */
+input[type=date],input[type=number]:not(.set-val-input):not(.set-input),input[type=text]{font-family:var(--mono);background:var(--surf2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);padding:10px 12px;font-size:14px;width:100%}
+input[type=date]:focus,input[type=number]:not(.set-val-input):not(.set-input):focus{outline:none;border-color:var(--border2)}
 input[type=date]{color-scheme:dark}
 .complete-btn{background:var(--accent);color:#1A0800;border:none;border-radius:var(--r-sm);padding:15px;font-size:15px;font-weight:700;font-family:var(--sans);width:100%;cursor:pointer;margin-top:14px;box-shadow:0 8px 28px rgba(255,107,53,.3);position:relative;z-index:50}
 .complete-btn:active{transform:scale(.98)}
