@@ -18,6 +18,15 @@ function toggleAwayMode(){
   renderToday();
 }
 
+// Once a set is marked done, the exercise's required-sets count is locked into the log
+// (l[ei]._sets) so a later away-mode switch can't retroactively raise or lower how many
+// sets are needed — a substitute's prescribed volume is independent of the gym exercise's,
+// so without this, sets already checked off could stop counting toward completion.
+function lockedSets(log,ei,liveSets){
+  const l=log[ei];
+  return (l&&l._sets!=null)?l._sets:liveSets;
+}
+
 // ─── TODAY ────────────────────────────────────────────────────────────────────
 let viewingSession=null;
 let _missedBannerDismissedCount=-1; // count at time of dismiss; -1 means not dismissed
@@ -232,7 +241,7 @@ function renderToday(){
 
   let doneSets=0,totalSets=0;
   // E1-8: Cap each exercise set count at 20 to guard against corrupted ex.sets values
-  exercises.forEach((ex,ei)=>{const sc=Math.min(ex.sets||0,20);totalSets+=sc;const el=log[ei]||{};for(let si=0;si<sc;si++)if(el[si]&&el[si].done)doneSets++;});
+  exercises.forEach((ex,ei)=>{const sc=Math.min(lockedSets(log,ei,ex.sets)||0,20);totalSets+=sc;const el=log[ei]||{};for(let si=0;si<sc;si++)if(el[si]&&el[si].done)doneSets++;});
   const pct=totalSets>0?Math.round(doneSets/totalSets*100):0,allDone=pct===100&&!alreadyCompleted;
 
   let html='';
@@ -267,8 +276,9 @@ function renderToday(){
     exercises.forEach((ex,ei)=>{
       const exLog=log[ei]||{};
       const doneCnt=Object.values(exLog).filter(s=>s&&s.done).length;
-      const pctEx=Math.round(doneCnt/ex.sets*100);
-      const isCur=ei===exercises.findIndex((_,i)=>{const el2=log[i]||{};return Object.values(el2).filter(s=>s&&s.done).length<exercises[i].sets;});
+      const sc=lockedSets(log,ei,ex.sets);
+      const pctEx=sc>0?Math.round(doneCnt/sc*100):0;
+      const isCur=ei===exercises.findIndex((_,i)=>{const el2=log[i]||{};return Object.values(el2).filter(s=>s&&s.done).length<lockedSets(log,i,exercises[i].sets);});
       const fillColor=pctEx===100?'var(--success)':isCur?'var(--accent)':'var(--muted)';
       html+=`<div class="seg-prog-item"><div class="seg-prog-fill" style="width:${pctEx}%;background:${fillColor}"></div>${isCur&&pctEx<100?`<div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:var(--accent);box-shadow:0 0 6px var(--accent)"></div>`:''}</div>`;
     });
@@ -328,7 +338,10 @@ function renderToday(){
   // Exercises
   exercises.forEach((ex,ei)=>{
     const exLog=log[ei]||{};
-    const exAllDone=!alreadyCompleted&&Object.values(exLog).filter(v=>v&&v.done).length>=ex.sets;
+    // Effective required sets for this exercise slot — locked to whatever was in play when
+    // the user first checked a set off, so a mode switch can't move the goalposts.
+    const effSc=lockedSets(log,ei,ex.sets);
+    const exAllDone=!alreadyCompleted&&Object.values(exLog).filter(v=>v&&v.done).length>=effSc;
     const rec=ex.isAway?null:getExRec(ex);
     const ref=EXREF[ex.n];
     const isAway=!!ex.isAway;
@@ -336,7 +349,7 @@ function renderToday(){
     html+=`<div class="ex-card${exAllDone?' done':''}${isAway?' away-ex':''}">`;
     // For away exercises, fold the strength level into the detail line as a small badge
     const awayLvlBadge=isAway&&ex.ratio!=null?`<span style="font-size:10px;font-family:var(--mono);color:${getStrengthLevel(ex.ratio).color};margin-left:6px">${getStrengthLevel(ex.ratio).label}</span>`:'';
-    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${ex.sets} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" aria-label="How to do this exercise" title="How to do this exercise" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
+    html+=`<div class="row" style="align-items:flex-start"><div style="flex:1"><div class="ex-name">${ex.n}${ex.ss?'<span class="ss-badge">superset</span>':''}${isAway?'<span class="away-badge">✈</span>':''}</div><div class="ex-detail">${effSc} sets · ${ex.reps} · ${ex.load}${ex.rest>0?' · '+ex.rest+'s rest':''}${awayLvlBadge}</div></div>${ref?`<button class="help-btn" aria-label="How to do this exercise" title="How to do this exercise" onclick="openRef('${ex.n.replace(/'/g,"\\'")}')">?</button>`:''}</div>`;
 
     // Weight rec — gym only; away exercises need no separate box
     if(!isAway&&rec){
@@ -374,7 +387,7 @@ function renderToday(){
 
       // Find first undone set (for active-set highlight)
       // E1-8: Cap at 20 sets to prevent infinite render loops from corrupted data
-      const setCount=Math.min(ex.sets||0,20);
+      const setCount=Math.min(effSc||0,20);
       let firstUndone=-1;
       for(let si=0;si<setCount;si++){if(!(exLog[si]&&exLog[si].done)){firstUndone=si;break;}}
 
@@ -425,7 +438,7 @@ function renderToday(){
             <div class="set-num ${numClass}">${si+1}</div>
             <div style="font-size:12px;font-family:var(--mono);color:var(--accent);background:var(--accent-dim);border-radius:6px;padding:4px 8px;text-align:center">${ex.reps}</div>
             <input class="set-input" type="number" inputmode="numeric" placeholder="sec held" value="${inputR}" oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
-            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}',${effSc})">${checkIcon}</button>
           </div>`;
         }else if(bwOnly){
           html+=`<div class="set-row bw-cols ${rowClass}">
@@ -435,7 +448,7 @@ function renderToday(){
               <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
-            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}',${effSc})">${checkIcon}</button>
           </div>
           ${vsLastHtml}`;
         }else{
@@ -451,7 +464,7 @@ function renderToday(){
               <input class="set-val-input${isDone?' done-val':''}" type="number" inputmode="numeric" placeholder="reps" value="${inputR}" ${isDone?'readonly':''} oninput="logField(${w},${di},${ei},${si},'reps',this.value)">
               <button onclick="stepReps(${w},${di},${ei},${si},1,${stepRBase})" ${isDone?'disabled':''}>+</button>
             </div>
-            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}')">${checkIcon}</button>
+            <button class="set-check ${checkClass}" onclick="toggleDone(${w},${di},${ei},${si},${ex.rest||0},'${exKey}',${effSc})">${checkIcon}</button>
           </div>
           ${vsLastHtml}`;
         }
@@ -461,7 +474,7 @@ function renderToday(){
     }else{
       let hasData=false;
       // E1-8: Cap at 20 sets to guard against corrupted data
-      const setCountDone=Math.min(ex.sets||0,20);
+      const setCountDone=Math.min(effSc||0,20);
       for(let si=0;si<setCountDone;si++){const s=exLog[si]||{};if(s.weight||s.reps)hasData=true;}
       if(hasData){
         html+=`<div class="sets-area">`;
@@ -509,12 +522,14 @@ function logField(w,di,ei,si,f,v){
 // Track within-session PRs to avoid repeated flashes for same weight
 const sessionPRsFlashed = {};
 
-function toggleDone(w,di,ei,si,restSecs,exName){
+function toggleDone(w,di,ei,si,restSecs,exName,liveSets){
   // Commit anything still being typed before reading state, and drop the keyboard
   const ae=document.activeElement;
   if(ae&&ae.tagName==='INPUT'&&ae.closest&&ae.closest('.set-row'))ae.blur();
   const l=getLog(w,di);
   if(!l[ei])l[ei]={};
+  // Lock the exercise's required-sets count in on first interaction — see lockedSets().
+  if(l[ei]._sets==null&&liveSets!=null) l[ei]._sets=liveSets;
   if(!l[ei][si])l[ei][si]={};
   const wasDone=l[ei][si].done;
   // Commit the carried-forward values the row was already displaying. Weight and reps carry
@@ -556,7 +571,7 @@ function toggleDone(w,di,ei,si,restSecs,exName){
     const _pi=phaseFor(w),_phDay=P.phases[_pi].days[di];
     const _exList=_phDay.exercises.map(ex=>{if(S.awayMode){const sub=getAwayExercise(ex);return sub||ex;}return ex;});
     let _done=0,_total=0;
-    _exList.forEach((ex,ei2)=>{const sc=Math.min(ex.sets||0,20);_total+=sc;const el2=l[ei2]||{};for(let s2=0;s2<sc;s2++)if(el2[s2]&&el2[s2].done)_done++;});
+    _exList.forEach((ex,ei2)=>{const sc=Math.min(lockedSets(l,ei2,ex.sets)||0,20);_total+=sc;const el2=l[ei2]||{};for(let s2=0;s2<sc;s2++)if(el2[s2]&&el2[s2].done)_done++;});
     if(_done===_total&&_total>0){
       const _sched=getSchedule(),_entry=_sched.find(s=>s.week===w&&s.dayIdx===di),_sd=_entry?_entry.date:null;
       if(!_sd||_sd<=todayStr()){
