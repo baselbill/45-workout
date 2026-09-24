@@ -31,9 +31,9 @@ function getPRsInMonth(monthStr){
 
 function getMonthlyStats(monthStr){
   let workouts=0;
-  // E2-2: Use explicit dateKey to avoid false positives from empty-string coercion
+  // Attribute the workout to the date it was actually completed, not its scheduled date.
   Object.values(S.logs||{}).forEach(log=>{
-    const dateKey=log._scheduledDate||log._completedDate;
+    const dateKey=log._completedDate||log._scheduledDate;
     if(log._completed&&dateKey&&dateKey.startsWith(monthStr)) workouts++;
   });
   const mobility=(S.mobHistory||[]).filter(e=>e.date.startsWith(monthStr)).length;

@@ -81,10 +81,11 @@ function getLastCompletedSession(){
 // between workout days should not reset the streak.
 function getTrainingStreak(){
   const sessSet=new Set();
-  // E2-2: Use an explicit dateKey variable to avoid adding undefined/empty-string to the Set
-  // if both _scheduledDate and _completedDate are missing (legacy data without either field).
+  // Count the streak by the date work was actually done (_completedDate), not the day it
+  // was scheduled for — a late or early session still counts on the real day it happened.
+  // Falls back to _scheduledDate for legacy data saved before _completedDate existed.
   Object.values(S.logs||{}).forEach(log=>{
-    const dateKey=log._scheduledDate||log._completedDate;
+    const dateKey=log._completedDate||log._scheduledDate;
     if(log._completed&&dateKey)sessSet.add(dateKey);
   });
   const mobSet=new Set((S.mobHistory||[]).map(e=>e.date));

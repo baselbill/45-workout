@@ -72,6 +72,7 @@ function renderCalendar(){
   const monthName=firstDay.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const streak=getTrainingStreak();
   const mobDoneSet=new Set((S.mobHistory||[]).map(e=>e.date));
+  const completions=getCompletionsByDate();
 
   // Phase journey strip
   const phDefs=[
@@ -115,13 +116,17 @@ function renderCalendar(){
   for(let i=0;i<7;i++){
     const dd=new Date(weekStart);dd.setDate(weekStart.getDate()+i);
     const ds=dateStr(dd),isT=ds===today;
+    // Prefer whatever was actually completed on this date over the day's scheduled slot —
+    // a session logged late (or early) shows as done on the day it really happened.
+    const doneHere=completions[ds];
     const sess=sched.find(s=>s.date===ds),hasMob=mobDoneSet.has(ds);
     let bg='var(--surf2)',col='var(--muted2)',ring='',oc='',lbl='';
-    if(sess){
-      const log=getLog(sess.week,sess.dayIdx);
-      const done=log._completed;
-      if(done){bg='rgba(91,196,137,0.15)';col='var(--success)';}
-      else if(isT){bg='var(--accent)';col='#1A0800';}
+    if(doneHere){
+      bg='rgba(91,196,137,0.15)';col='var(--success)';
+      lbl=(doneHere.dayIdx===1?'L':'U')+(doneHere.log._awayMode?' ✈':'');
+      oc=`onclick="jumpTo(${doneHere.week},${doneHere.dayIdx});showScreenById('today')"`;
+    }else if(sess){
+      if(isT){bg='var(--accent)';col='#1A0800';}
       else if(ds<today){bg='rgba(231,106,106,0.10)';col='var(--red)';}
       else{bg='rgba(255,255,255,0.05)';col='var(--muted)';}
       oc=`onclick="jumpTo(${sess.week},${sess.dayIdx});showScreenById('today')"`;
@@ -141,20 +146,23 @@ function renderCalendar(){
     const date=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const entry=sched.find(s=>s.date===date),isToday=date===today,isFut=date>today;
     const hasMobDone=mobDoneSet.has(date);
+    // A session is shown as "completed" on the date it was ACTUALLY done (_completedDate),
+    // not the day it was originally scheduled for. That means a session finished late (or
+    // early) renders under the real day the work happened; its old scheduled slot — if
+    // still un-worked — falls through to the missed/upcoming states below.
+    const doneHere=completions[date];
     let cls='',label='';
-    if(entry){
-      const doneLog=S.logs[dayKey(entry.week,entry.dayIdx)]||{};
-      // E1-1: A session appears as "completed" on its SCHEDULED date.
-      // Primary check: _scheduledDate===date (set by completeSession() since v7).
-      // Fallback: legacy data without _scheduledDate uses _completedDate===date.
-      // This correctly handles late completions (scheduled Wed, done Thu) by always
-      // rendering completion on the scheduled date, not the actual completion date.
-      const done=!!doneLog._completed&&(doneLog._scheduledDate===date||(!doneLog._scheduledDate&&doneLog._completedDate===date)),wasAway=!!doneLog._awayMode;
-      cls=done?(wasAway?'completed-away':'completed'):isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
-      label=(entry.dayIdx===1?'L':'U')+(entry.dayIdx+1)+(wasAway&&done?' ✈':'');
+    if(doneHere){
+      const wasAway=!!doneHere.log._awayMode;
+      cls=wasAway?'completed-away':'completed';
+      label=(doneHere.dayIdx===1?'L':'U')+(doneHere.dayIdx+1)+(wasAway?' ✈':'');
+    }else if(entry){
+      cls=isToday?'today-workout':isFut?'has-workout future':'missed has-workout';
+      label=(entry.dayIdx===1?'L':'U')+(entry.dayIdx+1);
     }else if(isToday){cls='today-rest';label=hasMobDone?'◆':'';
     }else if(!isFut){label=hasMobDone?'◆':'';if(hasMobDone)cls='has-workout';}
-    const oc=entry?`onclick="jumpTo(${entry.week},${entry.dayIdx});showScreenById('today')"`:hasMobDone?`onclick="showScreen('mobility',document.querySelectorAll('.nav-item')[4])"`:'' ;
+    const jump=doneHere||entry;
+    const oc=jump?`onclick="jumpTo(${jump.week},${jump.dayIdx});showScreenById('today')"`:hasMobDone?`onclick="showScreen('mobility',document.querySelectorAll('.nav-item')[4])"`:'' ;
     html+=`<div class="cal-day ${cls}" ${oc} style="${hasMobDone&&!entry?'border:1px solid rgba(167,139,250,.4);background:rgba(167,139,250,.08)':''}"><span>${d}</span>${label?`<span style="font-size:8px;margin-top:1px;opacity:.85">${label}</span>`:''}</div>`;
   }
   html+=`</div>`;

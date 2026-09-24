@@ -6,6 +6,23 @@ function getLog(w, d) { return S.logs[dayKey(w,d)] || {}; }
 function setLog(w, d, data) { S.logs[dayKey(w,d)] = data; saveState(); }
 function isSessionDone(w, d) { return !!(S.logs[dayKey(w,d)] || {})._completed; }
 
+// Map of calendar date -> {week, dayIdx, log} for every completed session, keyed by the
+// ACTUAL date the work was done (_completedDate), not the day it was originally scheduled
+// for. Used by the calendar/streak/stats views so a late or early completion is recorded
+// on the day it really happened, not the day it was supposed to happen.
+function getCompletionsByDate() {
+  const map = {};
+  Object.entries(S.logs || {}).forEach(([key, log]) => {
+    if (!log || !log._completed) return;
+    const date = log._completedDate || log._scheduledDate;
+    if (!date) return;
+    const m = key.match(/^w(\d+)d(\d+)$/);
+    if (!m) return;
+    map[date] = { week: parseInt(m[1], 10), dayIdx: parseInt(m[2], 10), log };
+  });
+  return map;
+}
+
 function completeSession(w, di, schedDate) {
   const today = todayStr();
   // Guard against string 'null' or invalid dates from onclick interpolation
