@@ -58,6 +58,13 @@ Stored in `S` (global state object) in localStorage:
 
 ## Recent Fixes
 
+### "Mark Session Complete" Stuck Inactive After Away-Mode Switch (Current)
+**Bug:** Session showed 100% complete, then dropped below 100% (button greyed out) after toggling Away Mode mid-session — even though the confirm dialog promises "Your logged sets will stay."
+**Root cause:** Each exercise's required-sets count came live from `ex.sets`, which differs between the gym exercise and its away substitute (`getAwayExercise()` derives sets from a strength-ratio bucket, entirely independent of the gym version's count — e.g. gym "Plank Shoulder Taps" wants 2 sets, its away substitute wants 3). Switching modes recomputed the requirement on the fly, so a fully-done exercise could suddenly need one more set of work it had already finished — and in the opposite direction, a logged 4th set could vanish from the UI entirely if the substitute only rendered 3 rows.
+**Fix:**
+- Added `lockedSets(log,ei,liveSets)` (`today.js`): once a set is first marked done, `toggleDone()` locks that exercise's required-sets count into the log as `l[ei]._sets`. Every place that previously read `ex.sets` for completion math (totals, per-exercise progress, the "all sets complete" badge, row count, the header's "N sets" text, and the auto-complete check inside `toggleDone()` itself) now reads the locked value when one exists, falling back to the live mode's count for exercises not yet touched.
+- Exercises with no logged sets yet still swap to the new mode's exercise and set count normally — only already-worked-on exercises are pinned.
+
 ### Set Logging Lost Weight/Reps ("null") (Current)
 **Bug:** Ticking a set sometimes logged nothing, or logged reps but not weight. Only fix was to untick and redo.
 **Root cause:** Three compounding issues.
