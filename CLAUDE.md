@@ -58,7 +58,15 @@ Stored in `S` (global state object) in localStorage:
 
 ## Recent Fixes
 
-### "Mark Session Complete" Stuck Inactive After Away-Mode Switch (Current)
+### Calendar Recorded Completions on the Scheduled Date, Not the Actual Day Worked (Current)
+**Bug:** If a session was logged late (or early) — say scheduled for Wednesday but actually done Friday — the calendar, streak, and monthly stats all showed the workout on Wednesday, not Friday. The day the work really happened showed as blank (or "missed" once it passed).
+**Root cause:** `completeSession()` already stored both `_scheduledDate` and `_completedDate` on the log, but every read site (`calendar.js`'s month grid and "This week" strip, `getTrainingStreak()`, `getMonthlyStats()`) preferred `_scheduledDate` first, so the session was always attributed to its original slot regardless of when it was actually finished.
+**Fix:**
+- Added `getCompletionsByDate()` (`state/session.js`): builds a `date → {week, dayIdx, log}` map keyed by each session's `_completedDate` (falling back to `_scheduledDate` only for legacy logs missing it).
+- `calendar.js`'s month grid and "This week" strip now check this map first — a date renders as completed when a session's real completion date lands there, even if that date wasn't itself a scheduled training day (e.g. a makeup session done on an off day). A scheduled slot that's still unworked falls through to its normal missed/upcoming state instead of falsely showing done.
+- `getTrainingStreak()` (`today.js`) and `getMonthlyStats()` (`progress.js`) swapped their date-key priority to `_completedDate || _scheduledDate`, so streaks and monthly workout counts follow the same real-world day.
+
+### "Mark Session Complete" Stuck Inactive After Away-Mode Switch
 **Bug:** Session showed 100% complete, then dropped below 100% (button greyed out) after toggling Away Mode mid-session — even though the confirm dialog promises "Your logged sets will stay."
 **Root cause:** Each exercise's required-sets count came live from `ex.sets`, which differs between the gym exercise and its away substitute (`getAwayExercise()` derives sets from a strength-ratio bucket, entirely independent of the gym version's count — e.g. gym "Plank Shoulder Taps" wants 2 sets, its away substitute wants 3). Switching modes recomputed the requirement on the fly, so a fully-done exercise could suddenly need one more set of work it had already finished — and in the opposite direction, a logged 4th set could vanish from the UI entirely if the substitute only rendered 3 rows.
 **Fix:**
