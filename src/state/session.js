@@ -67,7 +67,13 @@ function completeSession(w, di, schedDate) {
   });
   saveState();
   resetSessionClock();
-  viewingSession = null;
+  // Keep showing the session that was just completed (its read-only "Undo completion" view)
+  // instead of clearing viewingSession. With it cleared, renderToday() falls through to
+  // getNextPendingSession() — since THIS session is now done, that's a different, upcoming
+  // session with nothing logged yet, so the screen would silently swap to a blank checklist
+  // right as the user finishes, with zero confirmation that anything completed. That read as
+  // "the button doesn't do anything" even though the session was in fact marked done.
+  viewingSession = { week: w, dayIdx: di };
   window.scrollTo(0, 0);
   renderToday();
 }

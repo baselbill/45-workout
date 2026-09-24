@@ -58,7 +58,12 @@ Stored in `S` (global state object) in localStorage:
 
 ## Recent Fixes
 
-### Calendar Recorded Completions on the Scheduled Date, Not the Actual Day Worked (Current)
+### "Mark Session Complete" Looked Broken — Screen Silently Jumped to a Different Day (Current)
+**Bug:** After finishing every set and tapping "Mark session complete" (or letting the built-in 1.5s auto-complete fire), the session *was* actually marked done in storage — but the Today screen instantly swapped to a completely different, unrelated session: the next upcoming training day, freshly unchecked, 0% done. The user's just-finished checklist visually vanished with no confirmation, which read as "the button doesn't do anything" (in the reported case, as the whole app appearing to freeze/not respond to any tap).
+**Root cause:** `completeSession()` set `viewingSession = null` before its final `renderToday()`. With no explicit session being viewed, `renderToday()` falls back to `getTodaySession()` — but that session is now marked done, so the fallback chain lands on `getNextPendingSession()` instead: a different, future, untouched session. The user was silently redirected away from the workout they just completed with nothing on screen acknowledging it.
+**Fix:** `completeSession()` (`state/session.js`) now sets `viewingSession = {week: w, dayIdx: di}` — the exact session just finished — instead of clearing it. `renderToday()` then renders that session's own completed/read-only summary with the "Undo completion" button, giving a clear, immediate confirmation instead of jumping elsewhere. Applies identically whether completion came from the manual button or the automatic 1.5s timer, since both call `completeSession()`.
+
+### Calendar Recorded Completions on the Scheduled Date, Not the Actual Day Worked
 **Bug:** If a session was logged late (or early) — say scheduled for Wednesday but actually done Friday — the calendar, streak, and monthly stats all showed the workout on Wednesday, not Friday. The day the work really happened showed as blank (or "missed" once it passed).
 **Root cause:** `completeSession()` already stored both `_scheduledDate` and `_completedDate` on the log, but every read site (`calendar.js`'s month grid and "This week" strip, `getTrainingStreak()`, `getMonthlyStats()`) preferred `_scheduledDate` first, so the session was always attributed to its original slot regardless of when it was actually finished.
 **Fix:**
